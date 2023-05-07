@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${default}",
+                "/home/jean/mypieces/rds/includes/",
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/g++",
+            "intelliSenseMode": "${default}",
+            "forcedInclude": []
+        }
+    ],
+    "version": 4
+}

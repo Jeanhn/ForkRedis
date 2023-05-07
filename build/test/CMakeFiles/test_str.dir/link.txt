@@ -1,0 +1,1 @@
+/usr/bin/c++ -g --coverage -pg CMakeFiles/test_str.dir/test_str.cc.o -o test_str  ../src/libredis.a /usr/local/lib/libgtest_main.a ../src/libredis.a /usr/local/lib/libgtest_main.a /usr/local/lib/libgtest.a 

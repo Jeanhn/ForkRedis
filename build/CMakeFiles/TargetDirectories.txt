@@ -1,0 +1,8 @@
+/home/jean/mypieces/rds/build/CMakeFiles/edit_cache.dir
+/home/jean/mypieces/rds/build/CMakeFiles/rebuild_cache.dir
+/home/jean/mypieces/rds/build/src/CMakeFiles/redis.dir
+/home/jean/mypieces/rds/build/src/CMakeFiles/edit_cache.dir
+/home/jean/mypieces/rds/build/src/CMakeFiles/rebuild_cache.dir
+/home/jean/mypieces/rds/build/test/CMakeFiles/test_str.dir
+/home/jean/mypieces/rds/build/test/CMakeFiles/edit_cache.dir
+/home/jean/mypieces/rds/build/test/CMakeFiles/rebuild_cache.dir

@@ -3,18 +3,6 @@
 namespace rds
 {
 
-    template <typename T, typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-    void List::PushFront(T &&data)
-    {
-        data_list_.push_front(std::forward<T>(data));
-    }
-
-    template <typename T, typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-    void List::PushBack(T &&data)
-    {
-        data_list_.push_back(std::forward<T>(data));
-    }
-
     auto List::PopFront() -> Str
     {
         if (data_list_.empty())
@@ -88,7 +76,7 @@ namespace rds
     auto List::EncodeValue() const -> std::string
     {
         std::string ret = BitsToString(data_list_.size());
-        std::for_each(std::cbegin(data_list_), std::cend(data_list_), [&ret](const Str &s)
+        std::for_each(std::cbegin(data_list_), std::cend(data_list_), [&ret](const Str &s) mutable
                       { ret.append(s.EncodeValue()); });
         return ret;
     }

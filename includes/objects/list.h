@@ -16,9 +16,17 @@ namespace rds
 
     public:
         template <typename T, typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-        void PushFront(T &&);
+        void PushFront(T &&data)
+        {
+            data_list_.push_front(std::forward<T>(data));
+        }
+
         template <typename T, typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-        void PushBack(T &&);
+        void PushBack(T &&data)
+        {
+            data_list_.push_back(std::forward<T>(data));
+        }
+
         auto PopFront() -> Str;
         auto PopBack() -> Str;
         auto Index(std::size_t) const -> Str;

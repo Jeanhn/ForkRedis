@@ -69,7 +69,7 @@ namespace rds
     auto ZSet::EncodeValue() const -> std::string
     {
         std::string ret = BitsToString(data_set_.size());
-        std::for_each(std::cbegin(ret), std::cend(ret), [&ret](const Str &s)
+        std::for_each(std::cbegin(data_set_), std::cend(data_set_), [&ret](const Str &s) mutable
                       { ret.append(s.EncodeValue()); });
         return ret;
     }

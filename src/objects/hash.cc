@@ -71,11 +71,12 @@ namespace rds
         std::string ret;
         ret.append(BitsToString(data_map_.size()));
         std::for_each(std::cbegin(data_map_), std::cend(data_map_),
-                      [&ret](const decltype(data_map_)::value_type &kv)
+                      [&ret](const decltype(data_map_)::value_type &kv) mutable
                       {
                           ret.append(kv.first.EncodeValue());
                           ret.append(kv.second.EncodeValue());
                       });
+        return ret;
     }
 
     void Hash::DecodeValue(std::deque<char> &source)

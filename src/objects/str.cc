@@ -4,6 +4,18 @@
 
 namespace rds
 {
+    void Str::TypeCheck()
+    {
+        for (auto it = data_.cbegin(); it != data_.cend(); it++)
+        {
+            if (*it < '0' || *it > '9')
+            {
+                encoding_type_ = EncodingType::STR_RAW;
+                return;
+            }
+        }
+        encoding_type_ = EncodingType::INT;
+    }
 
     auto Str::GetRaw() -> std::string &
     {
@@ -13,25 +25,33 @@ namespace rds
     void Str::Set(const std::string &data)
     {
         data_ = data;
+        TypeCheck();
     }
 
     void Str::Set(std::string &&data)
     {
         data_ = std::move(data);
+        TypeCheck();
     }
 
     void Str::Append(const std::string &data)
     {
         data_.append(data);
+        TypeCheck();
     }
 
     void Str::Append(std::string &&data)
     {
         data_.append(std::move(data));
+        TypeCheck();
     }
 
     void Str::IncrBy(int delta)
     {
+        if (encoding_type_ != EncodingType::INT)
+        {
+            return;
+        }
         int raw_int = std::stoi(data_);
         raw_int += delta;
         data_ = std::to_string(raw_int);
@@ -39,41 +59,52 @@ namespace rds
 
     void Str::DecrBy(int delta)
     {
+        if (encoding_type_ != EncodingType::INT)
+        {
+            return;
+        }
         int raw_int = std::stoi(data_);
         raw_int -= delta;
         data_ = std::to_string(raw_int);
     }
 
-    auto Str::Len() -> std::size_t
+    auto Str::Len() const -> std::size_t
     {
         return data_.size();
     }
 
-    auto Str::Empty() -> bool
+    auto Str::Empty() const -> bool
     {
         return data_.empty();
     }
 
-    template <typename T, typename =
-                              std::enable_if_t<std::is_same_v<std::string, std::decay_t<T>>, void>>
-    Str::Str(T &&data) : data_(std::forward<T>(data))
-    {
-    }
+    // template <typename T, typename =
+    //                           std::enable_if_t<std::is_same_v<std::string, std::decay_t<T>>, void>>
+    // Str::Str(T &&data) : data_(std::forward<T>(data))
+    // {
+    // }
 
     auto Str::GetObjectType() const -> ObjectType
     {
         return ObjectType::STR;
     }
 
-    auto Compress(const std::string &) -> std::string;
-    auto Decompress(const std::string &) -> std::string;
+    auto Compress(const std::string &) -> std::string
+    {
+        return {};
+    }
+    auto Decompress(const std::string &) -> std::string
+    {
+        return {};
+    }
 
     /*
     char obj-type
     [size_t len_after_compress]/[size_t len_origin]
     [int/string]value
      */
-    auto Str::EncodeValue() -> std::string
+
+    auto Str::EncodeValue() const -> std::string
     {
         std::string ret;
         // encode-type: int or string or compress-string
@@ -114,6 +145,11 @@ namespace rds
         return ret;
     }
 
+    auto Str::GetEncodingType() const -> EncodingType
+    {
+        return encoding_type_;
+    }
+
     void Str::DecodeValue(std::deque<char> &source)
     {
         EncodingType etyp = CharToEncodingType(source.front());
@@ -121,6 +157,10 @@ namespace rds
 
         assert(etyp == EncodingType::INT || etyp == EncodingType::STR_RAW);
         // assert(etyp == EncodingType::STR_COMPRESS);
+
+        encoding_type_ = etyp;
+
+        data_.clear();
 
         if (etyp == EncodingType::INT)
         {

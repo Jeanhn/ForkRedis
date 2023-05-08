@@ -17,7 +17,7 @@ namespace rds
         std::unique_ptr<Object> value_;
         std::optional<std::size_t> expire_time_stamp_;
 
-        auto KeyEncode() -> std::string;
+        auto PrefixEncode() -> std::string;
 
     public:
         auto Encode() -> std::string;
@@ -67,14 +67,13 @@ namespace rds
         void NewHash(const Str &);
 
     public:
-        auto ExportLRU() -> StrLRU *;
-
         void Del(const Str &);
         auto Get(const Str &) -> Object *;
 
         void ExpireAtTime(const Str &, std::size_t);
         void Expire(const Str &, std::size_t);
         void PExpire(const Str &, std::size_t);
+        void ExpireOut(std::size_t);
         CLASS_DEFAULT_DECLARE(Db);
     };
 

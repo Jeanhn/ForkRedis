@@ -18,15 +18,15 @@ namespace rds
         template <typename T,
                   typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
         void Add(T &&);
-        auto Card() -> std::size_t;
-        auto IsMember(const Str &) -> bool;
-        auto Members() -> std::vector<Str>;
-        auto RandMember() -> Str;
+        auto Card() const -> std::size_t;
+        auto IsMember(const Str &) const -> bool;
+        auto Members() const -> std::vector<Str>;
+        auto RandMember() const -> Str;
         auto Pop() -> Str;
         void Rem(const Str &);
 
         auto GetObjectType() const -> ObjectType override;
-        auto EncodeValue() -> std::string override;
+        auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> &) override;
 
         CLASS_DEFAULT_DECLARE(Set);

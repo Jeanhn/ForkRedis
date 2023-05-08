@@ -23,6 +23,7 @@ namespace rds
         }
         Str &s = data_list_.front();
         Str ret(std::move(s));
+        data_list_.pop_front();
         return ret;
     }
 
@@ -34,6 +35,7 @@ namespace rds
         }
         Str &s = data_list_.back();
         Str ret(std::move(s));
+        data_list_.pop_back();
         return ret;
     }
 
@@ -79,6 +81,28 @@ namespace rds
         std::advance(b, begin);
         std::advance(e, end);
         data_list_.erase(b, e);
+    }
+
+    auto List::GetObjectType() const -> ObjectType { return ObjectType::LIST; }
+
+    auto List::EncodeValue() const -> std::string
+    {
+        std::string ret = BitsToString(data_list_.size());
+        std::for_each(std::cbegin(data_list_), std::cend(data_list_), [&ret](const Str &s)
+                      { ret.append(s.EncodeValue()); });
+        return ret;
+    }
+
+    void List::DecodeValue(std::deque<char> &source)
+    {
+        std::size_t len = PeekSize(source);
+        data_list_.clear();
+        for (std::size_t i = 0; i < len; i++)
+        {
+            Str s;
+            s.DecodeValue(source);
+            data_list_.push_back(std::move(s));
+        }
     }
 
 } // namespace rds

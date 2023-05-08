@@ -61,4 +61,28 @@ namespace rds
         data_set_.erase(it);
     }
 
+    auto ZSet::GetObjectType() const -> ObjectType
+    {
+        return ObjectType::ZSET;
+    }
+
+    auto ZSet::EncodeValue() const -> std::string
+    {
+        std::string ret = BitsToString(data_set_.size());
+        std::for_each(std::cbegin(ret), std::cend(ret), [&ret](const Str &s)
+                      { ret.append(s.EncodeValue()); });
+        return ret;
+    }
+
+    void ZSet::DecodeValue(std::deque<char> &source)
+    {
+        data_set_.clear();
+        std::size_t len = PeekSize(source);
+        for (std::size_t i = 0; i < len; i++)
+        {
+            Str s;
+            s.DecodeValue(source);
+            data_set_.insert(std::move(s));
+        }
+    }
 } // namespace fds

@@ -51,12 +51,43 @@ namespace rds
         return data_map_.size();
     }
 
-    auto Hash::GetAll() -> std::vector<std::pair<Str, Str>>{
+    auto Hash::GetAll() -> std::vector<std::pair<Str, Str>>
+    {
         std::vector<std::pair<Str, Str>> ret;
-        for(auto &element:data_map_){
+        for (auto &element : data_map_)
+        {
             ret.push_back(element);
         }
         return ret;
+    }
+
+    auto Hash::GetObjectType() const -> ObjectType
+    {
+        return ObjectType::HASH;
+    }
+
+    auto Hash::EncodeValue() const -> std::string
+    {
+        std::string ret;
+        ret.append(BitsToString(data_map_.size()));
+        std::for_each(std::cbegin(data_map_), std::cend(data_map_),
+                      [&ret](const decltype(data_map_)::value_type &kv)
+                      {
+                          ret.append(kv.first.EncodeValue());
+                          ret.append(kv.second.EncodeValue());
+                      });
+    }
+
+    void Hash::DecodeValue(std::deque<char> &source)
+    {
+        std::size_t len = PeekSize(source);
+        for (std::size_t i = 0; i < len; i++)
+        {
+            Str k, v;
+            k.DecodeValue(source);
+            v.DecodeValue(source);
+            data_map_.insert({k, v});
+        }
     }
 
 } // namespace rds

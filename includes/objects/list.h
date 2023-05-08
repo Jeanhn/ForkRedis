@@ -27,7 +27,7 @@ namespace rds
         void Trim(std::size_t, std::size_t);
 
         auto GetObjectType() const -> ObjectType override;
-        auto EncodeValue() -> std::string override;
+        auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> &) override;
 
         CLASS_DEFAULT_DECLARE(List);

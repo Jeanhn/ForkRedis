@@ -10,18 +10,18 @@ namespace rds
         data_set_.insert(std::forward<T>(data));
     }
 
-    auto Set::Card() -> std::size_t
+    auto Set::Card() const -> std::size_t
     {
         return data_set_.size();
     }
 
-    auto Set::IsMember(const Str &m) -> bool
+    auto Set::IsMember(const Str &m) const -> bool
     {
         auto it = data_set_.find(m);
         return (it == data_set_.cend());
     }
 
-    auto Set::Members() -> std::vector<Str>
+    auto Set::Members() const -> std::vector<Str>
     {
         std::vector<Str> ret;
         for (auto &element : data_set_)
@@ -31,7 +31,7 @@ namespace rds
         return ret;
     }
 
-    auto Set::RandMember() -> Str
+    auto Set::RandMember() const -> Str
     {
         if (data_set_.empty())
         {
@@ -59,6 +59,29 @@ namespace rds
             return;
         }
         data_set_.erase(it);
+    }
+
+    auto Set::GetObjectType() const -> ObjectType
+    {
+        return ObjectType::SET;
+    }
+    auto Set::EncodeValue() const -> std::string
+    {
+        std::string ret = BitsToString(data_set_.size());
+        std::for_each(std::cbegin(data_set_), std::cend(data_set_), [&ret](const Str &s)
+                      { ret.append(s.EncodeValue()); });
+        return ret;
+    }
+    void Set::DecodeValue(std::deque<char> &source)
+    {
+        data_set_.clear();
+        std::size_t len = PeekSize(source);
+        for (std::size_t i = 0; i < len; i++)
+        {
+            Str s;
+            s.DecodeValue(source);
+            data_set_.insert(std::move(s));
+        }
     }
 
 } // namespace fds

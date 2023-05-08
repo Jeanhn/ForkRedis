@@ -8,25 +8,27 @@
 namespace rds
 {
 
-    auto KeyValue::KeyEncode() -> std::string
+    auto KeyValue::PrefixEncode() -> std::string
     {
         std::string ret;
 
         if (expire_time_stamp_.has_value()) // the entry has expire
         {
-            char c = EncodingTypeToChar(EncodingType::EXPIRE);
+            char c = ObjectTypeToChar(ObjectType::EXPIRE_ENTRY);
             ret.push_back(c);
             std::string expr_ms = BitsToString(expire_time_stamp_.value());
             ret.append(expr_ms);
         }
-        ret.append(key_.EncodeValue());
+        char otyp = ObjectTypeToChar(value_->GetObjectType());
+        ret.push_back(otyp);
         return ret;
     }
 
     auto KeyValue::Encode() -> std::string
     {
         std::string ret;
-        ret.append(KeyEncode());
+        ret.append(PrefixEncode());
+        ret.append(key_.EncodeValue());
         ret.append(value_->EncodeValue());
         return ret;
     }
@@ -43,14 +45,14 @@ namespace rds
 
     auto ExpireDecode(std::deque<char> &source) -> std::optional<std::size_t>
     {
-        EncodingType etyp = CharToEncodingType(source.front());
-        if (etyp != EncodingType::EXPIRE)
+        ObjectType etyp = CharToObjectType(source.front());
+        if (etyp != ObjectType::EXPIRE_ENTRY)
         {
             return {};
         };
         source.pop_front();
-        std::size_t ret = PeekSize(source);
-        std::optional<std::size_t> r(ret);
+        std::size_t ret_expire_us = PeekSize(source);
+        std::optional<std::size_t> r(ret_expire_us);
         return r;
     }
 }
@@ -141,5 +143,23 @@ namespace rds
     void Db::PExpire(const Str &key, std::size_t time_period_ms)
     {
         ExpireAtTime(key, UsTime() + time_period_ms * 1000);
+    }
+
+    void Db::ExpireOut(std::size_t expiring_limit_us)
+    {
+        std::size_t start = UsTime();
+        while (!str_lru_.Empty())
+        {
+            Str key = str_lru_.Evict();
+            if (key.Empty())
+            {
+                break;
+            }
+            key_value_map_.erase(key);
+            if (UsTime() - start > expiring_limit_us)
+            {
+                break;
+            }
+        }
     }
 }

@@ -298,6 +298,30 @@ objects/zset.cc.s:
 	cd /home/jean/mypieces/rds/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/redis.dir/build.make src/CMakeFiles/redis.dir/objects/zset.cc.s
 .PHONY : objects/zset.cc.s
 
+util.o: util.cc.o
+.PHONY : util.o
+
+# target to build an object file
+util.cc.o:
+	cd /home/jean/mypieces/rds/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/redis.dir/build.make src/CMakeFiles/redis.dir/util.cc.o
+.PHONY : util.cc.o
+
+util.i: util.cc.i
+.PHONY : util.i
+
+# target to preprocess a source file
+util.cc.i:
+	cd /home/jean/mypieces/rds/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/redis.dir/build.make src/CMakeFiles/redis.dir/util.cc.i
+.PHONY : util.cc.i
+
+util.s: util.cc.s
+.PHONY : util.s
+
+# target to generate assembly for a file
+util.cc.s:
+	cd /home/jean/mypieces/rds/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/redis.dir/build.make src/CMakeFiles/redis.dir/util.cc.s
+.PHONY : util.cc.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -328,6 +352,9 @@ help:
 	@echo "... objects/zset.o"
 	@echo "... objects/zset.i"
 	@echo "... objects/zset.s"
+	@echo "... util.o"
+	@echo "... util.i"
+	@echo "... util.s"
 .PHONY : help
 
 

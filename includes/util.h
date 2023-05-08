@@ -72,24 +72,12 @@ namespace rds
         }
     };
 
-    std::size_t UsTime(void)
-    {
-        struct timeval tv;
-        std::size_t ust;
+    auto UsTime(void) -> std::size_t;
 
-        gettimeofday(&tv, NULL);
-        ust = ((std::size_t)tv.tv_sec) * 1000000;
-        ust += tv.tv_usec;
-        return ust;
-    }
-
-    std::size_t MsTime(void)
-    {
-        return UsTime() / 1000;
-    }
+    auto MsTime(void) -> std::size_t;
 
     template <typename BitType>
-    auto BitsToString(BitType data) -> std::string
+    inline auto BitsToString(BitType data) -> std::string
     {
         std::string ret;
         char buf[sizeof(BitType) + 2];
@@ -98,39 +86,11 @@ namespace rds
         return ret;
     }
 
-    auto PeekInt(std::deque<char> &source) -> int
-    {
-        int ret;
-        int *p = &ret;
-        for (std::size_t i = 0; i < sizeof(int); i++)
-        {
-            *p = source[i];
-            p++;
-        }
-        source.erase(source.cbegin(), source.cbegin() + sizeof(int));
-        return ret;
-    }
+    auto PeekInt(std::deque<char> &source) -> int;
 
-    auto PeekSize(std::deque<char> &source) -> std::size_t
-    {
-        std::size_t ret;
-        std::size_t *p = &ret;
-        for (std::size_t i = 0; i < sizeof(std::size_t); i++)
-        {
-            *p = source[i];
-            p++;
-        }
-        source.erase(source.cbegin(), source.cbegin() + sizeof(std::size_t));
-        return ret;
-    }
+    auto PeekSize(std::deque<char> &source) -> std::size_t;
 
-    auto PeekString(std::deque<char> &source, std::size_t size) -> std::string
-    {
-        std::string ret;
-        ret.append(source.cbegin(), source.cbegin() + size);
-        source.erase(source.cbegin(), source.cbegin() + size);
-        return ret;
-    }
+    auto PeekString(std::deque<char> &source, std::size_t size) -> std::string;
 
 } // namespace rds
 

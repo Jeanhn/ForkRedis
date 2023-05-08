@@ -13,6 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/redis.dir/objects/str.cc.o.d"
   "CMakeFiles/redis.dir/objects/zset.cc.o"
   "CMakeFiles/redis.dir/objects/zset.cc.o.d"
+  "CMakeFiles/redis.dir/util.cc.o"
+  "CMakeFiles/redis.dir/util.cc.o.d"
   "libredis.a"
   "libredis.pdb"
 )

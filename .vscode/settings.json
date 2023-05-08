@@ -72,7 +72,9 @@
         "fstream": "cpp",
         "codecvt": "cpp",
         "iomanip": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "any": "cpp",
+        "cinttypes": "cpp"
     },
     "editor.formatOnType": true,
     "editor.formatOnSave": true,

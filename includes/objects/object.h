@@ -15,10 +15,11 @@ namespace rds
         LIST,
         HASH,
         SET,
-        ZSET
+        ZSET,
+        EXPIRE_ENTRY
     };
 
-    auto ObjectTypeToChar(ObjectType otyp) -> char
+    inline auto ObjectTypeToChar(ObjectType otyp) -> char
     {
         char ret;
         switch (otyp)
@@ -41,11 +42,14 @@ namespace rds
         case ObjectType::ZSET:
             ret = 5;
             break;
+        case ObjectType::EXPIRE_ENTRY:
+            ret = 6;
+            break;
         }
         return ret;
     }
 
-    auto CharToObjectType(char c) -> ObjectType
+    inline auto CharToObjectType(char c) -> ObjectType
     {
         ObjectType otyp;
         switch (c)
@@ -68,6 +72,9 @@ namespace rds
         case 5:
             otyp = ObjectType::ZSET;
             break;
+        case 6:
+            otyp = ObjectType::EXPIRE_ENTRY;
+            break;
         default:
             assert(0);
             break;
@@ -83,11 +90,10 @@ namespace rds
         LIST,    // linked list
         ARRAY,   // zip list
         HASHMAP, // ht
-        RBTREE,  // skip list
-        EXPIRE
+        RBTREE   // skip list
     };
 
-    auto EncodingTypeToChar(EncodingType etyp) -> char
+    inline auto EncodingTypeToChar(EncodingType etyp) -> char
     {
         char ret;
         switch (etyp)
@@ -113,14 +119,11 @@ namespace rds
         case EncodingType::RBTREE:
             ret = 6;
             break;
-        case EncodingType::EXPIRE:
-            ret = 7;
-            break;
         }
         return ret;
     }
 
-    auto CharToEncodingType(char c) -> EncodingType
+    inline auto CharToEncodingType(char c) -> EncodingType
     {
         EncodingType etyp;
         switch (c)
@@ -146,9 +149,6 @@ namespace rds
         case 6:
             etyp = EncodingType::RBTREE;
             break;
-        case 7:
-            etyp = EncodingType::EXPIRE;
-            break;
         default:
             assert(0);
             break;
@@ -163,7 +163,7 @@ namespace rds
 
     protected:
     public:
-        virtual auto EncodeValue() -> std::string = 0;
+        virtual auto EncodeValue() const -> std::string = 0;
 
         virtual void DecodeValue(std::deque<char> &) = 0;
 

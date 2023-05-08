@@ -26,7 +26,7 @@ namespace rds
         auto GetAll() -> std::vector<std::pair<Str, Str>>;
 
         auto GetObjectType() const -> ObjectType override;
-        auto EncodeValue() -> std::string override;
+        auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> &) override;
 
         CLASS_DEFAULT_DECLARE(Hash);

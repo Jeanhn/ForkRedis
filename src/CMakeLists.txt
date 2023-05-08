@@ -1,4 +1,4 @@
-file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*/*.cc)
+file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*/*.cc ${PROJECT_SOURCE_DIR}/src/*.cc)
 
 add_library(redis STATIC ${SOURCES})
 

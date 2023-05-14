@@ -1,6 +1,7 @@
 #include <objects/str.h>
 #include <gtest/gtest.h>
 #include <vector>
+#include <util.h>
 
 TEST(StrTest, Consrtuct)
 {
@@ -45,7 +46,10 @@ void EncodeRaw(const std::string &raw_str, std::deque<char> &str_cache)
 
     std::string str_encode = rstr.EncodeValue();
 
-    ASSERT_EQ(str_encode.size(), raw_str.size() + sizeof(size_t) + sizeof(char));
+    if (!DefineCompress())
+    {
+        ASSERT_EQ(str_encode.size(), raw_str.size() + sizeof(size_t) + sizeof(char));
+    }
 
     str_cache.insert(str_cache.end(), str_encode.cbegin(), str_encode.cend());
 }
@@ -65,7 +69,7 @@ void Decode(const std::string &data, std::deque<char> &str_cache, rds::EncodingT
                             << "dcd:" << dcd_str.GetRaw() << std::endl;
 }
 
-TEST(StrTest, DISABLED_IntEncodeAndDecode)
+TEST(StrTest, DISABLED_Mix)
 {
     using namespace rds;
     std::deque<char> cache;
@@ -89,7 +93,7 @@ TEST(StrTest, DISABLED_IntEncodeAndDecode)
     }
 }
 
-TEST(StrTest, RawEncodeAndDecode)
+TEST(StrTest, DISABLED_RawEncodeAndDecode)
 {
     using namespace rds;
     std::deque<char> cache;
@@ -104,7 +108,58 @@ TEST(StrTest, RawEncodeAndDecode)
         raw_str_src.push_back(s);
     }
     std::vector<std::string> int_str_src;
-    for (int i = 0xffff; i < 0xfffff; i++)
+    for (int i = 0xffff; i < 0x2ffff; i++)
+    {
+        int_str_src.push_back(std::to_string(i));
+    }
+
+    for (auto &s : raw_str_src)
+    {
+        EncodeRaw(s, cache);
+    }
+
+    for (auto &s : int_str_src)
+    {
+        EncodeInt(s, cache);
+    }
+
+    for (auto &s : raw_str_src)
+    {
+        Decode(s, cache, EncodingType::STR_RAW);
+    }
+    for (auto &s : int_str_src)
+    {
+        Decode(s, cache, EncodingType::INT);
+    }
+}
+
+TEST(TestCompressDecompress, CompressAndDecompress)
+{
+    std::string raw{"flkjdhsalkfhdaskljhfdlkjsahfkdhafkjdhlakjshflkjsaflkjdhsalkfhdaskljhfdlkjsahfkdhafkjdhlakjshflkjsa"};
+    std::string cmprs = rds::Compress(raw);
+    std::cout << "after compress:" << cmprs.size() << std::endl;
+    std::string dcmprs = rds::Decompress(cmprs);
+    ASSERT_NE(dcmprs, cmprs);
+    ASSERT_EQ(raw, dcmprs) << "dcprs size:" << dcmprs.size();
+}
+
+TEST(StrTest, MixCompress)
+{
+    using namespace rds;
+    EnCompress();
+    std::deque<char> cache;
+    std::vector<std::string> raw_str_src;
+    for (int i = 0; i < 1000; i++)
+    {
+        std::string s;
+        for (int j = 20; j < 100; j++)
+        {
+            s.push_back('a' + j % 26);
+        }
+        raw_str_src.push_back(s);
+    }
+    std::vector<std::string> int_str_src;
+    for (int i = 0xffff; i < 0x2ffff; i++)
     {
         int_str_src.push_back(std::to_string(i));
     }

@@ -92,6 +92,16 @@ namespace rds
 
     auto PeekString(std::deque<char> &source, std::size_t size) -> std::string;
 
+    auto Decompress(const std::string &data) -> std::string;
+
+    auto Compress(const std::string &data) -> std::string;
+
+    auto DefineCompress() -> bool;
+
+    void EnCompress();
+
+    void DisCompress();
+
 } // namespace rds
 
 #endif

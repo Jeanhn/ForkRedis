@@ -22,7 +22,6 @@ namespace rds
     private:
         std::string data_;
         EncodingType encoding_type_;
-        bool compress_{false};
 
         void TypeCheck();
 

@@ -89,40 +89,30 @@ namespace rds
         return ObjectType::STR;
     }
 
-    auto Compress(const std::string &) -> std::string
-    {
-        return {};
-    }
-    auto Decompress(const std::string &) -> std::string
-    {
-        return {};
-    }
-
     /*
     char obj-type
     [size_t len_after_compress]/[size_t len_origin]
     [int/string]value
      */
-
     auto Str::EncodeValue() const -> std::string
     {
         std::string ret;
         // encode-type: int or string or compress-string
         char t = EncodingTypeToChar(encoding_type_);
 
+        assert(encoding_type_ == EncodingType::STR_RAW || encoding_type_ == EncodingType::INT || encoding_type_ == EncodingType::STR_COMPRESS);
+
         // if str [len] or [len len-before-compress]
         if (encoding_type_ == EncodingType::STR_RAW)
         {
-            if (compress_)
+            if (DefineCompress())
             {
-                assert(0);
                 t = EncodingTypeToChar(EncodingType::STR_COMPRESS);
             }
             ret.push_back(t);
             std::string res;
-            if (compress_)
+            if (DefineCompress())
             {
-                assert(0);
                 std::string cprs = Compress(data_);
                 std::size_t len = cprs.size();
                 ret.append(BitsToString(len));
@@ -155,18 +145,18 @@ namespace rds
         EncodingType etyp = CharToEncodingType(source.front());
         source.pop_front();
 
-        assert(etyp == EncodingType::INT || etyp == EncodingType::STR_RAW);
-        // assert(etyp == EncodingType::STR_COMPRESS);
-
-        encoding_type_ = etyp;
+        assert(etyp == EncodingType::INT || etyp == EncodingType::STR_RAW || etyp == EncodingType::STR_COMPRESS);
 
         data_.clear();
 
         if (etyp == EncodingType::INT)
         {
+            encoding_type_ = EncodingType::INT;
             data_ = std::to_string(PeekInt(source));
+            return;
         }
-        else if (etyp == EncodingType::STR_RAW)
+        encoding_type_ = EncodingType::STR_RAW;
+        if (etyp == EncodingType::STR_RAW)
         {
             size_t size = PeekSize(source);
             data_ = PeekString(source, size);
@@ -174,8 +164,9 @@ namespace rds
         else if (etyp == EncodingType::STR_COMPRESS)
         {
             size_t size_compress = PeekSize(source);
-            /* size_t size_origin =  */ PeekSize(source);
+            size_t size_origin = PeekSize(source);
             data_ = Decompress(PeekString(source, size_compress));
+            assert(size_origin == data_.size());
         }
     }
 

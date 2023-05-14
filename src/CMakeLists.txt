@@ -4,4 +4,6 @@ add_library(redis STATIC ${SOURCES})
 
 target_include_directories(redis PUBLIC ${PROJECT_SOURCE_DIR}/includes)
 
+target_link_libraries(redis PUBLIC lzf::lib)
+
 add_library(rds::lib ALIAS redis)

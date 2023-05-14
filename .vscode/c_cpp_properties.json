@@ -5,6 +5,7 @@
             "includePath": [
                 "${default}",
                 "/home/jean/mypieces/rds/includes/",
+                "${workspaceFolder}/third/lzfse/src"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

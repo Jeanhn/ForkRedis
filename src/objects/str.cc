@@ -6,6 +6,11 @@ namespace rds
 {
     void Str::TypeCheck()
     {
+        if (data_.size() > sizeof(int))
+        {
+            encoding_type_ = EncodingType::STR_RAW;
+            return;
+        }
         for (auto it = data_.cbegin(); it != data_.cend(); it++)
         {
             if (*it < '0' || *it > '9')
@@ -46,26 +51,28 @@ namespace rds
         TypeCheck();
     }
 
-    void Str::IncrBy(int delta)
+    auto Str::IncrBy(int delta) -> bool
     {
         if (encoding_type_ != EncodingType::INT)
         {
-            return;
+            return false;
         }
         int raw_int = std::stoi(data_);
         raw_int += delta;
         data_ = std::to_string(raw_int);
+        return true;
     }
 
-    void Str::DecrBy(int delta)
+    auto Str::DecrBy(int delta) -> bool
     {
         if (encoding_type_ != EncodingType::INT)
         {
-            return;
+            return false;
         }
         int raw_int = std::stoi(data_);
         raw_int -= delta;
         data_ = std::to_string(raw_int);
+        return true;
     }
 
     auto Str::Len() const -> std::size_t
@@ -140,10 +147,10 @@ namespace rds
         return encoding_type_;
     }
 
-    void Str::DecodeValue(std::deque<char> &source)
+    void Str::DecodeValue(std::deque<char> *source)
     {
-        EncodingType etyp = CharToEncodingType(source.front());
-        source.pop_front();
+        EncodingType etyp = CharToEncodingType(source->front());
+        source->pop_front();
 
         assert(etyp == EncodingType::INT || etyp == EncodingType::STR_RAW || etyp == EncodingType::STR_COMPRESS);
 

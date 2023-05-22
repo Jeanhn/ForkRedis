@@ -22,6 +22,8 @@ namespace rds
     public:
         auto Encode() -> std::string;
 
+        void Decode(std::deque<char> *);
+
         auto MakeExpire(std::size_t time_stamp)
         {
             expire_time_stamp_ = time_stamp;
@@ -30,6 +32,11 @@ namespace rds
         void UndoExpire()
         {
             expire_time_stamp_.reset();
+        }
+
+        auto GetExpire() -> std::optional<std::size_t>
+        {
+            return expire_time_stamp_;
         }
 
         auto IsExpire() -> bool
@@ -55,12 +62,12 @@ namespace rds
     class Db
     {
     private:
+        constexpr static char SELECT_DB_ = 's';
+        int number_;
         std::unordered_map<Str, KeyValue, decltype(&StrHash)> key_value_map_{0xff, StrHash};
         StrLRU str_lru_;
 
-        template <typename T,
-                  typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-        void NewStr(const Str &, T &&);
+        void NewStr(const Str &, Str);
         void NewList(const Str &);
         void NewSet(const Str &);
         void NewZSet(const Str &);
@@ -74,6 +81,13 @@ namespace rds
         void Expire(const Str &, std::size_t);
         void PExpire(const Str &, std::size_t);
         void ExpireOut(std::size_t);
+
+        auto Save() -> std::string;
+
+        void Load(std::deque<char> *);
+
+        auto Size() -> std::size_t;
+
         CLASS_DEFAULT_DECLARE(Db);
     };
 

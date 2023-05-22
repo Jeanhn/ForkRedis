@@ -1,12 +1,14 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
+#include <configure.h>
 #include <cassert>
 #include <utility>
 #include <tuple>
 #include <type_traits>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <thread>
 #include <shared_mutex>
 #include <atomic>
@@ -18,6 +20,44 @@
 #include <cstring>
 #include <cassert>
 #include <deque>
+#include <snmalloc/override/override.h>
+#include <iostream>
+
+void *operator new(size_t size);
+
+void *operator new[](size_t size);
+
+void *operator new(size_t size, std::nothrow_t &);
+
+void *operator new[](size_t size, std::nothrow_t &);
+
+void operator delete(void *p) noexcept;
+
+void operator delete(void *p, size_t size) noexcept;
+
+void operator delete(void *p, std::nothrow_t &);
+
+void operator delete[](void *p) noexcept;
+
+void operator delete[](void *p, size_t size) noexcept;
+
+void operator delete[](void *p, std::nothrow_t &);
+
+void *operator new(size_t size, std::align_val_t val);
+
+void *operator new[](size_t size, std::align_val_t val);
+
+void *operator new(size_t size, std::align_val_t val, std::nothrow_t &);
+
+void *operator new[](size_t size, std::align_val_t val, std::nothrow_t &);
+
+void operator delete(void *p, std::align_val_t) noexcept;
+
+void operator delete[](void *p, std::align_val_t) noexcept;
+
+void operator delete(void *p, size_t size, std::align_val_t val) noexcept;
+
+void operator delete[](void *p, size_t size, std::align_val_t val) noexcept;
 
 #define CLASS_DEFAULT_DECLARE(name)                 \
     name() = default;                               \
@@ -39,6 +79,12 @@
     name(const name &) = default;                   \
     name(name &&) noexcept = default;               \
     auto operator=(const name &)->name & = default; \
+    auto operator=(name &&) noexcept -> name & = default;
+
+#define CLASS_DECLARE_uncopyable(name)             \
+    name(const name &) = delete;                   \
+    name(name &&) noexcept = default;              \
+    auto operator=(const name &)->name & = delete; \
     auto operator=(name &&) noexcept -> name & = default;
 
 namespace rds
@@ -86,11 +132,11 @@ namespace rds
         return ret;
     }
 
-    auto PeekInt(std::deque<char> &source) -> int;
+    auto PeekInt(std::deque<char> *source) -> int;
 
-    auto PeekSize(std::deque<char> &source) -> std::size_t;
+    auto PeekSize(std::deque<char> *source) -> std::size_t;
 
-    auto PeekString(std::deque<char> &source, std::size_t size) -> std::string;
+    auto PeekString(std::deque<char> *source, std::size_t size) -> std::string;
 
     auto Decompress(const std::string &data) -> std::string;
 

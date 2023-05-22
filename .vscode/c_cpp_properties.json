@@ -5,7 +5,10 @@
             "includePath": [
                 "${default}",
                 "/home/jean/mypieces/rds/includes/",
-                "${workspaceFolder}/third/lzfse/src"
+                "${workspaceFolder}/third/lzfse/src",
+                "${workspaceFolder}/third/snmalloc/src",
+                "${workspaceFolder}/third/json11",
+                "${workspaceFolder}/third/HTTPRequest/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

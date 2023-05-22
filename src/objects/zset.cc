@@ -3,62 +3,146 @@
 namespace rds
 {
 
-    template <typename T,
-              typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-    void ZSet::Add(T &&data)
+    auto ZSet::Add(int score, Str member) -> bool
     {
-        data_set_.insert(std::forward<T>(data));
+        auto it = member_map_.insert({std::move(member), sequence_list_.end()});
+        if (!it.second)
+        {
+            return false;
+        }
+        sequence_list_.push_back({it.first->first, score});
+        auto pos = sequence_list_.end();
+        pos--;
+        it.first->second = pos;
+        rank_map_.insert({score, it.first});
+        return true;
     }
 
     auto ZSet::Card() -> std::size_t
     {
-        return data_set_.size();
+        return sequence_list_.size();
     }
 
-    auto ZSet::IsMember(const Str &m) -> bool
+    auto ZSet::Rem(int score, const Str &member) -> bool
     {
-        auto it = data_set_.find(m);
-        return (it == data_set_.cend());
-    }
-
-    auto ZSet::Members() -> std::vector<Str>
-    {
-        std::vector<Str> ret;
-        for (auto &element : data_set_)
+        auto pos = member_map_.find(member);
+        if (pos == member_map_.end())
         {
-            ret.push_back(element);
+            return false;
         }
+        if (pos->second->second != score)
+        {
+            return false;
+        }
+        sequence_list_.erase(pos->second);
+        auto it = rank_map_.upper_bound(score - 1);
+        while (it->second != pos)
+        {
+            it++;
+        }
+        rank_map_.erase(it);
+        member_map_.erase(pos);
+        return true;
+    }
+
+    auto ZSet::Count(int score_low, int score_high) -> std::size_t
+    {
+        if (score_low > score_high)
+        {
+            return 0;
+        }
+        auto low = rank_map_.lower_bound(score_low);
+        auto high = rank_map_.upper_bound(score_high);
+        return std::distance(low, high);
+    }
+
+    auto ZSet::LexCount(const Str &member_low, const Str &member_high) -> std::size_t
+    {
+        if (member_low < member_high)
+        {
+            return 0;
+        }
+        auto low = member_map_.lower_bound(member_low);
+        auto high = member_map_.upper_bound(member_high);
+        return std::distance(low, high);
+    }
+
+    auto ZSet::IncrBy(int delta_score, const Str &member) -> bool
+    {
+        auto pos = member_map_.find(member);
+        if (pos == member_map_.end())
+        {
+            return false;
+        }
+        auto it = rank_map_.lower_bound(pos->second->second);
+        while (it->second != pos)
+        {
+            it++;
+        }
+        rank_map_.erase(it);
+        rank_map_.insert({pos->second->second + delta_score, pos});
+        pos->second->second += delta_score;
+        return true;
+    }
+
+    auto ZSet::DecrBy(int delta_score, const Str &member) -> bool
+    {
+        return IncrBy(-delta_score, member);
+    }
+
+    auto ZSet::Range(int beg, int end) -> std::vector<std::pair<Str, int>>
+    {
+        auto legalRange = [size = sequence_list_.size()](int r) -> std::size_t
+        {
+            if (r >= 0)
+            {
+                return r % size;
+            }
+            int _r = -r;
+            r += (_r / size + 1) * size;
+            return static_cast<std::size_t>(r);
+        };
+        std::vector<std::pair<Str, int>> ret;
+        std::size_t lbeg = legalRange(beg);
+        std::size_t lend = legalRange(end);
+        if (lbeg >= lend)
+        {
+            return {};
+        }
+        auto b = sequence_list_.begin();
+        auto e = b;
+        std::advance(b, lbeg);
+        std::advance(e, lend + 1);
+        std::copy(b, e, std::back_inserter(ret));
         return ret;
     }
 
-    auto ZSet::RandMember() -> Str
+    auto ZSet::RangeByScore(int score_low, int score_high) -> std::vector<std::pair<Str, int>>
     {
-        if (data_set_.empty())
+        if (score_low > score_high)
         {
             return {};
         }
-        return *(data_set_.cbegin());
+        auto low = rank_map_.lower_bound(score_low);
+        auto high = rank_map_.upper_bound(score_high);
+        std::vector<std::pair<Str, int>> ret;
+        std::for_each(low, high, [&ret](const decltype(rank_map_)::value_type &v) mutable
+                      { ret.push_back({v.second->first, v.first}); });
+        return ret;
     }
 
-    auto ZSet::Pop() -> Str
+    auto ZSet::RangeByLex(const Str &member_low, const Str &member_high) -> std::vector<std::pair<Str, int>>
     {
-        if (data_set_.empty())
+        if (member_low > member_high)
         {
             return {};
         }
-        Str s(std::move(*(data_set_.cbegin())));
-        data_set_.erase(data_set_.cbegin());
-        return *(data_set_.cbegin());
-    }
-
-    void ZSet::Rem(const Str &m)
-    {
-        auto it = data_set_.find(m);
-        if (it == data_set_.cend())
-        {
-            return;
-        }
-        data_set_.erase(it);
+        std::vector<std::pair<Str, int>> ret;
+        auto low = member_map_.lower_bound(member_low);
+        auto high = member_map_.upper_bound(member_high);
+        std::for_each(low, high, [&ret](const decltype(member_map_)::value_type &v) mutable
+                      { ret.push_back({v.first, v.second->second}); });
+        return ret;
     }
 
     auto ZSet::GetObjectType() const -> ObjectType
@@ -68,21 +152,23 @@ namespace rds
 
     auto ZSet::EncodeValue() const -> std::string
     {
-        std::string ret = BitsToString(data_set_.size());
-        std::for_each(std::cbegin(data_set_), std::cend(data_set_), [&ret](const Str &s) mutable
-                      { ret.append(s.EncodeValue()); });
+        std::string ret = BitsToString(sequence_list_.size());
+        std::for_each(std::cbegin(sequence_list_), std::cend(sequence_list_), [&ret](const decltype(sequence_list_)::value_type &v) mutable
+                      { ret.append(BitsToString(v.second));ret.append(v.first.EncodeValue()); });
         return ret;
     }
 
-    void ZSet::DecodeValue(std::deque<char> &source)
+    void ZSet::DecodeValue(std::deque<char> *source)
     {
-        data_set_.clear();
+        member_map_.clear();
         std::size_t len = PeekSize(source);
         for (std::size_t i = 0; i < len; i++)
         {
             Str s;
+            int r;
+            r = PeekInt(source);
             s.DecodeValue(source);
-            data_set_.insert(std::move(s));
+            Add(r, std::move(s));
         }
     }
-} // namespace fds
+} // namespace rds

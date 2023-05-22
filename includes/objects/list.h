@@ -15,28 +15,18 @@ namespace rds
         std::list<Str> data_list_;
 
     public:
-        template <typename T, typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-        void PushFront(T &&data)
-        {
-            data_list_.push_front(std::forward<T>(data));
-        }
-
-        template <typename T, typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-        void PushBack(T &&data)
-        {
-            data_list_.push_back(std::forward<T>(data));
-        }
-
+        void PushFront(Str);
+        void PushBack(Str);
         auto PopFront() -> Str;
         auto PopBack() -> Str;
         auto Index(std::size_t) const -> Str;
         auto Len() const -> std::size_t;
         auto Rem(const Str &) -> bool;
-        void Trim(std::size_t, std::size_t);
+        void Trim(int, int);
 
         auto GetObjectType() const -> ObjectType override;
         auto EncodeValue() const -> std::string override;
-        void DecodeValue(std::deque<char> &) override;
+        void DecodeValue(std::deque<char> *) override;
 
         CLASS_DEFAULT_DECLARE(List);
     };

@@ -165,7 +165,7 @@ namespace rds
     public:
         virtual auto EncodeValue() const -> std::string = 0;
 
-        virtual void DecodeValue(std::deque<char> &) = 0;
+        virtual void DecodeValue(std::deque<char> *) = 0;
 
         virtual auto GetObjectType() const -> ObjectType
         {

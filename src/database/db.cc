@@ -7,6 +7,7 @@
 
 namespace rds
 {
+    KeyValue::KeyValue(const Str &k, std::unique_ptr<Object> v) : key_(k), value_(std::move(v)) {}
 
     auto KeyValue::PrefixEncode() -> std::string
     {
@@ -33,6 +34,57 @@ namespace rds
         return ret;
     }
 
+    void KeyValue::Decode(std::deque<char> *source)
+    {
+        ObjectType otyp = CharToObjectType(source->front());
+        source->pop_front();
+
+        if (otyp == ObjectType::EXPIRE_ENTRY)
+        {
+            auto s = PeekSize(source);
+            expire_time_stamp_ = s;
+        }
+        else
+        {
+            expire_time_stamp_.reset();
+        }
+
+        if (otyp == ObjectType::EXPIRE_ENTRY)
+        {
+            otyp = CharToObjectType(source->front());
+            source->pop_front();
+        }
+
+        key_.DecodeValue(source);
+
+        switch (otyp)
+        {
+        case ObjectType::STR:
+            value_ = std::make_unique<Str>();
+            value_->DecodeValue(source);
+            break;
+        case ObjectType::LIST:
+            value_ = std::make_unique<List>();
+            value_->DecodeValue(source);
+            break;
+        case ObjectType::HASH:
+            value_ = std::make_unique<Hash>();
+            value_->DecodeValue(source);
+            break;
+        case ObjectType::SET:
+            value_ = std::make_unique<Set>();
+            value_->DecodeValue(source);
+            break;
+        case ObjectType::ZSET:
+            value_ = std::make_unique<ZSet>();
+            value_->DecodeValue(source);
+            break;
+        default:
+            assert(0);
+            break;
+        }
+    }
+
     auto KeyValue::GetValue() -> Object *
     {
         return value_.get();
@@ -43,14 +95,14 @@ namespace rds
         return key_;
     }
 
-    auto ExpireDecode(std::deque<char> &source) -> std::optional<std::size_t>
+    auto ExpireDecode(std::deque<char> *source) -> std::optional<std::size_t>
     {
-        ObjectType etyp = CharToObjectType(source.front());
+        ObjectType etyp = CharToObjectType(source->front());
         if (etyp != ObjectType::EXPIRE_ENTRY)
         {
             return {};
         };
-        source.pop_front();
+        source->pop_front();
         std::size_t ret_expire_us = PeekSize(source);
         std::optional<std::size_t> r(ret_expire_us);
         return r;
@@ -71,11 +123,9 @@ namespace rds
  */
 namespace rds
 {
-    template <typename T,
-              typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-    void Db::NewStr(const Str &key, T &&value)
+    void Db::NewStr(const Str &key, Str value)
     {
-        auto str = std::make_unique<Str>(std::forward<T>(value));
+        auto str = std::make_unique<Str>(std::move(value));
         KeyValue kv{key, std::move(str)};
         key_value_map_.insert({key, std::move(kv)});
     }
@@ -160,6 +210,38 @@ namespace rds
             {
                 break;
             }
+        }
+    }
+
+    auto Db::Save() -> std::string
+    {
+        std::string ret;
+        ret.push_back(SELECT_DB_);
+        ret.append(BitsToString(number_));
+        ret.append(BitsToString(key_value_map_.size()));
+        for (auto &kv : key_value_map_)
+        {
+            std::string v = kv.second.Encode();
+            ret.append(v);
+        }
+        return ret;
+    }
+
+    void Db::Load(std::deque<char> *source)
+    {
+        char s = source->front();
+        source->pop_front();
+        if (s != SELECT_DB_)
+        {
+            throw std::runtime_error("Err loading db");
+        }
+        number_ = PeekInt(source);
+        std::size_t n = PeekSize(source);
+        for (std::size_t i = 0; i < n; i++)
+        {
+            KeyValue kv;
+            kv.Decode(source);
+            key_value_map_.insert({kv.GetKey(), std::move(kv)});
         }
     }
 }

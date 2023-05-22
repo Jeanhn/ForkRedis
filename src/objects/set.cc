@@ -1,13 +1,12 @@
 #include <objects/set.h>
+#include <set>
 
 namespace rds
 {
 
-    template <typename T,
-              typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-    void Set::Add(T &&data)
+    void Set::Add(Str data)
     {
-        data_set_.insert(std::forward<T>(data));
+        data_set_.insert(std::move(data));
     }
 
     auto Set::Card() const -> std::size_t
@@ -18,7 +17,7 @@ namespace rds
     auto Set::IsMember(const Str &m) const -> bool
     {
         auto it = data_set_.find(m);
-        return (it == data_set_.cend());
+        return (it != data_set_.cend());
     }
 
     auto Set::Members() const -> std::vector<Str>
@@ -37,7 +36,10 @@ namespace rds
         {
             return {};
         }
-        return *(data_set_.cbegin());
+        auto it = data_set_.begin();
+
+        std::advance(it, static_cast<std::size_t>(std::rand()) % data_set_.size());
+        return *(it);
     }
 
     auto Set::Pop() -> Str
@@ -65,6 +67,7 @@ namespace rds
     {
         return ObjectType::SET;
     }
+
     auto Set::EncodeValue() const -> std::string
     {
         std::string ret = BitsToString(data_set_.size());
@@ -72,7 +75,8 @@ namespace rds
                       { ret.append(s.EncodeValue()); });
         return ret;
     }
-    void Set::DecodeValue(std::deque<char> &source)
+
+    void Set::DecodeValue(std::deque<char> *source)
     {
         data_set_.clear();
         std::size_t len = PeekSize(source);
@@ -84,4 +88,25 @@ namespace rds
         }
     }
 
+    auto Set::Diff(const Set &s) -> std::vector<Str>
+    {
+        std::vector<Str> ret;
+        std::for_each(data_set_.cbegin(), data_set_.cend(), [&ret, &s](const Str &str) mutable
+                      {
+            if(!s.IsMember(str)){
+                ret.push_back(str);
+            } });
+        return ret;
+    }
+
+    auto Set::Inter(const Set &s) -> std::vector<Str>
+    {
+        std::vector<Str> ret;
+        std::for_each(data_set_.cbegin(), data_set_.cend(), [&ret, &s](const Str &str) mutable
+                      {
+            if(s.IsMember(str)){
+                ret.push_back(str);
+            } });
+        return ret;
+    }
 } // namespace fds

@@ -74,7 +74,10 @@
         "iomanip": "cpp",
         "iostream": "cpp",
         "any": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "source_location": "cpp"
     },
     "editor.formatOnType": true,
     "editor.formatOnSave": true,

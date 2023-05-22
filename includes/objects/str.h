@@ -3,10 +3,10 @@
 
 #include <objects/object.h>
 #include <string>
+#include <configure.h>
 
 namespace rds
 {
-
     class Str final : public Object
     {
         friend auto operator==(const Str &a, const Str &b) -> bool;
@@ -31,8 +31,8 @@ namespace rds
         void Set(std::string &&);
         void Append(const std::string &);
         void Append(std::string &&);
-        void IncrBy(int);
-        void DecrBy(int);
+        auto IncrBy(int) -> bool;
+        auto DecrBy(int) -> bool;
         auto Len() const -> std::size_t;
         auto Empty() const -> bool;
 
@@ -40,7 +40,7 @@ namespace rds
 
         auto GetObjectType() const -> ObjectType override;
         auto EncodeValue() const -> std::string override;
-        void DecodeValue(std::deque<char> &) override;
+        void DecodeValue(std::deque<char> *) override;
 
         CLASS_DEFAULT_DECLARE(Str);
 

@@ -3,6 +3,16 @@
 namespace rds
 {
 
+    void List::PushFront(Str str)
+    {
+        data_list_.push_front(std::move(str));
+    }
+
+    void List::PushBack(Str str)
+    {
+        data_list_.push_back(std::move(str));
+    }
+
     auto List::PopFront() -> Str
     {
         if (data_list_.empty())
@@ -45,7 +55,7 @@ namespace rds
 
     auto List::Rem(const Str &data) -> bool
     {
-        auto it = std::remove(data_list_.begin(), data_list_.end(), data);
+        auto it = std::find(data_list_.cbegin(), data_list_.cend(), data);
         if (it == data_list_.end())
         {
             return false;
@@ -54,21 +64,29 @@ namespace rds
         return true;
     }
 
-    void List::Trim(std::size_t begin, std::size_t end)
+    void List::Trim(int begin, int end)
     {
-        auto b = data_list_.cbegin();
-        auto e = b;
-        if (begin >= end || begin >= data_list_.size())
+        auto legalRange = [size = data_list_.size()](int r) -> std::size_t
         {
-            return;
-        }
-        if (end >= data_list_.size())
+            if (r >= 0)
+            {
+                return r % size;
+            }
+            int _r = -r;
+            r += (_r / size + 1) * size;
+            return static_cast<std::size_t>(r);
+        };
+        begin = legalRange(begin);
+        end = legalRange(end);
+        if (begin > end)
         {
-            end = data_list_.size();
+            std::swap(begin, end);
         }
-        std::advance(b, begin);
-        std::advance(e, end);
-        data_list_.erase(b, e);
+        auto beg = std::begin(data_list_);
+        auto ed = beg;
+        std::advance(beg, static_cast<std::size_t>(begin));
+        std::advance(ed, static_cast<std::size_t>(end) + 1);
+        data_list_.erase(beg, ed);
     }
 
     auto List::GetObjectType() const -> ObjectType { return ObjectType::LIST; }
@@ -81,7 +99,7 @@ namespace rds
         return ret;
     }
 
-    void List::DecodeValue(std::deque<char> &source)
+    void List::DecodeValue(std::deque<char> *source)
     {
         std::size_t len = PeekSize(source);
         data_list_.clear();

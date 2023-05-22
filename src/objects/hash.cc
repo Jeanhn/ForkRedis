@@ -3,19 +3,6 @@
 namespace rds
 {
 
-    template <typename T,
-              typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-    void Hash::Set(const Str &key, T &&value)
-    {
-        auto it = data_map_.find(key);
-        if (it != data_map_.end())
-        {
-            it->second = std::forward<T>(value);
-            return;
-        }
-        data_map_.insert({key, std::forward<T>(value)});
-    }
-
     auto Hash::Get(const Str &key) -> Str
     {
         auto it = data_map_.find(key);
@@ -29,11 +16,7 @@ namespace rds
     auto Hash::Exist(const Str &key) -> bool
     {
         auto it = data_map_.find(key);
-        if (it == data_map_.end())
-        {
-            return false;
-        }
-        return true;
+        return it != data_map_.end();
     }
 
     void Hash::Del(const Str &key)
@@ -79,7 +62,7 @@ namespace rds
         return ret;
     }
 
-    void Hash::DecodeValue(std::deque<char> &source)
+    void Hash::DecodeValue(std::deque<char> *source)
     {
         std::size_t len = PeekSize(source);
         for (std::size_t i = 0; i < len; i++)
@@ -89,6 +72,17 @@ namespace rds
             v.DecodeValue(source);
             data_map_.insert({k, v});
         }
+    }
+
+    void Hash::Set(const Str &key, Str value)
+    {
+        auto it = data_map_.find(key);
+        if (it != data_map_.end())
+        {
+            it->second = std::move(value);
+            return;
+        }
+        data_map_.insert({key, std::move(value)});
     }
 
 } // namespace rds

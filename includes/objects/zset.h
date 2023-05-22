@@ -4,7 +4,8 @@
 #include <objects/object.h>
 #include <util.h>
 #include <objects/str.h>
-#include <set>
+#include <map>
+#include <list>
 
 namespace rds
 {
@@ -12,22 +13,25 @@ namespace rds
     class ZSet final : public Object
     {
     private:
-        std::set<Str, decltype(&StrLess)> data_set_{StrLess};
+        std::list<std::pair<const Str &, int>> sequence_list_;
+        std::map<Str, decltype(sequence_list_)::iterator> member_map_;
+        std::multimap<int, decltype(member_map_)::iterator> rank_map_;
 
     public:
-        template <typename T,
-                  typename = std::enable_if_t<std::is_same_v<Str, std::decay_t<T>>, void>>
-        void Add(T &&);
+        auto Add(int, Str) -> bool;
         auto Card() -> std::size_t;
-        auto IsMember(const Str &) -> bool;
-        auto Members() -> std::vector<Str>;
-        auto RandMember() -> Str;
-        auto Pop() -> Str;
-        void Rem(const Str &);
+        auto Rem(int, const Str &) -> bool;
+        auto Count(int, int) -> std::size_t;
+        auto LexCount(const Str &, const Str &) -> std::size_t;
+        auto IncrBy(int, const Str &) -> bool;
+        auto DecrBy(int, const Str &) -> bool;
+        auto Range(int, int) -> std::vector<std::pair<Str, int>>;
+        auto RangeByScore(int, int) -> std::vector<std::pair<Str, int>>;
+        auto RangeByLex(const Str &, const Str &) -> std::vector<std::pair<Str, int>>;
 
         auto GetObjectType() const -> ObjectType override;
         auto EncodeValue() const -> std::string override;
-        void DecodeValue(std::deque<char> &) override;
+        void DecodeValue(std::deque<char> *) override;
 
         CLASS_DEFAULT_DECLARE(ZSet);
     };

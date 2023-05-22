@@ -4,22 +4,29 @@
 #include <deque>
 #include <fstream>
 #include <string>
+#include <configure.h>
 
 namespace rds
 {
-
-    class DBLoader
+    class DiskManager
     {
     private:
-        std::fstream fs_;
-        std::deque<char> cache_;
-        std::string file_path_;
-        void Load();
+        const std::string filename_;
+        std::fstream file_strm_;
+        std::deque<char> write_cache_;
+        std::deque<char> read_cache_;
+        std::size_t write_cache_size_{0};
 
     public:
-        auto Export() -> std::deque<char>;
-        DBLoader(const std::string & = "rds.db");
-        ~DBLoader();
+        void Flush();
+        void Write(const std::string &);
+        auto LoadAndExport() -> std::deque<char>;
+        void EnCached(std::size_t = 1024);
+        void DisCached();
+        void Truncate(std::size_t = 0);
+        DiskManager(const std::string &filename = "dump.db");
+        DiskManager(const std::string &filename, std::size_t write_cache_size);
+        ~DiskManager() = default;
     };
 
 } // namespace rds

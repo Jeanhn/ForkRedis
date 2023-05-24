@@ -3,19 +3,34 @@
 
 namespace rds
 {
-    DiskManager::DiskManager(const std::string &filename = "dump.db") : DiskManager(filename, 0)
+    DiskManager::DiskManager(const std::string &filename) : DiskManager(filename, 0)
     {
+    }
+
+    DiskManager::~DiskManager()
+    {
+        Flush();
     }
 
     DiskManager::DiskManager(const std::string &filename, std::size_t write_cache_size) : filename_(filename),
                                                                                           write_cache_size_(write_cache_size)
     {
         file_strm_.open(filename, std::ios::app | std::ios::in | std::ios::out);
+        if (std::filesystem::file_size(filename) == 0)
+        {
+            file_strm_ << "REDIS"
+                       << "0006"
+                       << "e" << std::uint64_t(0x12345678);
+            file_strm_.flush();
+        }
+        file_strm_.close();
+        file_strm_.open(filename, std::ios::app | std::ios::in | std::ios::out);
     }
 
-    void DiskManager::Truncate(std::size_t size)
+    void DiskManager::Truncate()
     {
-        std::filesystem::resize_file(filename_, size);
+        file_strm_.close();
+        file_strm_.open(filename_, std::ios::in | std::ios::out);
     }
 
     void DiskManager::Flush()

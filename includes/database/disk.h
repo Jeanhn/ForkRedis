@@ -23,10 +23,10 @@ namespace rds
         auto LoadAndExport() -> std::deque<char>;
         void EnCached(std::size_t = 1024);
         void DisCached();
-        void Truncate(std::size_t = 0);
+        void Truncate();
         DiskManager(const std::string &filename = "dump.db");
         DiskManager(const std::string &filename, std::size_t write_cache_size);
-        ~DiskManager() = default;
+        ~DiskManager();
     };
 
 } // namespace rds

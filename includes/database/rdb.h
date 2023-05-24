@@ -3,6 +3,8 @@
 
 #include <database/db.h>
 #include <optional>
+#include <util.h>
+#include <list>
 
 namespace rds
 {
@@ -12,16 +14,18 @@ namespace rds
         const std::string name_{"REDIS"};
         const std::string db_version_{"0006"};
         std::vector<Db *> databases_;
-        std::map<Db *, std::size_t> frequency_map_;
-        const char eof_ = '0';
-        std::uint64_t check_sum_;
+        const char eof_ = 'e';
+        const std::uint64_t check_sum_{0x12345678};
+
+        std::size_t save_period_us_;
 
     public:
         auto Save() -> std::string;
-        auto Load(std::deque<char> *) -> std::vector<std::unique_ptr<Db>>;
-        void SetSave(std::size_t second, std::size_t times, int db_number);
-        Rdb();
-        ~Rdb();
+        static auto Load(std::deque<char> *) -> std::list<std::unique_ptr<Db>>;
+        void SetSave(std::size_t second, std::size_t times);
+        auto Period() const -> std::size_t;
+        Rdb() = default;
+        ~Rdb() = default;
     };
 
 } // namespace rds

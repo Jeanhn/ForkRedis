@@ -3,15 +3,18 @@
 #include <objects/hash.h>
 #include <objects/set.h>
 #include <objects/zset.h>
+#include <server/server.h>
 
 namespace rds
 {
-    auto RawCommandToJson(const std::string &raw) -> json11::Json::array
+    auto RawCommandToRequest(const std::string &raw) -> json11::Json::array
     {
         auto it = raw.cbegin();
         auto isTokenMember = [](char c)
         {
-            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+            return (c >= '0' && c <= '9') ||
+                   (c >= 'a' && c <= 'z') ||
+                   (c >= 'A' && c <= 'Z');
         };
         auto nextToken = [&raw, &it, &isTokenMember]() mutable -> std::string
         {
@@ -43,16 +46,10 @@ namespace rds
         };
 
         json11::Json::array ret;
-        std::string token;
-        do
+        for (std::string token = nextToken(); !token.empty(); token = nextToken())
         {
-            token = nextToken();
-            json11::Json str_js(std::move(token));
-            if (!token.empty())
-            {
-                ret.push_back(std::move(str_js));
-            }
-        } while (!token.empty());
+            ret.push_back(std::move(token));
+        }
         return ret;
     }
 
@@ -63,8 +60,8 @@ namespace rds
             ret->valid_ = false;
             return false;
         }
-        ret->command_ = source[0].dump();
-        ret->obj_name_ = source[1].dump();
+        ret->command_ = source[0].string_value();
+        ret->obj_name_ = source[1].string_value();
         return true;
     }
 
@@ -84,7 +81,7 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
-        ret.value_ = source[2].dump();
+        ret.value_ = source[2].string_value();
         return ret;
     }
 
@@ -106,9 +103,9 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
-        for (int i = 2; i < source.size(); i++)
+        for (std::size_t i = 2; i < source.size(); i++)
         {
-            ret.values_.push_back({source[i].dump()});
+            ret.values_.push_back({source[i].string_value()});
         }
         return ret;
     }
@@ -132,9 +129,9 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
-        for (int i = 2; i < source.size(); i++)
+        for (std::size_t i = 2; i < source.size(); i++)
         {
-            ret.values_.push_back({source[i].dump()});
+            ret.values_.push_back({source[i].string_value()});
         }
         return ret;
     }
@@ -155,9 +152,9 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
-        for (int i = 2; i < source.size(); i++)
+        for (std::size_t i = 2; i < source.size(); i++)
         {
-            ret.values_.push_back({source[i].dump()});
+            ret.values_.push_back({source[i].string_value()});
         }
         return ret;
     }
@@ -186,9 +183,9 @@ namespace rds
                 return ret;
             }
         }
-        for (int i = 2; i < source.size(); i++)
+        for (std::size_t i = 2; i < source.size(); i++)
         {
-            ret.values_.push_back(source[i].dump());
+            ret.values_.push_back(source[i].string_value());
         }
         return ret;
     }
@@ -209,7 +206,14 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
-        ret.value_ = source[2].dump();
+        ret.value_ = source[2].string_value();
+        return ret;
+    }
+
+    auto JsonToCliCommand(const json11::Json::array &source) -> CliCommand
+    {
+        CliCommand ret;
+        JsonToBase(&ret, source);
         return ret;
     }
     /*
@@ -220,11 +224,15 @@ namespace rds
 
      */
 
-    auto JsonToCommandExec(const json11::Json::array &source) -> std::unique_ptr<CommandBase>
+    auto RequestToCommandExec(ClientInfo *client, const json11::Json::array &req) -> std::unique_ptr<CommandBase>
     {
+        auto isCliCommand = [](const std::string &cmd)
+        {
+            return (cmd == "SELECT" || cmd == "DROP");
+        };
         auto isDbCommand = [](const std::string &cmd)
         {
-            return (cmd == "DEL" || cmd.find("EXPIRE") < cmd.size());
+            return (cmd == "DEL" || cmd == "EXPIRE");
         };
         auto isStrCommand = [](const std::string &cmd)
         {
@@ -282,42 +290,45 @@ namespace rds
                     cmd == "HINCRBY" ||
                     cmd == "HDECRBY");
         };
-        if (source.empty())
+        if (req.empty())
         {
             return nullptr;
         }
-        auto cmd = source[0].dump();
+        auto cmd = req[0].string_value();
+        std::unique_ptr<CommandBase> ret;
+        if (isCliCommand(cmd))
+        {
+            ret = std::make_unique<CliCommand>(JsonToCliCommand(req));
+        }
         if (isDbCommand(cmd))
         {
-            auto ret = std::make_unique<DbCommand>(JsonToDbCommand(source));
-            return ret;
+            ret = std::make_unique<DbCommand>(JsonToDbCommand(req));
         }
         if (isStrCommand(cmd))
         {
-            auto ret = std::make_unique<StrCommand>(JsonToStrCommand(source));
-            return ret;
+            ret = std::make_unique<StrCommand>(JsonToStrCommand(req));
         }
         if (isListCommand(cmd))
         {
-            auto ret = std::make_unique<ListCommand>(JsonToListCommand(source));
-            return ret;
+            ret = std::make_unique<ListCommand>(JsonToListCommand(req));
         }
         if (isHashCommand(cmd))
         {
-            auto ret = std::make_unique<HashCommand>(JsonToHashCommand(source));
-            return ret;
+            ret = std::make_unique<HashCommand>(JsonToHashCommand(req));
         }
         if (isSetCommand(cmd))
         {
-            auto ret = std::make_unique<SetCommand>(JsonToSetCommand(source));
-            return ret;
+            ret = std::make_unique<SetCommand>(JsonToSetCommand(req));
         }
         if (isZSetCommand(cmd))
         {
-            auto ret = std::make_unique<ZSetCommand>(JsonToZSetCommand(source));
-            return ret;
+            ret = std::make_unique<ZSetCommand>(JsonToZSetCommand(req));
         }
-        return nullptr;
+        if (ret)
+        {
+            ret->cli_ = client;
+        }
+        return ret;
     }
     /*
 
@@ -325,17 +336,26 @@ namespace rds
 
      */
 
-    auto StrCommand::Exec(Db *database) -> json11::Json::array
+    auto StrCommand::Exec() -> json11::Json::array
     {
         if (!valid_)
         {
-            return {"Invalid command"};
+            return {""};
         }
 
-        obj_ = database->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_});
+        if (obj_ == nullptr)
+        {
+            if (command_ != "SET")
+            {
+                return {""};
+            }
+            cli_->GetDB()->NewStr({obj_name_});
+            obj_ = cli_->GetDB()->Get({obj_name_});
+        }
         if (obj_->GetObjectType() != ObjectType::STR)
         {
-            return {"Error Type"};
+            return {""};
         }
 
         auto str = reinterpret_cast<Str *>(obj_);
@@ -386,17 +406,26 @@ namespace rds
 
      */
 
-    auto ListCommand::Exec(Db *database) -> json11::Json::array
+    auto ListCommand::Exec() -> json11::Json::array
     {
         if (!valid_)
         {
-            return {"Invalid command"};
+            return {""};
         }
 
-        obj_ = database->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_});
+        if (obj_ == nullptr)
+        {
+            if (command_ != "LPUSHF" && command_ != "LPUSHB")
+            {
+                return {""};
+            }
+            cli_->GetDB()->NewList({obj_name_});
+            obj_ = cli_->GetDB()->Get({obj_name_});
+        }
         if (obj_->GetObjectType() != ObjectType::LIST)
         {
-            return {"Error Type"};
+            return {""};
         }
 
         auto l = reinterpret_cast<List *>(obj_);
@@ -463,17 +492,26 @@ namespace rds
 
 
      */
-    auto HashCommand::Exec(Db *database) -> json11::Json::array
+    auto HashCommand::Exec() -> json11::Json::array
     {
         if (!valid_)
         {
-            return {"Invalid command"};
+            return {""};
         }
 
-        obj_ = database->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_});
+        if (obj_ == nullptr)
+        {
+            if (command_ != "HGET")
+            {
+                return {""};
+            }
+            cli_->GetDB()->NewHash({obj_name_});
+            obj_ = cli_->GetDB()->Get({obj_name_});
+        }
         if (obj_->GetObjectType() != ObjectType::HASH)
         {
-            return {"Error Type"};
+            return {""};
         }
 
         auto tbl = reinterpret_cast<Hash *>(obj_);
@@ -513,7 +551,7 @@ namespace rds
                 tbl->Del(key);
             }
         }
-        else if (command_ == "LEN")
+        else if (command_ == "HLEN")
         {
             return {std::to_string(tbl->Len())};
         }
@@ -553,17 +591,26 @@ namespace rds
 
 
      */
-    auto SetCommand::Exec(Db *database) -> json11::Json::array
+    auto SetCommand::Exec() -> json11::Json::array
     {
         if (!valid_)
         {
-            return {"Invalid command"};
+            return {""};
         }
 
-        obj_ = database->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_});
+        if (obj_ == nullptr)
+        {
+            if (command_ != "SADD")
+            {
+                return {""};
+            }
+            cli_->GetDB()->NewSet({obj_name_});
+            obj_ = cli_->GetDB()->Get({obj_name_});
+        }
         if (obj_->GetObjectType() != ObjectType::SET)
         {
-            return {"Error Type"};
+            return {""};
         }
 
         auto st = reinterpret_cast<Set *>(obj_);
@@ -618,7 +665,7 @@ namespace rds
         }
         else if (command_ == "SINTER")
         {
-            Object *another_set = database->Get(values_[0]);
+            Object *another_set = cli_->GetDB()->Get(values_[0]);
             if (another_set->GetObjectType() != ObjectType::SET)
             {
                 return {"Failed"};
@@ -632,7 +679,7 @@ namespace rds
         }
         else if (command_ == "SDIFF")
         {
-            Object *another_set = database->Get(values_[0]);
+            Object *another_set = cli_->GetDB()->Get(values_[0]);
             if (another_set->GetObjectType() != ObjectType::SET)
             {
                 return {"Failed"};
@@ -656,17 +703,26 @@ namespace rds
 
 
      */
-    auto ZSetCommand::Exec(Db *database) -> json11::Json::array
+    auto ZSetCommand::Exec() -> json11::Json::array
     {
         if (!valid_)
         {
-            return {"Invalid command"};
+            return {""};
         }
 
-        obj_ = database->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_});
+        if (obj_ == nullptr)
+        {
+            if (command_ != "ZADD")
+            {
+                return {""};
+            }
+            cli_->GetDB()->NewZSet({obj_name_});
+            obj_ = cli_->GetDB()->Get({obj_name_});
+        }
         if (obj_->GetObjectType() != ObjectType::ZSET)
         {
-            return {"Error Type"};
+            return {""};
         }
 
         auto zst = reinterpret_cast<ZSet *>(obj_);
@@ -752,24 +808,51 @@ namespace rds
 
 
      */
-    auto DbCommand::Exec(Db *database) -> json11::Json::array
+    auto DbCommand::Exec() -> json11::Json::array
     {
         if (!valid_)
         {
-            return {"Invalid command"};
+            return {""};
+        }
+
+        if (cli_->GetDB() == nullptr)
+        {
+            return {""};
         }
 
         if (command_ == "DEL")
         {
-            database->Del({obj_name_});
+            cli_->GetDB()->Del({obj_name_});
         }
         else if (command_ == "EXPIRE")
         {
-            database->Expire({obj_name_}, std::stoul(value_.value()));
+            cli_->GetDB()->Expire({obj_name_}, std::stoul(value_.value()));
         }
         else
         {
+            assert(0);
             return {"Failed"};
+        }
+        return {"OK"};
+    }
+    /*
+
+
+
+     */
+    auto CliCommand::Exec() -> json11::Json::array
+    {
+        if (!valid_)
+        {
+            return {""};
+        }
+        if (command_ == "SELECT")
+        {
+            cli_->ShiftDB(std::stoi(value_.value()));
+        }
+        else
+        {
+            assert(0);
         }
         return {"OK"};
     }

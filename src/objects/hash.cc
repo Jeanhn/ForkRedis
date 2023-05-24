@@ -74,6 +74,26 @@ namespace rds
         }
     }
 
+    auto Hash::IncrBy(const Str &key, int delta) -> bool
+    {
+        auto it = data_map_.find(key);
+        if (it == data_map_.end())
+        {
+            return false;
+        }
+        return it->second.IncrBy(delta);
+    }
+
+    auto Hash::DecrBy(const Str &key, int delta) -> bool
+    {
+        auto it = data_map_.find(key);
+        if (it == data_map_.end())
+        {
+            return false;
+        }
+        return it->second.DecrBy(delta);
+    }
+
     void Hash::Set(const Str &key, Str value)
     {
         auto it = data_map_.find(key);

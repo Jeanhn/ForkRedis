@@ -92,6 +92,10 @@ namespace rds
 
     auto ZSet::Range(int beg, int end) -> std::vector<std::pair<Str, int>>
     {
+        if (sequence_list_.empty())
+        {
+            return {};
+        }
         auto legalRange = [size = sequence_list_.size()](int r) -> std::size_t
         {
             if (r >= 0)

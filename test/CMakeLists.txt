@@ -10,10 +10,12 @@ foreach(unit_test_src ${UNIT_TEST_SRC})
 
     add_executable(${unit_test_exec_filename} ${unit_test_src_filename})
 
-    target_link_libraries(${unit_test_exec_filename} rds::lib)
+    target_link_libraries(${unit_test_exec_filename} redis)
 
     target_link_libraries(
     ${unit_test_exec_filename}
         GTest::gtest_main
     )
+
+    target_compile_options(${unit_test_exec_filename} PRIVATE -g)
 endforeach()

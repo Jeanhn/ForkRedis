@@ -22,8 +22,8 @@ namespace rds
         void Del(const Str &);
         auto Len() -> std::size_t;
         auto GetAll() -> std::vector<std::pair<Str, Str>>;
-        auto IncrBy(const Str &key, std::size_t delta) -> bool;
-        auto DecrBy(const Str &key, std::size_t delta) -> bool;
+        auto IncrBy(const Str &key, int delta) -> bool;
+        auto DecrBy(const Str &key, int delta) -> bool;
 
         auto GetObjectType() const -> ObjectType override;
         auto EncodeValue() const -> std::string override;

@@ -6,7 +6,6 @@
 #include <objects/str.h>
 #include <map>
 #include <unordered_map>
-#include <util/str_lru.h>
 
 namespace rds
 {
@@ -62,25 +61,22 @@ namespace rds
     class Db
     {
     private:
+        static int number;
         constexpr static char SELECT_DB_ = 's';
         int number_;
         std::unordered_map<Str, KeyValue, decltype(&StrHash)> key_value_map_{0xff, StrHash};
-        StrLRU str_lru_;
 
-        void NewStr(const Str &, Str);
+    public:
+        void NewStr(const Str &);
         void NewList(const Str &);
         void NewSet(const Str &);
         void NewZSet(const Str &);
         void NewHash(const Str &);
 
-    public:
         void Del(const Str &);
         auto Get(const Str &) -> Object *;
 
-        void ExpireAtTime(const Str &, std::size_t);
         void Expire(const Str &, std::size_t);
-        void PExpire(const Str &, std::size_t);
-        void ExpireOut(std::size_t);
 
         auto Save() -> std::string;
 
@@ -88,7 +84,10 @@ namespace rds
 
         auto Size() -> std::size_t;
 
-        CLASS_DEFAULT_DECLARE(Db);
+        auto Number() const -> int;
+
+        Db();
+        ~Db() = default;
     };
 
 } // namespace rds

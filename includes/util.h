@@ -20,7 +20,6 @@
 #include <cstring>
 #include <cassert>
 #include <deque>
-#include <snmalloc/override/override.h>
 #include <iostream>
 
 void *operator new(size_t size);
@@ -147,6 +146,14 @@ namespace rds
     void EnCompress();
 
     void DisCompress();
+
+    inline void Assert(bool expr, const std::string &info)
+    {
+        if (!expr)
+        {
+            throw std::runtime_error(info);
+        }
+    }
 
 } // namespace rds
 

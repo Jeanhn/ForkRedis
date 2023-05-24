@@ -10,9 +10,11 @@ namespace rds
 {
     struct CommandBase;
 
-    auto RawCommandToJson(const std::string &) -> json11::Json::array;
+    class ClientInfo;
 
-    auto JsonToCommandExec(const json11::Json::array &) -> std::unique_ptr<CommandBase>;
+    auto RawCommandToRequest(const std::string &) -> json11::Json::array;
+
+    auto RequestToCommandExec(ClientInfo *client, const json11::Json::array &req) -> std::unique_ptr<CommandBase>;
 
     struct CommandBase
     {
@@ -20,43 +22,58 @@ namespace rds
         std::string command_;
         std::string obj_name_;
         Object *obj_;
-        virtual auto Exec(Db *) -> json11::Json::array;
+        ClientInfo *cli_;
+        virtual auto Exec() -> json11::Json::array = 0;
+        CLASS_DEFAULT_DECLARE(CommandBase);
+    };
+
+    struct CliCommand : CommandBase
+    {
+        std::optional<std::string> value_;
+        auto Exec() -> json11::Json::array;
+        CLASS_DEFAULT_DECLARE(CliCommand);
     };
 
     struct DbCommand : CommandBase
     {
         std::optional<std::string> value_;
-        auto Exec(Db *) -> json11::Json::array;
+        auto Exec() -> json11::Json::array;
+        CLASS_DEFAULT_DECLARE(DbCommand);
     };
 
     struct StrCommand : CommandBase
     {
         std::optional<std::string> value_;
-        auto Exec(Db *) -> json11::Json::array;
+        auto Exec() -> json11::Json::array;
+        CLASS_DEFAULT_DECLARE(StrCommand);
     };
 
     struct ListCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec(Db *) -> json11::Json::array;
+        auto Exec() -> json11::Json::array;
+        CLASS_DEFAULT_DECLARE(ListCommand);
     };
 
     struct HashCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec(Db *) -> json11::Json::array;
+        auto Exec() -> json11::Json::array;
+        CLASS_DEFAULT_DECLARE(HashCommand);
     };
 
     struct SetCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec(Db *) -> json11::Json::array;
+        auto Exec() -> json11::Json::array;
+        CLASS_DEFAULT_DECLARE(SetCommand);
     };
 
     struct ZSetCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec(Db *) -> json11::Json::array;
+        auto Exec() -> json11::Json::array;
+        CLASS_DEFAULT_DECLARE(ZSetCommand);
     };
 
 } // namespace rds

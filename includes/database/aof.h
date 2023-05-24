@@ -15,6 +15,7 @@ namespace rds
         void OptimizeAll();
 
     public:
+        void AddDB(Db *);
         void Load(std::deque<char> *);
         void Append(const Str &, std::string);
         void ReWrite();

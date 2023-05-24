@@ -55,6 +55,10 @@ namespace rds
 
     auto List::Rem(const Str &data) -> bool
     {
+        if (data_list_.empty())
+        {
+            return false;
+        }
         auto it = std::find(data_list_.cbegin(), data_list_.cend(), data);
         if (it == data_list_.end())
         {
@@ -66,6 +70,10 @@ namespace rds
 
     void List::Trim(int begin, int end)
     {
+        if (data_list_.empty())
+        {
+            return;
+        }
         auto legalRange = [size = data_list_.size()](int r) -> std::size_t
         {
             if (r >= 0)

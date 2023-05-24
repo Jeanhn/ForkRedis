@@ -123,9 +123,17 @@ namespace rds
  */
 namespace rds
 {
-    void Db::NewStr(const Str &key, Str value)
+    int Db::number = 0;
+    Db::Db() : number_(number++) {}
+
+    auto Db::Number() const -> int
     {
-        auto str = std::make_unique<Str>(std::move(value));
+        return number_;
+    }
+
+    void Db::NewStr(const Str &key)
+    {
+        auto str = std::make_unique<Str>();
         KeyValue kv{key, std::move(str)};
         key_value_map_.insert({key, std::move(kv)});
     }
@@ -160,7 +168,6 @@ namespace rds
 
     void Db::Del(const Str &key)
     {
-        str_lru_.Del(key);
         key_value_map_.erase(key);
     }
 
@@ -174,43 +181,8 @@ namespace rds
         return it->second.GetValue();
     }
 
-    void Db::ExpireAtTime(const Str &key, std::size_t time_stamp)
-    {
-        auto it = key_value_map_.find(key);
-        if (it == key_value_map_.end())
-        {
-            return;
-        }
-        it->second.MakeExpire(time_stamp);
-        str_lru_.Set(key, time_stamp);
-    }
-
     void Db::Expire(const Str &key, std::size_t time_period_s)
     {
-        PExpire(key, time_period_s * 1000);
-    }
-
-    void Db::PExpire(const Str &key, std::size_t time_period_ms)
-    {
-        ExpireAtTime(key, UsTime() + time_period_ms * 1000);
-    }
-
-    void Db::ExpireOut(std::size_t expiring_limit_us)
-    {
-        std::size_t start = UsTime();
-        while (!str_lru_.Empty())
-        {
-            Str key = str_lru_.Evict();
-            if (key.Empty())
-            {
-                break;
-            }
-            key_value_map_.erase(key);
-            if (UsTime() - start > expiring_limit_us)
-            {
-                break;
-            }
-        }
     }
 
     auto Db::Save() -> std::string

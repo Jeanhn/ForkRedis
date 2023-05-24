@@ -1,7 +1,6 @@
 #include <util.h>
 #include <lzfse.h>
 #include <cstdlib>
-#include <snmalloc/override/new.cc>
 
 namespace rds
 {

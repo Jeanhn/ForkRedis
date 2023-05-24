@@ -6,11 +6,6 @@ namespace rds
 {
     void Str::TypeCheck()
     {
-        if (data_.size() > sizeof(int))
-        {
-            encoding_type_ = EncodingType::STR_RAW;
-            return;
-        }
         for (auto it = data_.cbegin(); it != data_.cend(); it++)
         {
             if (*it < '0' || *it > '9')

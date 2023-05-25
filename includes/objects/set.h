@@ -16,7 +16,7 @@ namespace rds
 
     public:
         auto GetRawSet() -> std::unordered_set<Str, decltype(&StrHash)> &;
-        void Add(Str data);
+        auto Add(Str data) -> bool;
         auto Card() const -> std::size_t;
         auto IsMember(const Str &) const -> bool;
         auto Members() const -> std::vector<Str>;

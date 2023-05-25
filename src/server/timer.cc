@@ -14,7 +14,7 @@ namespace rds
         newtmr->expire_time_us_ = rdb_->Period() + UsTime();
         hdlr_->Push(std::move(newtmr));
         auto str = rdb_->Save();
-        dm_->Write(str);
+        fm_->Write(str);
     }
 
 } // namespace rds

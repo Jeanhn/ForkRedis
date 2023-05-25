@@ -8,12 +8,12 @@
 
 namespace rds
 {
-    Server::Server()
+    Server::Server(const char *ip, short port)
     {
         sockaddr_in si;
-        si.sin_addr.s_addr = inet_addr("127.0.0.1");
+        si.sin_addr.s_addr = inet_addr(ip);
         si.sin_family = AF_INET;
-        si.sin_port = htons(8080);
+        si.sin_port = htons(port);
         listen_fd_ = socket(AF_INET, SOCK_STREAM, 0);
         Assert(listen_fd_ != -1, "listenfd");
         int ret = bind(listen_fd_, reinterpret_cast<sockaddr *>(&si), sizeof(si));
@@ -28,6 +28,8 @@ namespace rds
         levt.data.fd = listen_fd_;
         levt.events = EPOLLIN;
         epoll_ctl(epfd_, EPOLL_CTL_ADD, listen_fd_, &levt);
+
+        Log("Server runs successfully on: ", ip, ':', port);
     }
 
     Server::~Server()
@@ -47,16 +49,11 @@ namespace rds
         std::vector<ClientInfo *> ret;
         for (int i = 0; i < n; i++)
         {
-            auto it = client_map_.find(epoll_revents_[i].data.fd);
-            if (it == client_map_.end())
+            if (epoll_revents_[i].data.fd == listen_fd_)
             {
-                std::cout << "Wait: valid client recv" << std::endl;
-                epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
-                close(epoll_revents_[i].data.fd);
-                continue;
-            }
-            if (it->first == listen_fd_)
-            {
+#ifndef NDEBUG
+                std::cout << "New client come" << std::endl;
+#endif
                 int cfd = ::accept(listen_fd_, 0, 0);
                 int fl = fcntl(cfd, F_GETFL);
                 fcntl(fl, F_SETFL, fl | O_NONBLOCK);
@@ -70,29 +67,57 @@ namespace rds
             }
             else
             {
+                auto it = client_map_.find(epoll_revents_[i].data.fd);
+                if (it == client_map_.end())
+                {
+#ifndef NDEBUG
+                    Log("Wait: invalid client recv");
+#endif
+                    epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
+                    close(epoll_revents_[i].data.fd);
+                    continue;
+                }
                 if (epoll_revents_[i].events & EPOLLIN)
                 {
+#ifndef NDEBUG
+                    Log("Client message recv");
+#endif
                     int nread = it->second->Read();
                     if (nread == 0 || nread == -1)
                     {
+#ifndef NDEBUG
+                        Log("Closed or invalid read");
+#endif
                         epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
                         client_map_.erase(it);
                     }
                     else
                     {
+#ifndef NDEBUG
+                        Log("Valid read");
+#endif
                         ret.push_back(it->second.get());
                     }
                 }
                 else
                 {
+#ifndef NDEBUG
+                    Log("Server message send");
+#endif
                     int nsend = it->second->Send();
                     if (nsend == -1)
                     {
+#ifndef NDEBUG
+                        Log("Inalid send");
+#endif
                         epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
                         client_map_.erase(it);
                     }
-                    if (it->second->IsSendOut())
+                    else if (it->second->IsSendOut())
                     {
+#ifndef NDEBUG
+                        Log("Valid send");
+#endif
                         epoll_event epev;
                         epev.data.fd = epoll_revents_[i].data.fd;
                         epev.events = EPOLLIN;
@@ -151,6 +176,14 @@ namespace rds
         }
     }
 
+    void Server::EnableSend(ClientInfo *client)
+    {
+        epoll_event epev;
+        epev.data.fd = client->fd_;
+        epev.events = EPOLLOUT;
+        epoll_ctl(epfd_, EPOLL_CTL_MOD, client->fd_, &epev);
+    }
+
     /*
 
 
@@ -175,6 +208,11 @@ namespace rds
                 return 0;
             }
             std::copy(std::cbegin(buf), std::cbegin(buf) + n, std::back_inserter(recv_buffer_));
+#ifndef NDEBUG
+            Log("Read");
+            std::copy(recv_buffer_.cbegin(), recv_buffer_.cend(), std::ostreambuf_iterator<char>(std::cout));
+            std::cout << std::endl;
+#endif
         } while (n == 65535);
         return total_n;
     }
@@ -190,6 +228,11 @@ namespace rds
         std::copy(send_buffer_.cbegin(), send_buffer_.cend(), std::back_inserter(buf));
         int n;
         n = write(fd_, buf.data(), buf.size());
+#ifndef NDEBUG
+        Log("Send");
+        std::copy(buf.cbegin(), buf.cend(), std::ostreambuf_iterator<char>(std::cout));
+        std::cout << std::endl;
+#endif
         if (n == 0 || n == -1)
         {
             return n;
@@ -212,39 +255,23 @@ namespace rds
 
     auto ClientInfo::ExportMessages() -> std::vector<json11::Json::array>
     {
-        auto beg = recv_buffer_.begin();
         std::vector<json11::Json::array> ret;
         do
         {
-            while (*beg != '[' && beg != recv_buffer_.end())
-            {
-                beg++;
-            }
-            auto end = beg;
-            while (*end != ']' && end != recv_buffer_.end())
-            {
-                end++;
-            }
-            if (beg != recv_buffer_.end() &&
-                end != recv_buffer_.end() &&
-                *beg == '[' && *end == ']')
-            {
-                end++;
-                std::string data;
-                std::copy(beg, end, std::back_inserter(data));
-                recv_buffer_.erase(recv_buffer_.begin(), end);
-                std::string err;
-                json11::Json obj = json11::Json::parse(data, err);
-                if (!err.empty())
-                {
-                    continue;
-                }
-                ret.push_back(obj.array_items());
-            }
-            else
+            auto beg = std::find(recv_buffer_.begin(), recv_buffer_.end(), '[');
+            auto end = std::find(recv_buffer_.begin(), recv_buffer_.end(), ']');
+            if (beg == recv_buffer_.end() ||
+                end == recv_buffer_.end() ||
+                std::distance(beg, end) <= 0)
             {
                 break;
             }
+            end++;
+            std::string element, err;
+            std::copy(beg, end, std::back_inserter(element));
+            json11::Json req = json11::Json::parse(element, err);
+            ret.push_back(req.array_items());
+            recv_buffer_.erase(recv_buffer_.begin(), end);
         } while (1);
         return ret;
     }
@@ -263,6 +290,10 @@ namespace rds
 
     auto ClientInfo::GetDB() -> Db *
     {
+        if (database_ == nullptr)
+        {
+            database_ = db_source_->begin()->get();
+        }
         return database_;
     }
 

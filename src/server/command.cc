@@ -55,7 +55,7 @@ namespace rds
 
     auto JsonToBase(CommandBase *ret, const json11::Json::array &source) -> bool
     {
-        if (source.size() <= 2)
+        if (source.size() < 2)
         {
             ret->valid_ = false;
             return false;
@@ -392,10 +392,7 @@ namespace rds
         {
             return {std::to_string(str->Len())};
         }
-        else
-        {
-            return {"Failed"};
-        }
+
         return {"OK"};
     }
 
@@ -429,6 +426,7 @@ namespace rds
         }
 
         auto l = reinterpret_cast<List *>(obj_);
+        json11::Json::array ret;
         if (command_ == "LPUSHF")
         {
             for (auto &it : values_)
@@ -445,18 +443,22 @@ namespace rds
         }
         else if (command_ == "LPOPF")
         {
-            auto ret = l->PopFront();
-            return {ret.GetRaw()};
+            auto str = l->PopFront();
+            return {str.GetRaw()};
         }
         else if (command_ == "LPOPB")
         {
-            auto ret = l->PopBack();
-            return {ret.GetRaw()};
+            auto str = l->PopBack();
+            return {str.GetRaw()};
         }
         else if (command_ == "LINDEX")
         {
-            auto ret = l->Index(std::stoi(values_[0].GetRaw()));
-            return {ret.GetRaw()};
+            for (auto &value : values_)
+            {
+                auto str = l->Index(std::stoi(value.GetRaw()));
+                ret.push_back(str.GetRaw());
+            }
+            return ret;
         }
         else if (command_ == "LLEN")
         {
@@ -473,10 +475,7 @@ namespace rds
         {
             l->Trim(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
         }
-        else
-        {
-            return {"Failed"};
-        }
+
         return {"OK"};
     }
 
@@ -502,7 +501,7 @@ namespace rds
         obj_ = cli_->GetDB()->Get({obj_name_});
         if (obj_ == nullptr)
         {
-            if (command_ != "HGET")
+            if (command_ != "HSET")
             {
                 return {""};
             }
@@ -578,10 +577,7 @@ namespace rds
                 tbl->DecrBy(values_[i], std::stoul(values_[i + 1].GetRaw()));
             }
         }
-        else
-        {
-            return {"Failed"};
-        }
+
         return ret;
     }
     /*
@@ -668,7 +664,7 @@ namespace rds
             Object *another_set = cli_->GetDB()->Get(values_[0]);
             if (another_set->GetObjectType() != ObjectType::SET)
             {
-                return {"Failed"};
+                return {""};
             }
             auto a_st = reinterpret_cast<Set *>(another_set);
             auto inter = st->Inter(*a_st);
@@ -682,7 +678,7 @@ namespace rds
             Object *another_set = cli_->GetDB()->Get(values_[0]);
             if (another_set->GetObjectType() != ObjectType::SET)
             {
-                return {"Failed"};
+                return {""};
             }
             auto a_st = reinterpret_cast<Set *>(another_set);
             auto inter = st->Diff(*a_st);
@@ -691,10 +687,7 @@ namespace rds
                 ret.push_back(std::move(element.GetRaw()));
             }
         }
-        else
-        {
-            return {"Failed"};
-        }
+
         return ret;
     }
     /*
@@ -797,10 +790,7 @@ namespace rds
                 ret.push_back(std::to_string(kv.second));
             }
         }
-        else
-        {
-            return {"Failed"};
-        }
+
         return ret;
     }
     /*
@@ -810,6 +800,7 @@ namespace rds
      */
     auto DbCommand::Exec() -> json11::Json::array
     {
+        assert(0);
         if (!valid_)
         {
             return {""};
@@ -828,11 +819,7 @@ namespace rds
         {
             cli_->GetDB()->Expire({obj_name_}, std::stoul(value_.value()));
         }
-        else
-        {
-            assert(0);
-            return {"Failed"};
-        }
+
         return {"OK"};
     }
     /*
@@ -842,6 +829,7 @@ namespace rds
      */
     auto CliCommand::Exec() -> json11::Json::array
     {
+        assert(0);
         if (!valid_)
         {
             return {""};
@@ -850,10 +838,7 @@ namespace rds
         {
             cli_->ShiftDB(std::stoi(value_.value()));
         }
-        else
-        {
-            assert(0);
-        }
+
         return {"OK"};
     }
 };

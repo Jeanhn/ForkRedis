@@ -17,7 +17,7 @@ void init()
     client.database_ = &database;
 }
 
-suit_t raw_str_cli_commands{
+suit_t str_cli_commands{
     "  SET  str1 100",
     "GET str1  ",
     "  INCRBY str1 -10  ",
@@ -30,9 +30,9 @@ suit_t str_values{"100", "00", "str1", "10000"};
 
 TEST(Command, RawCommandToRequest)
 {
-    for (std::size_t i = 0; i < raw_str_cli_commands.size(); i++)
+    for (std::size_t i = 0; i < str_cli_commands.size(); i++)
     {
-        auto &raw = raw_str_cli_commands[i];
+        auto &raw = str_cli_commands[i];
         auto req = rds::RawCommandToRequest(raw);
         auto cmd = std::find(str_commands.cbegin(), str_commands.cend(), req[0].string_value());
         auto reqcmd = req[0].string_value();
@@ -51,7 +51,7 @@ TEST(Command, Str)
 {
     init();
     int i = 0;
-    for (auto cmd : raw_str_cli_commands)
+    for (auto cmd : str_cli_commands)
     {
         auto req = rds::RawCommandToRequest(cmd);
         auto exec = rds::RequestToCommandExec(&client, req);
@@ -67,5 +67,5 @@ TEST(Command, Str)
     cout << reinterpret_cast<rds::Str *>(s)->GetRaw() << endl;
 }
 
-suit_t raw_list_cli_commands;
+suit_t list_cli_commands;
 suit_t list_commands{"LPUSHF", "LPOPF", "LPUSHB", "LPOPB", "LLEN", "LTRIM", "LINDEX", "LREM", "LTRIM"};

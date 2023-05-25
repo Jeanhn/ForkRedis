@@ -6,11 +6,12 @@ target_include_directories(redis PUBLIC ${PROJECT_SOURCE_DIR}/includes)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE DEBUG)
+    set(ADD_TEST ON)
     target_compile_options(redis PUBLIC --coverage -pg)
     target_link_options(redis PUBLIC --coverage -pg)
 else()
     set(CMAKE_BUILD_TYPE RELEASE)
-    target_compile_definitions(redis PUBLIC -NDEBUG)
+    target_compile_options(redis PUBLIC -DNDEBUG)
 endif()
 
 target_compile_options(redis PUBLIC -Wall -Werror)

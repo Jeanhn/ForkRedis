@@ -15,13 +15,13 @@ namespace rds
         std::list<Str> data_list_;
 
     public:
-        void PushFront(Str);
-        void PushBack(Str);
+        void PushFront(Str str);
+        void PushBack(Str str);
         auto PopFront() -> Str;
         auto PopBack() -> Str;
-        auto Index(std::size_t) const -> Str;
+        auto Index(int idx) const -> Str;
         auto Len() const -> std::size_t;
-        auto Rem(const Str &) -> bool;
+        auto Rem(const Str &data) -> bool;
         void Trim(int, int);
 
         auto GetObjectType() const -> ObjectType override;

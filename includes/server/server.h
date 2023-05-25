@@ -50,16 +50,16 @@ namespace rds
     class Server
     {
     private:
-        std::list<std::unique_ptr<Db>> *db_source_;
         std::unordered_map<int, std::unique_ptr<ClientInfo>> client_map_;
         std::vector<epoll_event> epoll_revents_;
         int listen_fd_;
         int epfd_;
 
     public:
+        std::list<std::unique_ptr<Db>> *db_source_;
         auto Wait(int timeout) -> std::vector<ClientInfo *>;
-        void EnableSend(ClientInfo *);
-        Server();
+        void EnableSend(ClientInfo *client);
+        Server(const char *ip = "127.0.0.1", short port = 8080);
         ~Server();
     };
 

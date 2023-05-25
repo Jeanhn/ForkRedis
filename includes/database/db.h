@@ -60,7 +60,11 @@ namespace rds
 
     class Db
     {
+#ifdef NDEBUG
     private:
+#else
+    public:
+#endif
         static int number;
         constexpr static char SELECT_DB_ = 's';
         int number_;
@@ -86,8 +90,8 @@ namespace rds
 
         auto Number() const -> int;
 
+        CLASS_DECLARE_without_constructor(Db);
         Db();
-        ~Db() = default;
     };
 
 } // namespace rds

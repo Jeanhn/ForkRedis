@@ -37,12 +37,23 @@ namespace rds
         return ret;
     }
 
-    auto List::Index(std::size_t idx) const -> Str
+    auto List::Index(int idx) const -> Str
     {
-        if (idx >= data_list_.size())
+        if (data_list_.empty())
         {
             return {};
         }
+        auto legalRange = [size = data_list_.size()](int r) -> std::size_t
+        {
+            if (r >= 0)
+            {
+                return r % size;
+            }
+            int _r = -r;
+            r += (_r / size + 1) * size;
+            return static_cast<std::size_t>(r);
+        };
+        idx = legalRange(idx);
         auto it = data_list_.cbegin();
         std::advance(it, idx);
         return *it;

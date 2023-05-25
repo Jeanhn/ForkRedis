@@ -1,7 +1,11 @@
 #include <database/db.h>
 #include <gtest/gtest.h>
-#include <objects/str.h>
+#include <objects/list.h>
 #include <objects/set.h>
+#include <objects/zset.h>
+#include <objects/hash.h>
+#include "util4test.h"
+#ifndef NDEBUG
 
 void CheckWhat(const std::string &what)
 {
@@ -60,7 +64,6 @@ TEST(KeyValue, kv)
     std::sort(m2.begin(), m2.end());
 
     ASSERT_EQ(m, m2);
-    CheckWhat("kv single en-de-code");
 
     std::vector<KeyValue> kvec;
     for (int i = 0; i < 1000; i++)
@@ -71,3 +74,28 @@ TEST(KeyValue, kv)
     }
     // decltype(kvec) kvec2;
 }
+TEST(Database, Db)
+{
+    using namespace rds;
+
+    print("dbsize: ", db.key_value_map_.size());
+
+    auto dbfile = db.Save();
+    print("dbfilesize: ", dbfile.size());
+    std::deque<char> cache;
+    std::copy(dbfile.cbegin(), dbfile.cend(), std::back_inserter(cache));
+
+    Db db2;
+    db2.Load(&cache);
+
+    print("db2size: ", db2.key_value_map_.size());
+
+    for (auto &kv : db2.key_value_map_)
+    {
+        auto pos = db.key_value_map_.find(kv.first);
+        ASSERT_NE(pos, db.key_value_map_.end());
+    }
+    ASSERT_EQ(db.key_value_map_.size(), db2.key_value_map_.size());
+}
+
+#endif

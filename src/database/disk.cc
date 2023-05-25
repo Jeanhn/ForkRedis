@@ -3,80 +3,74 @@
 
 namespace rds
 {
-    DiskManager::DiskManager(const std::string &filename) : DiskManager(filename, 0)
+    FileManager::~FileManager()
     {
     }
 
-    DiskManager::~DiskManager()
+    FileManager::FileManager(const std::string &filename) : filename_(filename)
     {
-        Flush();
-    }
-
-    DiskManager::DiskManager(const std::string &filename, std::size_t write_cache_size) : filename_(filename),
-                                                                                          write_cache_size_(write_cache_size)
-    {
-        file_strm_.open(filename, std::ios::app | std::ios::in | std::ios::out);
-        if (std::filesystem::file_size(filename) == 0)
+        if (!std::filesystem::exists(filename))
         {
-            file_strm_ << "REDIS"
-                       << "0006"
-                       << "e" << std::uint64_t(0x12345678);
-            file_strm_.flush();
+            std::ofstream ofile_strm;
+            ofile_strm.open(filename, std::ios::out);
         }
-        file_strm_.close();
-        file_strm_.open(filename, std::ios::app | std::ios::in | std::ios::out);
     }
 
-    void DiskManager::Truncate()
+    void FileManager::Truncate()
     {
-        file_strm_.close();
-        file_strm_.open(filename_, std::ios::in | std::ios::out);
+        std::filesystem::resize_file(filename_, 0);
     }
 
-    void DiskManager::Flush()
+    auto FileManager::LoadAndExport() -> std::deque<char>
     {
-        std::ostreambuf_iterator<char> outer(file_strm_);
-        while (!write_cache_.empty())
+        if (std::filesystem::is_empty(filename_))
         {
-            outer = write_cache_.front();
-            write_cache_.pop_front();
+            return {};
         }
-        file_strm_.flush();
-    }
+        std::ifstream ifile_strm;
+        ifile_strm.open(filename_, std::ios::in | std::ios::binary);
 
-    auto DiskManager::LoadAndExport() -> std::deque<char>
-    {
-        std::istreambuf_iterator<char> iner(file_strm_);
-        while (!file_strm_.eof())
+        std::deque<char> ret;
+        while (!ifile_strm.eof())
         {
-            read_cache_.push_back(*iner);
+            char c;
+            ifile_strm.read(&c, sizeof(c));
+            ret.push_back(c);
         }
-        std::deque<char> ret = std::move(read_cache_);
-        read_cache_ = std::deque<char>{};
+        ret.pop_back();
         return ret;
     }
 
-    void DiskManager::Write(const std::string &data)
+    void FileManager::Write(const std::string &bytes)
     {
-        if (write_cache_size_ == 0)
-        {
-            file_strm_ << data;
-            return;
-        }
-        std::copy(data.cbegin(), data.cend(), std::back_inserter(write_cache_));
-        if (write_cache_.size() >= write_cache_size_)
-        {
-            Flush();
-        }
+        std::ofstream ofile_strm;
+        ofile_strm.open(filename_, std::ios::out | std::ios::app);
+        ofile_strm << bytes;
     }
 
-    void DiskManager::EnCached(std::size_t cache_size)
+    void FileManager::Write(std::string &&bytes)
     {
-        write_cache_size_ = cache_size;
+        std::ofstream ofile_strm;
+        ofile_strm.open(filename_, std::ios::out | std::ios::app);
+        ofile_strm << std::move(bytes);
     }
-    void DiskManager::DisCached()
+
+    auto FileManager::Name() const -> std::string
     {
-        write_cache_size_ = 0;
+        return filename_;
+    }
+    auto FileManager::Size() const -> std::size_t
+    {
+        return std::filesystem::file_size(filename_);
+    }
+    void FileManager::Change(const std::string &filename)
+    {
+        filename_ = filename;
+        if (!std::filesystem::exists(filename))
+        {
+            std::ofstream ofile_strm;
+            ofile_strm.open(filename, std::ios::out);
+        }
     }
 
 } // namespace rds

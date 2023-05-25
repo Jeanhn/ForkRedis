@@ -14,7 +14,8 @@ namespace rds
     {
         bool valid_;
         std::size_t expire_time_us_;
-        virtual void Exec();
+        virtual void Exec() = 0;
+        CLASS_DEFAULT_DECLARE(Timer);
     };
 
     struct DbExpireTimer : Timer
@@ -22,6 +23,7 @@ namespace rds
         Db *database_;
         std::string obj_name_;
         void Exec();
+        CLASS_DEFAULT_DECLARE(DbExpireTimer);
     };
 
     class Handler;
@@ -30,15 +32,16 @@ namespace rds
     {
         Handler *hdlr_;
         Rdb *rdb_;
-        static DiskManager *dm_;
+        FileManager *fm_;
         void Exec();
+        CLASS_DEFAULT_DECLARE(RdbTimer);
     };
 
     struct AofTimer : Timer
     {
         Handler *hdlr_;
         Aof *aof_;
-        static DiskManager *dm_;
+        FileManager *dm_;
         void Exec();
     };
 

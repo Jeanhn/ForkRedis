@@ -16,7 +16,8 @@ namespace rds
         HASH,
         SET,
         ZSET,
-        EXPIRE_ENTRY
+        EXPIRE_ENTRY,
+        UNKNOWN
     };
 
     inline auto ObjectTypeToChar(ObjectType otyp) -> char
@@ -45,41 +46,44 @@ namespace rds
         case ObjectType::EXPIRE_ENTRY:
             ret = 6;
             break;
+        case ObjectType::UNKNOWN:
+            assert(0);
+            break;
         }
         return ret;
     }
 
     inline auto CharToObjectType(char c) -> ObjectType
     {
-        ObjectType otyp;
+        ObjectType ret_typ = ObjectType::UNKNOWN;
         switch (c)
         {
         case 0:
-            otyp = ObjectType::OBJ;
+            ret_typ = ObjectType::OBJ;
             break;
         case 1:
-            otyp = ObjectType::STR;
+            ret_typ = ObjectType::STR;
             break;
         case 2:
-            otyp = ObjectType::LIST;
+            ret_typ = ObjectType::LIST;
             break;
         case 3:
-            otyp = ObjectType::HASH;
+            ret_typ = ObjectType::HASH;
             break;
         case 4:
-            otyp = ObjectType::SET;
+            ret_typ = ObjectType::SET;
             break;
         case 5:
-            otyp = ObjectType::ZSET;
+            ret_typ = ObjectType::ZSET;
             break;
         case 6:
-            otyp = ObjectType::EXPIRE_ENTRY;
+            ret_typ = ObjectType::EXPIRE_ENTRY;
             break;
         default:
             assert(0);
             break;
         }
-        return otyp;
+        return ret_typ;
     }
 
     enum class EncodingType
@@ -90,7 +94,8 @@ namespace rds
         LIST,    // linked list
         ARRAY,   // zip list
         HASHMAP, // ht
-        RBTREE   // skip list
+        RBTREE,  // skip list
+        UNKNOWN
     };
 
     inline auto EncodingTypeToChar(EncodingType etyp) -> char
@@ -119,13 +124,16 @@ namespace rds
         case EncodingType::RBTREE:
             ret = 6;
             break;
+        case EncodingType::UNKNOWN:
+            assert(0);
+            break;
         }
         return ret;
     }
 
     inline auto CharToEncodingType(char c) -> EncodingType
     {
-        EncodingType etyp;
+        EncodingType etyp = EncodingType::UNKNOWN;
         switch (c)
         {
         case 0:

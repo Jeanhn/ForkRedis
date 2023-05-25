@@ -1,1 +1,0 @@
-/home/jean/.vscode-server/extensions/ms-vscode.cpptools-1.15.4-linux-x64/LLVM/bin/clang-format

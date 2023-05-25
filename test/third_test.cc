@@ -4,6 +4,9 @@
 #include <iostream>
 #include <json11.hpp>
 #include <gtest/gtest.h>
+#include <server/command.h>
+using std::cout;
+using std::endl;
 
 struct tempForJson
 {
@@ -19,15 +22,9 @@ struct tempForJson
 TEST(Third, Json11)
 {
     using namespace json11;
-    Json obj = Json::object{{"k", "v"}};
-    std::string err;
-    auto obj3 = Json::parse(obj.dump(), err);
-    std::cout << obj.dump() << std::endl;
-    std::cout << obj3.dump() << "\nerr:" << err << std::endl;
-
-    Json arr = Json::array{"1", "2"};
-    auto obj4 = Json::parse(arr.dump(), err);
-    std::cout << obj4.dump() << "\nerr:" << err << std::endl;
+    using namespace rds;
+    Json cmd = RawCommandToRequest("SET STR GOOD");
+    cout << cmd.dump() << endl;
 }
 
 TEST(Third, Snmalloc)

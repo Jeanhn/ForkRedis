@@ -4,9 +4,10 @@
 namespace rds
 {
 
-    void Set::Add(Str data)
+    auto Set::Add(Str data) -> bool
     {
-        data_set_.insert(std::move(data));
+        auto it = data_set_.insert(std::move(data));
+        return it.second;
     }
 
     auto Set::Card() const -> std::size_t

@@ -3,6 +3,13 @@
 namespace rds
 {
 
+    // ZSet::ZSet(ZSet &&rhs) : sequence_list_(rhs.sequence_list_), member_map_(std::move(rhs.member_map_)),
+    //                          rank_map_(std::move(rank_map_)) {}
+    // ZSet &ZSet::operator=(ZSet &&rhs) {
+    //     sequence_list_ = rhs.sequence_list_;
+
+    // }
+
     auto ZSet::Add(int score, Str member) -> bool
     {
         auto it = member_map_.insert({std::move(member), sequence_list_.end()});
@@ -10,7 +17,7 @@ namespace rds
         {
             return false;
         }
-        sequence_list_.push_back({it.first->first, score});
+        sequence_list_.push_back({&it.first->first, score});
         auto pos = sequence_list_.end();
         pos--;
         it.first->second = pos;
@@ -113,11 +120,12 @@ namespace rds
         {
             return {};
         }
-        auto b = sequence_list_.begin();
+        auto b = sequence_list_.cbegin();
         auto e = b;
         std::advance(b, lbeg);
         std::advance(e, lend + 1);
-        std::copy(b, e, std::back_inserter(ret));
+        std::for_each(b, e, [&ret](const decltype(sequence_list_)::value_type &v)
+                      { ret.push_back({*(v.first), v.second}); });
         return ret;
     }
 
@@ -158,7 +166,7 @@ namespace rds
     {
         std::string ret = BitsToString(sequence_list_.size());
         std::for_each(std::cbegin(sequence_list_), std::cend(sequence_list_), [&ret](const decltype(sequence_list_)::value_type &v) mutable
-                      { ret.append(BitsToString(v.second));ret.append(v.first.EncodeValue()); });
+                      { ret.append(BitsToString(v.second));ret.append(v.first->EncodeValue()); });
         return ret;
     }
 

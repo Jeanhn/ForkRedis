@@ -183,6 +183,12 @@ namespace rds
 
     void Db::Expire(const Str &key, std::size_t time_period_s)
     {
+        auto it = key_value_map_.find(key);
+        if (it == key_value_map_.end())
+        {
+            return;
+        }
+        it->second.MakeExpire(UsTime() + time_period_s * 1000'000);
     }
 
     auto Db::Save() -> std::string

@@ -1,0 +1,11 @@
+logic right and robust
+
+objects: 
+    set.cc: Set::RandMember
+
+server:
+    command.cc:
+        CliCommand
+        DbCommand
+    server.cc
+    timer.cc

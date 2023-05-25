@@ -21,6 +21,9 @@
 #include <cassert>
 #include <deque>
 #include <iostream>
+#define Panic()                         \
+    std::cout << __FILE__ << std::endl; \
+    std::abort();
 
 void *operator new(size_t size);
 
@@ -154,6 +157,27 @@ namespace rds
             throw std::runtime_error(info);
         }
     }
+
+    template <typename T, typename... Ts>
+    inline void Log(T arg, Ts... args)
+    {
+        std::cout << arg;
+        if constexpr (sizeof...(args) != 0)
+        {
+            std::cout << ' ';
+            Log(args...);
+        }
+        else
+        {
+            std::cout << std::endl;
+        }
+    }
+
+    struct RedisConf
+    {
+        const char *ip_;
+        short port_;
+    };
 
 } // namespace rds
 

@@ -13,7 +13,7 @@ namespace rds
     class ZSet final : public Object
     {
     private:
-        std::list<std::pair<const Str &, int>> sequence_list_;
+        std::list<std::pair<const Str *, int>> sequence_list_;
         std::map<Str, decltype(sequence_list_)::iterator> member_map_;
         std::multimap<int, decltype(member_map_)::iterator> rank_map_;
 
@@ -34,6 +34,12 @@ namespace rds
         void DecodeValue(std::deque<char> *) override;
 
         CLASS_DEFAULT_DECLARE(ZSet);
+        // ZSet() = default;
+        // ZSet(const ZSet &) = default;
+        // ~ZSet() = default;
+        // ZSet &operator=(const ZSet &) = default;
+        // ZSet(ZSet &&);
+        // ZSet &operator=(ZSet &&);
     };
 
 } // namespace rds

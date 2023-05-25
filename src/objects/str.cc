@@ -166,7 +166,11 @@ namespace rds
         else if (etyp == EncodingType::STR_COMPRESS)
         {
             size_t size_compress = PeekSize(source);
+#ifndef NDEBUG
             size_t size_origin = PeekSize(source);
+#else
+            PeekSize(source);
+#endif
             data_ = Decompress(PeekString(source, size_compress));
             assert(size_origin == data_.size());
         }

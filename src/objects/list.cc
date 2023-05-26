@@ -3,14 +3,16 @@
 namespace rds
 {
 
-    void List::PushFront(Str str)
+    auto List::PushFront(Str str) -> std::size_t
     {
         data_list_.push_front(std::move(str));
+        return data_list_.size();
     }
 
-    void List::PushBack(Str str)
+    auto List::PushBack(Str str) -> std::size_t
     {
         data_list_.push_back(std::move(str));
+        return data_list_.size();
     }
 
     auto List::PopFront() -> Str
@@ -64,26 +66,82 @@ namespace rds
         return data_list_.size();
     }
 
-    auto List::Rem(const Str &data) -> bool
+    auto List::Rem(int count, const Str &value) -> std::size_t
     {
         if (data_list_.empty())
         {
-            return false;
+            return 0;
         }
-        auto it = std::find(data_list_.cbegin(), data_list_.cend(), data);
-        if (it == data_list_.end())
+        std::size_t abs = count;
+        if (count < 0)
         {
-            return false;
+            abs = -count;
         }
-        data_list_.erase(it);
-        return true;
+        std::size_t cnt = std::count(data_list_.cbegin(), data_list_.cend(), value);
+        if (!cnt == 0)
+        {
+            return 0;
+        }
+        if (cnt > abs)
+        {
+            cnt = abs;
+        }
+        auto n = cnt;
+        if (count > 0)
+        {
+            auto beg = data_list_.begin();
+            auto next = beg;
+            next++;
+            while (n > 0)
+            {
+                if (*beg == value)
+                {
+                    data_list_.erase(beg);
+                    n--;
+                    if (next == data_list_.end())
+                    {
+                        return cnt;
+                    }
+                }
+                beg = next;
+                next++;
+            }
+        }
+        else
+        {
+            auto beg = data_list_.end();
+            beg--;
+            auto next = beg;
+            if (next != data_list_.begin())
+            {
+                next--;
+            }
+            while (n > 0)
+            {
+                if (*beg == value)
+                {
+                    data_list_.erase(beg);
+                    if (beg == next)
+                    {
+                        return cnt;
+                    }
+                    n--;
+                }
+                beg = next;
+                if (next != data_list_.begin())
+                {
+                    next--;
+                }
+            }
+        }
+        return cnt;
     }
 
-    void List::Trim(int begin, int end)
+    auto List::Trim(int begin, int end) -> bool
     {
         if (data_list_.empty())
         {
-            return;
+            return false;
         }
         auto legalRange = [size = data_list_.size()](int r) -> std::size_t
         {
@@ -99,13 +157,37 @@ namespace rds
         end = legalRange(end);
         if (begin > end)
         {
-            std::swap(begin, end);
+            return false;
         }
         auto beg = std::begin(data_list_);
         auto ed = beg;
         std::advance(beg, static_cast<std::size_t>(begin));
         std::advance(ed, static_cast<std::size_t>(end) + 1);
         data_list_.erase(beg, ed);
+        return true;
+    }
+
+    auto List::Set(int index, const Str &value) -> bool
+    {
+        if (data_list_.empty())
+        {
+            return false;
+        }
+        auto legalRange = [size = data_list_.size()](int r) -> std::size_t
+        {
+            if (r >= 0)
+            {
+                return r % size;
+            }
+            int _r = -r;
+            r += (_r / size + 1) * size;
+            return static_cast<std::size_t>(r);
+        };
+        index = legalRange(index);
+        auto it = data_list_.begin();
+        std::advance(it, index);
+        *it = value;
+        return true;
     }
 
     auto List::GetObjectType() const -> ObjectType { return ObjectType::LIST; }

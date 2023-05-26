@@ -55,10 +55,14 @@ namespace rds
         int listen_fd_;
         int epfd_;
 
+        std::list<std::unique_ptr<Db>> databases_;
+        FileManager file_manager_;
+
     public:
-        std::list<std::unique_ptr<Db>> *db_source_;
         auto Wait(int timeout) -> std::vector<ClientInfo *>;
         void EnableSend(ClientInfo *client);
+        auto Databases() -> std::list<std::unique_ptr<Db>> *;
+        auto File() -> FileManager *;
         Server(const char *ip = "127.0.0.1", short port = 8080);
         ~Server();
     };

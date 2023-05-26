@@ -1,6 +1,7 @@
 #include <util.h>
 #include <lzfse.h>
 #include <cstdlib>
+#include <objects/str.h>
 
 namespace rds
 {
@@ -109,5 +110,41 @@ namespace rds
     void DisCompress()
     {
         __compress.store(false);
+    }
+
+    auto RedisStrToInt(const Str &value) -> std::optional<int>
+    {
+        auto raw = value.GetRaw();
+        if (raw.empty())
+        {
+            return {};
+        }
+        if (raw[0] != '-')
+        {
+            for (auto c : raw)
+            {
+                if (c < '0' || c > '9')
+                {
+                    return {};
+                }
+            }
+            return std::stoi(raw);
+        }
+        else
+        {
+            std::string abs(raw.begin() + 1, raw.end());
+            if (abs.empty())
+            {
+                return {};
+            }
+            for (auto c : abs)
+            {
+                if (c < '0' || c > '9')
+                {
+                    return {};
+                }
+            }
+            return -std::stoi(abs);
+        }
     }
 }

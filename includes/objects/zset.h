@@ -18,16 +18,18 @@ namespace rds
         std::multimap<int, decltype(member_map_)::iterator> rank_map_;
 
     public:
-        auto Add(int, Str) -> bool;
+        auto Add(int, Str) -> bool; // number of new (except update)
         auto Card() -> std::size_t;
         auto Rem(int, const Str &) -> bool;
         auto Count(int, int) -> std::size_t;
         auto LexCount(const Str &, const Str &) -> std::size_t;
-        auto IncrBy(int, const Str &) -> bool;
-        auto DecrBy(int, const Str &) -> bool;
+        auto IncrBy(int, const Str &) -> std::string;
+        auto DecrBy(int, const Str &) -> std::string;
         auto Range(int, int) -> std::vector<std::pair<Str, int>>;
         auto RangeByScore(int, int) -> std::vector<std::pair<Str, int>>;
         auto RangeByLex(const Str &, const Str &) -> std::vector<std::pair<Str, int>>;
+        auto Rank(const Str &member) const -> std::string;
+        auto Score(const Str &member) const -> std::string;
 
         auto GetObjectType() const -> ObjectType override;
         auto EncodeValue() const -> std::string override;

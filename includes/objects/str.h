@@ -26,13 +26,11 @@ namespace rds
         void TypeCheck();
 
     public:
-        auto GetRaw() -> std::string &;
-        void Set(const std::string &);
-        void Set(std::string &&);
-        void Append(const std::string &);
-        void Append(std::string &&);
-        auto IncrBy(int) -> bool;
-        auto DecrBy(int) -> bool;
+        auto GetRaw() const -> std::string;
+        void Set(std::string);
+        auto Append(std::string) -> std::size_t;
+        auto IncrBy(int) -> std::string;
+        auto DecrBy(int) -> std::string;
         auto Len() const -> std::size_t;
         auto Empty() const -> bool;
 

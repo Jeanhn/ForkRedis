@@ -14,6 +14,7 @@ namespace rds
 
     auto RawCommandToRequest(const std::string &) -> json11::Json::array;
 
+    /* ensure that if ret-val is not null, then it can be execed  */
     auto RequestToCommandExec(ClientInfo *client, const json11::Json::array &req) -> std::unique_ptr<CommandBase>;
 
     struct CommandBase
@@ -30,49 +31,49 @@ namespace rds
     struct CliCommand : CommandBase
     {
         std::optional<std::string> value_;
-        auto Exec() -> json11::Json::array;
+        auto Exec() -> json11::Json::array override;
         CLASS_DEFAULT_DECLARE(CliCommand);
     };
 
     struct DbCommand : CommandBase
     {
         std::optional<std::string> value_;
-        auto Exec() -> json11::Json::array;
+        auto Exec() -> json11::Json::array override;
         CLASS_DEFAULT_DECLARE(DbCommand);
     };
 
     struct StrCommand : CommandBase
     {
         std::optional<std::string> value_;
-        auto Exec() -> json11::Json::array;
+        auto Exec() -> json11::Json::array override;
         CLASS_DEFAULT_DECLARE(StrCommand);
     };
 
     struct ListCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec() -> json11::Json::array;
+        auto Exec() -> json11::Json::array override;
         CLASS_DEFAULT_DECLARE(ListCommand);
     };
 
     struct HashCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec() -> json11::Json::array;
+        auto Exec() -> json11::Json::array override;
         CLASS_DEFAULT_DECLARE(HashCommand);
     };
 
     struct SetCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec() -> json11::Json::array;
+        auto Exec() -> json11::Json::array override;
         CLASS_DEFAULT_DECLARE(SetCommand);
     };
 
     struct ZSetCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec() -> json11::Json::array;
+        auto Exec() -> json11::Json::array override;
         CLASS_DEFAULT_DECLARE(ZSetCommand);
     };
 

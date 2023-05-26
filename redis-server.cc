@@ -1,36 +1,25 @@
 #include <rds.h>
 
 rds::Server server("127.0.0.1", 8080);
-rds::Handler handler;
 rds::Rdb rdb;
-std::list<std::unique_ptr<rds::Db>> databases;
-rds::FileManager fm;
 rds::RdbTimer rdb_timer;
+rds::Handler handler;
+
+/* above should be managed in server */
 
 int main()
 {
-    std::cout << "loading rdb file ..." << std::endl;
-    auto dbfile = fm.LoadAndExport();
-    fm.Truncate();
-
-    databases = rds::Rdb::Load(&dbfile);
-
+    rds::Log("Default save:Rdb");
     rdb.SetSaveFrequency(1, 1);
-    rdb.Manage(&databases);
+    rdb.Manage(server.Databases());
 
-    rdb_timer.fm_ = &fm;
+    rdb_timer.fm_ = server.File();
     rdb_timer.hdlr_ = &handler;
     rdb_timer.valid_ = true;
     rdb_timer.rdb_ = &rdb;
     rdb_timer.expire_time_us_ = rdb.Period() + rds::UsTime();
 
     handler.Push(std::make_unique<rds::RdbTimer>(rdb_timer));
-
-    std::cout << "waiting for client" << std::endl;
-
-    databases.push_back(std::make_unique<rds::Db>());
-
-    server.db_source_ = &databases;
 
     while (1)
     {
@@ -68,5 +57,5 @@ int main()
         handler.Handle();
     }
 
-    fm.Truncate();
+    rdb_timer.fm_->Truncate();
 }

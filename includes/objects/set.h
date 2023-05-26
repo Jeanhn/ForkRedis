@@ -16,13 +16,13 @@ namespace rds
 
     public:
         auto GetRawSet() -> std::unordered_set<Str, decltype(&StrHash)> &;
-        auto Add(Str data) -> bool;
+        auto Add(Str data) -> bool; // number of added-new-members
         auto Card() const -> std::size_t;
         auto IsMember(const Str &) const -> bool;
         auto Members() const -> std::vector<Str>;
         auto RandMember() const -> Str;
         auto Pop() -> Str;
-        void Rem(const Str &);
+        auto Rem(const Str &) -> bool; // number of removed-members
         auto Diff(const Set &) -> std::vector<Str>;
         auto Inter(const Set &) -> std::vector<Str>;
 

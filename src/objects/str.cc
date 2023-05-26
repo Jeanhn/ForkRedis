@@ -17,57 +17,46 @@ namespace rds
         encoding_type_ = EncodingType::INT;
     }
 
-    auto Str::GetRaw() -> std::string &
+    auto Str::GetRaw() const -> std::string
     {
         return data_;
     }
 
-    void Str::Set(const std::string &data)
-    {
-        data_ = data;
-        TypeCheck();
-    }
-
-    void Str::Set(std::string &&data)
+    void Str::Set(std::string data)
     {
         data_ = std::move(data);
         TypeCheck();
     }
 
-    void Str::Append(const std::string &data)
-    {
-        data_.append(data);
-        TypeCheck();
-    }
-
-    void Str::Append(std::string &&data)
+    auto Str::Append(std::string data) -> std::size_t
     {
         data_.append(std::move(data));
         TypeCheck();
+        return data_.size();
     }
 
-    auto Str::IncrBy(int delta) -> bool
+    auto Str::IncrBy(int delta) -> std::string
     {
         if (encoding_type_ != EncodingType::INT)
         {
-            return false;
+            return {};
         }
         int raw_int = std::stoi(data_);
         raw_int += delta;
         data_ = std::to_string(raw_int);
-        return true;
+        return data_;
     }
 
-    auto Str::DecrBy(int delta) -> bool
+    auto Str::DecrBy(int delta) -> std::string
     {
         if (encoding_type_ != EncodingType::INT)
         {
-            return false;
+            return {};
         }
         int raw_int = std::stoi(data_);
         raw_int -= delta;
         data_ = std::to_string(raw_int);
-        return true;
+        return data_;
     }
 
     auto Str::Len() const -> std::size_t

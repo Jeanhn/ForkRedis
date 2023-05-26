@@ -150,6 +150,9 @@ namespace rds
 
     void DisCompress();
 
+    class Str;
+    auto RedisStrToInt(const Str &value) -> std::optional<int>;
+
     inline void Assert(bool expr, const std::string &info)
     {
         if (!expr)

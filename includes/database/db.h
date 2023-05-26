@@ -16,10 +16,10 @@ namespace rds
         std::unique_ptr<Object> value_;
         std::optional<std::size_t> expire_time_stamp_;
 
-        auto PrefixEncode() -> std::string;
+        auto PrefixEncode() const -> std::string;
 
     public:
-        auto Encode() -> std::string;
+        auto Encode() const -> std::string;
 
         void Decode(std::deque<char> *);
 
@@ -33,12 +33,12 @@ namespace rds
             expire_time_stamp_.reset();
         }
 
-        auto GetExpire() -> std::optional<std::size_t>
+        auto GetExpire() const -> std::optional<std::size_t>
         {
             return expire_time_stamp_;
         }
 
-        auto IsExpire() -> bool
+        auto IsExpire() const -> bool
         {
             if (!expire_time_stamp_.has_value())
             {
@@ -47,9 +47,9 @@ namespace rds
             return expire_time_stamp_.value() < UsTime();
         }
 
-        auto GetValue() -> Object *;
+        auto GetValue() const -> Object *;
 
-        auto GetKey() -> Str;
+        auto GetKey() const -> Str;
 
         KeyValue(const Str &, std::unique_ptr<Object>);
 
@@ -78,15 +78,15 @@ namespace rds
         void NewHash(const Str &);
 
         void Del(const Str &);
-        auto Get(const Str &) -> Object *;
+        auto Get(const Str &) const -> Object *;
 
         void Expire(const Str &, std::size_t);
 
-        auto Save() -> std::string;
+        auto Save() const -> std::string;
 
         void Load(std::deque<char> *);
 
-        auto Size() -> std::size_t;
+        auto Size() const -> std::size_t;
 
         auto Number() const -> int;
 

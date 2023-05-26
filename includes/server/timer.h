@@ -22,7 +22,7 @@ namespace rds
     {
         Db *database_;
         std::string obj_name_;
-        void Exec();
+        void Exec() override;
         CLASS_DEFAULT_DECLARE(DbExpireTimer);
     };
 
@@ -33,7 +33,7 @@ namespace rds
         Handler *hdlr_;
         Rdb *rdb_;
         FileManager *fm_;
-        void Exec();
+        void Exec() override;
         CLASS_DEFAULT_DECLARE(RdbTimer);
     };
 

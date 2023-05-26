@@ -147,7 +147,14 @@ namespace rds
         {
             return ret;
         }
-        if (source.size() % 2 != 0 || source.size() < 3)
+        if (source.size() < 3)
+        {
+            ret.valid_ = false;
+            return ret;
+        }
+        if (source.size() % 2 != 0 && (ret.command_ != "ZSCORE" ||
+                                       ret.command_ != "ZRANK" ||
+                                       ret.command_ != "ZREM"))
         {
             ret.valid_ = false;
             return ret;
@@ -340,7 +347,7 @@ namespace rds
     {
         if (!valid_)
         {
-            return {""};
+            return {" "};
         }
 
         obj_ = cli_->GetDB()->Get({obj_name_});
@@ -348,14 +355,14 @@ namespace rds
         {
             if (command_ != "SET")
             {
-                return {""};
+                return {" "};
             }
             cli_->GetDB()->NewStr({obj_name_});
             obj_ = cli_->GetDB()->Get({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::STR)
         {
-            return {""};
+            return {" "};
         }
 
         auto str = reinterpret_cast<Str *>(obj_);
@@ -366,27 +373,35 @@ namespace rds
         }
         else if (command_ == "GET")
         {
-            return {str->GetRaw()};
+            auto ret = str->GetRaw();
+            if (ret.empty())
+            {
+                return {"(nil)"};
+            }
+            return {"\"" + ret + "\""};
         }
         else if (command_ == "INCRBY")
         {
-            bool ret = str->IncrBy(std::stoi(value_.value()));
-            if (!ret)
+            auto ret = str->IncrBy(std::stoi(value_.value()));
+            if (ret.empty())
             {
-                return {"Failed"};
+                return {" "};
             }
+            return {ret};
         }
         else if (command_ == "DECRBY")
         {
-            bool ret = str->DecrBy(std::stoi(value_.value()));
-            if (!ret)
+            auto ret = str->DecrBy(std::stoi(value_.value()));
+            if (ret.empty())
             {
-                return {"Failed"};
+                return {" "};
             }
+            return {ret};
         }
         else if (command_ == "APPEND")
         {
-            str->Append(std::move(value_.value()));
+            auto size = str->Append(std::move(value_.value()));
+            return {std::to_string(size)};
         }
         else if (command_ == "LEN")
         {
@@ -407,7 +422,7 @@ namespace rds
     {
         if (!valid_)
         {
-            return {""};
+            return {" "};
         }
 
         obj_ = cli_->GetDB()->Get({obj_name_});
@@ -415,24 +430,24 @@ namespace rds
         {
             if (command_ != "LPUSHF" && command_ != "LPUSHB")
             {
-                return {""};
+                return {" "};
             }
             cli_->GetDB()->NewList({obj_name_});
             obj_ = cli_->GetDB()->Get({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::LIST)
         {
-            return {""};
+            return {" "};
         }
 
         auto l = reinterpret_cast<List *>(obj_);
-        json11::Json::array ret;
         if (command_ == "LPUSHF")
         {
             for (auto &it : values_)
             {
                 l->PushFront(std::move(it));
             }
+            return {std::to_string(l->Len())};
         }
         else if (command_ == "LPUSHB")
         {
@@ -440,23 +455,40 @@ namespace rds
             {
                 l->PushBack(std::move(it));
             }
+            return {std::to_string(l->Len())};
         }
         else if (command_ == "LPOPF")
         {
             auto str = l->PopFront();
-            return {str.GetRaw()};
+            if (str.Empty())
+            {
+                return {"(nil)"};
+            }
+            return {'\"' + str.GetRaw() + '\"'};
         }
         else if (command_ == "LPOPB")
         {
             auto str = l->PopBack();
-            return {str.GetRaw()};
+            if (str.Empty())
+            {
+                return {"(nil)"};
+            }
+            return {'\"' + str.GetRaw() + '\"'};
         }
         else if (command_ == "LINDEX")
         {
+            json11::Json::array ret;
             for (auto &value : values_)
             {
                 auto str = l->Index(std::stoi(value.GetRaw()));
-                ret.push_back(str.GetRaw());
+                if (!str.Empty())
+                {
+                    ret.push_back('\"' + str.GetRaw() + '\"');
+                }
+            }
+            if (ret.empty())
+            {
+                return {"(nil)"};
             }
             return ret;
         }
@@ -466,14 +498,36 @@ namespace rds
         }
         else if (command_ == "LREM")
         {
-            for (auto &it : values_)
+            if (values_.size() < 2)
             {
-                l->Rem(it);
+                return {" "};
             }
+            std::size_t n = l->Rem(std::stoi(values_[0].GetRaw()), values_[1]);
+            return {std::to_string(n)};
         }
         else if (command_ == "LTRIM")
         {
-            l->Trim(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
+            if (values_.size() < 2)
+            {
+                return {" "};
+            }
+            bool ret = l->Trim(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
+            if (!ret)
+            {
+                return {" "};
+            }
+        }
+        else if (command_ == "LSET")
+        {
+            if (values_.size() < 2)
+            {
+                return {" "};
+            }
+            bool ret = l->Set(std::stoi(values_[0].GetRaw()), values_[1]);
+            if (!ret)
+            {
+                return {" "};
+            }
         }
 
         return {"OK"};
@@ -495,7 +549,7 @@ namespace rds
     {
         if (!valid_)
         {
-            return {""};
+            return {" "};
         }
 
         obj_ = cli_->GetDB()->Get({obj_name_});
@@ -503,18 +557,17 @@ namespace rds
         {
             if (command_ != "HSET")
             {
-                return {""};
+                return {" "};
             }
             cli_->GetDB()->NewHash({obj_name_});
             obj_ = cli_->GetDB()->Get({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::HASH)
         {
-            return {""};
+            return {" "};
         }
 
         auto tbl = reinterpret_cast<Hash *>(obj_);
-        json11::Json::array ret;
         if (command_ == "HSET")
         {
             for (std::size_t i = 0; i < values_.size(); i += 2)
@@ -524,24 +577,37 @@ namespace rds
         }
         else if (command_ == "HGET")
         {
+            json11::Json::array ret;
             for (auto &key : values_)
             {
-                ret.push_back(tbl->Get(key).GetRaw());
+                auto s = tbl->Get(key).GetRaw();
+                if (s.empty())
+                {
+                    s = "(nil)";
+                }
+                ret.push_back('\"' + s + '\"');
             }
+            if (ret.empty())
+            {
+                return {"(nil)"};
+            }
+            return ret;
         }
         else if (command_ == "HEXIST")
         {
+            json11::Json::array ret;
             for (auto &key : values_)
             {
                 if (tbl->Exist(key))
                 {
-                    ret.push_back("Exist");
+                    ret.push_back("1");
                 }
                 else
                 {
-                    ret.push_back("NotExist");
+                    ret.push_back("0");
                 }
             }
+            return ret;
         }
         else if (command_ == "HDEL")
         {
@@ -556,29 +622,39 @@ namespace rds
         }
         else if (command_ == "HGETALL")
         {
+            json11::Json::array ret;
             auto all = tbl->GetAll();
             for (auto &kv : all)
             {
-                ret.push_back(kv.first.GetRaw());
-                ret.push_back(kv.second.GetRaw());
+                ret.push_back('\"' + kv.first.GetRaw() + '\"');
+                ret.push_back('\"' + kv.second.GetRaw() + '\"');
             }
+            if (ret.empty())
+            {
+                return {"(nil)"};
+            }
+            return ret;
         }
         else if (command_ == "HINCRBY")
         {
-            for (std::size_t i = 0; i < values_.size(); i += 2)
+            auto val = tbl->IncrBy(values_[0], std::stoul(values_[1].GetRaw()));
+            if (val.empty())
             {
-                tbl->IncrBy(values_[i], std::stoul(values_[i + 1].GetRaw()));
+                return {" "};
             }
+            return {val};
         }
         else if (command_ == "HDECRBY")
         {
-            for (std::size_t i = 0; i < values_.size(); i += 2)
+            auto val = tbl->DecrBy(values_[0], std::stoul(values_[1].GetRaw()));
+            if (val.empty())
             {
-                tbl->DecrBy(values_[i], std::stoul(values_[i + 1].GetRaw()));
+                return {" "};
             }
+            return {val};
         }
 
-        return ret;
+        return {"OK"};
     }
     /*
 
@@ -591,7 +667,7 @@ namespace rds
     {
         if (!valid_)
         {
-            return {""};
+            return {" "};
         }
 
         obj_ = cli_->GetDB()->Get({obj_name_});
@@ -599,24 +675,29 @@ namespace rds
         {
             if (command_ != "SADD")
             {
-                return {""};
+                return {" "};
             }
             cli_->GetDB()->NewSet({obj_name_});
             obj_ = cli_->GetDB()->Get({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::SET)
         {
-            return {""};
+            return {" "};
         }
 
         auto st = reinterpret_cast<Set *>(obj_);
-        json11::Json::array ret;
         if (command_ == "SADD")
         {
+            int cnt = 0;
             for (auto &element : values_)
             {
-                st->Add(std::move(element));
+                bool ok = st->Add(std::move(element));
+                if (ok)
+                {
+                    cnt++;
+                }
             }
+            return {std::to_string(cnt)};
         }
         else if (command_ == "SCARD")
         {
@@ -624,71 +705,115 @@ namespace rds
         }
         else if (command_ == "SISMEMBER")
         {
+            json11::Json::array ret;
             for (auto &element : values_)
             {
                 if (st->IsMember(element))
                 {
-                    ret.push_back("IsMember");
+                    ret.push_back("1");
                 }
                 else
                 {
-                    ret.push_back("IsNotMember");
+                    ret.push_back("0");
                 }
             }
+            if (ret.empty())
+            {
+                return {"(nil)"};
+            }
+            return ret;
         }
         else if (command_ == "SMEMBERS")
         {
+            json11::Json::array ret;
             auto m = st->Members();
             for (auto &element : m)
             {
-                ret.push_back(std::move(element.GetRaw()));
+                ret.push_back('\"' + std::move(element.GetRaw()) + '\"');
             }
+            if (ret.empty())
+            {
+                return {"(nil)"};
+            }
+            return ret;
         }
         else if (command_ == "SRANDMEMBER")
         {
-            ret.push_back({st->RandMember().GetRaw()});
+            json11::Json::array ret;
+            auto v = st->RandMember().GetRaw();
+            if (v.empty())
+            {
+                return {"(nil)"};
+            }
+            ret.push_back({'\"' + std::move(v) + '\"'});
+            return ret;
         }
         else if (command_ == "SPOP")
         {
-            ret.push_back({st->Pop().GetRaw()});
+            json11::Json::array ret;
+            auto v = st->Pop().GetRaw();
+            if (v.empty())
+            {
+                return {"(nil)"};
+            }
+            ret.push_back({'\"' + std::move(v) + '\"'});
+            return ret;
         }
         else if (command_ == "SREM")
         {
+            int cnt = 0;
             for (auto &element : values_)
             {
-                st->Rem(element);
+                bool ok = st->Rem(element);
+                if (ok)
+                {
+                    cnt++;
+                }
             }
+            return {std::to_string(cnt)};
         }
         else if (command_ == "SINTER")
         {
             Object *another_set = cli_->GetDB()->Get(values_[0]);
             if (another_set->GetObjectType() != ObjectType::SET)
             {
-                return {""};
+                return {" "};
             }
             auto a_st = reinterpret_cast<Set *>(another_set);
             auto inter = st->Inter(*a_st);
+            json11::Json::array ret;
             for (auto &element : inter)
             {
                 ret.push_back(std::move(element.GetRaw()));
             }
+            if (ret.empty())
+            {
+                return {"(nil)"};
+            }
+            return ret;
         }
         else if (command_ == "SDIFF")
         {
             Object *another_set = cli_->GetDB()->Get(values_[0]);
             if (another_set->GetObjectType() != ObjectType::SET)
             {
-                return {""};
+                return {" "};
             }
             auto a_st = reinterpret_cast<Set *>(another_set);
             auto inter = st->Diff(*a_st);
+            json11::Json::array ret;
             for (auto &element : inter)
             {
                 ret.push_back(std::move(element.GetRaw()));
             }
+            if (ret.empty())
+            {
+                return {"(nil)"};
+            }
+            return ret;
         }
 
-        return ret;
+        return {"OK"};
     }
     /*
 
@@ -700,7 +825,7 @@ namespace rds
     {
         if (!valid_)
         {
-            return {""};
+            return {" "};
         }
 
         obj_ = cli_->GetDB()->Get({obj_name_});
@@ -708,24 +833,29 @@ namespace rds
         {
             if (command_ != "ZADD")
             {
-                return {""};
+                return {" "};
             }
             cli_->GetDB()->NewZSet({obj_name_});
             obj_ = cli_->GetDB()->Get({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::ZSET)
         {
-            return {""};
+            return {" "};
         }
 
         auto zst = reinterpret_cast<ZSet *>(obj_);
-        json11::Json::array ret;
         if (command_ == "ZADD")
         {
+            int cnt;
             for (std::size_t i = 0; i < values_.size(); i += 2)
             {
-                zst->Add(std::stoi(values_[i].GetRaw()), std::move(values_[i + 1]));
+                auto ok = zst->Add(std::stoi(values_[i].GetRaw()), std::move(values_[i + 1]));
+                if (ok)
+                {
+                    cnt++;
+                }
             }
+            return {std::to_string(cnt)};
         }
         else if (command_ == "ZCARD")
         {
@@ -751,47 +881,87 @@ namespace rds
         }
         else if (command_ == "ZINCRBY")
         {
-            for (std::size_t i = 0; i < values_.size(); i += 2)
+            auto val = zst->IncrBy(std::stoi(values_[0].GetRaw()), values_[1]);
+            if (val.empty())
             {
-                zst->IncrBy(std::stoi(values_[i].GetRaw()), values_[i + 1]);
+                return {" "};
             }
+            return {val};
         }
         else if (command_ == "ZDECRBY")
         {
-            for (std::size_t i = 0; i < values_.size(); i += 2)
+            auto val = zst->DecrBy(std::stoi(values_[0].GetRaw()), values_[1]);
+            if (val.empty())
             {
-                zst->DecrBy(std::stoi(values_[i].GetRaw()), values_[i + 1]);
+                return {" "};
             }
+            return {val};
         }
         else if (command_ == "ZRANGE")
         {
             auto res = zst->Range(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
+            if (res.empty())
+            {
+                return {"(nil)"};
+            }
+            json11::Json::array ret;
             for (auto kv : res)
             {
                 ret.push_back(kv.first.GetRaw());
                 ret.push_back(std::to_string(kv.second));
             }
+            return ret;
         }
         else if (command_ == "ZRANGEBYSCORE")
         {
             auto res = zst->RangeByScore(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
+            if (res.empty())
+            {
+                return {"(nil)"};
+            }
+            json11::Json::array ret;
             for (auto kv : res)
             {
                 ret.push_back(kv.first.GetRaw());
                 ret.push_back(std::to_string(kv.second));
             }
+            return ret;
         }
         else if (command_ == "ZRANGEBYLEX")
         {
             auto res = zst->RangeByLex(values_[0], values_[1]);
+            if (res.empty())
+            {
+                return {"(nil)"};
+            }
+            json11::Json::array ret;
             for (auto kv : res)
             {
                 ret.push_back(kv.first.GetRaw());
                 ret.push_back(std::to_string(kv.second));
             }
+            return ret;
+        }
+        else if (command_ == "ZRANK")
+        {
+            auto rank = zst->Rank(values_[0]);
+            if (rank.empty())
+            {
+                return {"(nil)"};
+            }
+            return {rank};
+        }
+        else if (command_ == "ZSCORE")
+        {
+            auto score = zst->Score(values_[0]);
+            if (score.empty())
+            {
+                return {"(nil)"};
+            }
+            return {score};
         }
 
-        return ret;
+        return {"OK"};
     }
     /*
 

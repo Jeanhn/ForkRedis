@@ -30,6 +30,18 @@ namespace rds
         epoll_ctl(epfd_, EPOLL_CTL_ADD, listen_fd_, &levt);
 
         Log("Server runs successfully on: ", ip, ':', port);
+
+        Log("Loading databases...");
+        auto dbfile = file_manager_.LoadAndExport();
+        file_manager_.Truncate();
+
+        databases_ = rds::Rdb::Load(&dbfile);
+
+        if (databases_.empty())
+        {
+            Log("Create a default database");
+            databases_.push_back(std::make_unique<Db>());
+        }
     }
 
     Server::~Server()
@@ -62,7 +74,7 @@ namespace rds
                 epev.events = EPOLLIN;
                 epoll_ctl(epfd_, EPOLL_CTL_ADD, cfd, &epev);
                 auto c = std::make_unique<ClientInfo>(cfd);
-                c->db_source_ = db_source_;
+                c->db_source_ = &databases_;
                 client_map_.insert({cfd, std::move(c)});
             }
             else
@@ -127,6 +139,15 @@ namespace rds
             }
         }
         return ret;
+    }
+
+    auto Server::Databases() -> std::list<std::unique_ptr<Db>> *
+    {
+        return &databases_;
+    }
+    auto Server::File() -> FileManager *
+    {
+        return &file_manager_;
     }
 
     /*

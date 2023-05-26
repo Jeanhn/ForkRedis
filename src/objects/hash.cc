@@ -74,22 +74,22 @@ namespace rds
         }
     }
 
-    auto Hash::IncrBy(const Str &key, int delta) -> bool
+    auto Hash::IncrBy(const Str &key, int delta) -> std::string
     {
         auto it = data_map_.find(key);
         if (it == data_map_.end())
         {
-            return false;
+            return {};
         }
         return it->second.IncrBy(delta);
     }
 
-    auto Hash::DecrBy(const Str &key, int delta) -> bool
+    auto Hash::DecrBy(const Str &key, int delta) -> std::string
     {
         auto it = data_map_.find(key);
         if (it == data_map_.end())
         {
-            return false;
+            return {};
         }
         return it->second.DecrBy(delta);
     }

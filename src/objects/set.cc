@@ -54,14 +54,15 @@ namespace rds
         return *(data_set_.cbegin());
     }
 
-    void Set::Rem(const Str &m)
+    auto Set::Rem(const Str &m) -> bool
     {
         auto it = data_set_.find(m);
         if (it == data_set_.cend())
         {
-            return;
+            return false;
         }
         data_set_.erase(it);
+        return true;
     }
 
     auto Set::GetObjectType() const -> ObjectType

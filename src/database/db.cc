@@ -9,7 +9,7 @@ namespace rds
 {
     KeyValue::KeyValue(const Str &k, std::unique_ptr<Object> v) : key_(k), value_(std::move(v)) {}
 
-    auto KeyValue::PrefixEncode() -> std::string
+    auto KeyValue::PrefixEncode() const -> std::string
     {
         std::string ret;
 
@@ -25,7 +25,7 @@ namespace rds
         return ret;
     }
 
-    auto KeyValue::Encode() -> std::string
+    auto KeyValue::Encode() const -> std::string
     {
         std::string ret;
         ret.append(PrefixEncode());
@@ -85,12 +85,12 @@ namespace rds
         }
     }
 
-    auto KeyValue::GetValue() -> Object *
+    auto KeyValue::GetValue() const -> Object *
     {
         return value_.get();
     }
 
-    auto KeyValue::GetKey() -> Str
+    auto KeyValue::GetKey() const -> Str
     {
         return key_;
     }
@@ -171,7 +171,7 @@ namespace rds
         key_value_map_.erase(key);
     }
 
-    auto Db::Get(const Str &key) -> Object *
+    auto Db::Get(const Str &key) const -> Object *
     {
         auto it = key_value_map_.find(key);
         if (it == key_value_map_.end())
@@ -191,7 +191,7 @@ namespace rds
         it->second.MakeExpire(UsTime() + time_period_s * 1000'000);
     }
 
-    auto Db::Save() -> std::string
+    auto Db::Save() const -> std::string
     {
         std::string ret;
         ret.push_back(SELECT_DB_);

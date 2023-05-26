@@ -74,12 +74,12 @@ namespace rds
         return std::distance(low, high);
     }
 
-    auto ZSet::IncrBy(int delta_score, const Str &member) -> bool
+    auto ZSet::IncrBy(int delta_score, const Str &member) -> std::string
     {
         auto pos = member_map_.find(member);
         if (pos == member_map_.end())
         {
-            return false;
+            return {};
         }
         auto it = rank_map_.lower_bound(pos->second->second);
         while (it->second != pos)
@@ -89,10 +89,10 @@ namespace rds
         rank_map_.erase(it);
         rank_map_.insert({pos->second->second + delta_score, pos});
         pos->second->second += delta_score;
-        return true;
+        return std::to_string(pos->second->second);
     }
 
-    auto ZSet::DecrBy(int delta_score, const Str &member) -> bool
+    auto ZSet::DecrBy(int delta_score, const Str &member) -> std::string
     {
         return IncrBy(-delta_score, member);
     }
@@ -182,5 +182,25 @@ namespace rds
             s.DecodeValue(source);
             Add(r, std::move(s));
         }
+    }
+
+    auto ZSet::Rank(const Str &member) const -> std::string
+    {
+        auto pos = member_map_.find(member);
+        if (pos == member_map_.end())
+        {
+            return {};
+        }
+        auto rank_pos = rank_map_.find(pos->second->second);
+        return std::to_string(std::distance(rank_map_.begin(), rank_pos));
+    }
+    auto ZSet::Score(const Str &member) const -> std::string
+    {
+        auto pos = member_map_.find(member);
+        if (pos == member_map_.end())
+        {
+            return {};
+        }
+        return std::to_string(pos->second->second);
     }
 } // namespace rds

@@ -30,7 +30,7 @@ namespace rds
         auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> *) override;
 
-        CLASS_DECLARE_uncopyable(Set);
+        CLASS_DECLARE_special_copy_move(Set);
     };
 
 } // namespace rds

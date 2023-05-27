@@ -26,7 +26,7 @@ namespace rds
         void Run();
         auto RdbSave() const -> std::string;
         MainLoop(const RedisConf &conf);
-        ~MainLoop();
+        ~MainLoop() = default;
     };
 } // namespace rds
 

@@ -8,7 +8,7 @@ namespace rds
         data_list_ = lhs.data_list_;
     }
 
-    List::List(List &&rhs)
+    List::List(List &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         data_list_ = std::move(rhs.data_list_);
@@ -21,7 +21,7 @@ namespace rds
         return *this;
     }
 
-    List &List::operator=(List &&rhs)
+    List &List::operator=(List &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         data_list_ = std::move(rhs.data_list_);

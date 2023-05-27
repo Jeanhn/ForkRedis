@@ -14,17 +14,17 @@ namespace rds
 
     class Server;
     class Handler;
+    class MainLoop;
 
     class ClientInfo
     {
-        friend Server;
-        friend Handler;
 #ifdef NDEBUG
     private:
 #else
     public:
 #endif
-        int fd_;
+        const int fd_;
+        Server *server_;
         Db *database_;
 
         std::deque<char> recv_buffer_;
@@ -33,29 +33,32 @@ namespace rds
         std::deque<char> send_buffer_;
         std::vector<json11::Json::array> send_messages_;
 
-        auto Read() -> int;
-        auto Send() -> int;
+        std::shared_mutex latch_;
 
     public:
-        void ShiftDB(Db *database);
+        auto GetFD() -> int;
+        auto Read() -> int;
+        auto Send() -> int;
+        void SetDB(Db *database);
         auto GetDB() -> Db *;
         void Append(json11::Json::array to_send_message);
         auto IsSendOut() -> bool;
         auto ExportMessages() -> std::vector<json11::Json::array>;
-        ClientInfo(int fd);
+        void EnableSend();
+        ClientInfo(Server *server = nullptr, int fd = -1);
         ~ClientInfo();
     };
 
     class Server
     {
     private:
-        std::unordered_map<int, std::unique_ptr<ClientInfo>> client_map_;
+        std::unordered_map<int, std::shared_ptr<ClientInfo>> client_map_;
         std::vector<epoll_event> epoll_revents_;
         int listen_fd_;
         int epfd_;
 
     public:
-        auto Wait(int timeout) -> std::vector<ClientInfo *>;
+        auto Wait(int timeout) -> std::vector<std::shared_ptr<ClientInfo>>;
         void EnableSend(ClientInfo *client);
         Server(const char *ip = "127.0.0.1", short port = 8080);
         ~Server();
@@ -70,15 +73,19 @@ namespace rds
 
         TimerQue tmr_que_;
 
-        void ExecCommand();
-        void ExecTimer();
+        static void ExecCommand(Handler *hdlr);
+        static void ExecTimer(Handler *hdlr);
+        static void HandleClient(Handler *hdlr);
+
+        std::mutex cli_mtx_;
+        std::condition_variable condv_;
+        std::queue<std::weak_ptr<ClientInfo>> cli_que_;
 
         std::list<std::thread> workers_;
 
     public:
-        void Push(ClientInfo *client, std::unique_ptr<CommandBase> cmd);
-        void Push(std::unique_ptr<Timer> timer);
         void Run();
+        void Handle(std::weak_ptr<ClientInfo> client);
         void Stop();
 
         CLASS_DEFAULT_DECLARE(Handler);

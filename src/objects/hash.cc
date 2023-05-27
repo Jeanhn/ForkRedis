@@ -8,7 +8,7 @@ namespace rds
         data_map_ = lhs.data_map_;
     }
 
-    Hash::Hash(Hash &&rhs)
+    Hash::Hash(Hash &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         data_map_ = std::move(rhs.data_map_);
@@ -21,7 +21,7 @@ namespace rds
         return *this;
     }
 
-    Hash &Hash::operator=(Hash &&rhs)
+    Hash &Hash::operator=(Hash &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         data_map_ = std::move(rhs.data_map_);

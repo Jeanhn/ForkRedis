@@ -6,7 +6,7 @@
 #include <database/db.h>
 #include <json11.hpp>
 #include <condition_variable>
-
+#include <queue>
 
 namespace rds
 {
@@ -17,7 +17,7 @@ namespace rds
     auto RawCommandToRequest(const std::string &) -> json11::Json::array;
 
     /* ensure that if ret-val is not null, then it can be execed  */
-    auto RequestToCommandExec(ClientInfo *client, const json11::Json::array &req) -> std::unique_ptr<CommandBase>;
+    auto RequestToCommandExec(std::shared_ptr<ClientInfo> client, json11::Json::array *req) -> std::unique_ptr<CommandBase>;
 
     struct CommandBase
     {
@@ -25,57 +25,57 @@ namespace rds
         std::string command_;
         std::string obj_name_;
         std::shared_ptr<Object> obj_;
-        ClientInfo *cli_;
-        virtual auto Exec() -> json11::Json::array = 0;
+        std::weak_ptr<ClientInfo> cli_;
+        virtual auto Exec() -> std::optional<json11::Json::array> = 0;
         CLASS_DEFAULT_DECLARE(CommandBase);
     };
 
     struct CliCommand : CommandBase
     {
         std::optional<std::string> value_;
-        auto Exec() -> json11::Json::array override;
+        auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(CliCommand);
     };
 
     struct DbCommand : CommandBase
     {
         std::optional<std::string> value_;
-        auto Exec() -> json11::Json::array override;
+        auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(DbCommand);
     };
 
     struct StrCommand : CommandBase
     {
         std::optional<std::string> value_;
-        auto Exec() -> json11::Json::array override;
+        auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(StrCommand);
     };
 
     struct ListCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec() -> json11::Json::array override;
+        auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(ListCommand);
     };
 
     struct HashCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec() -> json11::Json::array override;
+        auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(HashCommand);
     };
 
     struct SetCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec() -> json11::Json::array override;
+        auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(SetCommand);
     };
 
     struct ZSetCommand : CommandBase
     {
         std::vector<Str> values_;
-        auto Exec() -> json11::Json::array override;
+        auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(ZSetCommand);
     };
 
@@ -85,22 +85,22 @@ namespace rds
         /* data */
         std::mutex mtx_;
         std::condition_variable condv_;
-        std::deque<std::pair<ClientInfo *, std::unique_ptr<CommandBase>>> que_;
+        std::queue<std::unique_ptr<CommandBase>> que_;
 
     public:
-        void Push(ClientInfo *client, std::unique_ptr<CommandBase> cmd)
+        void Push(std::unique_ptr<CommandBase> cmd)
         {
             std::lock_guard<std::mutex> lg(mtx_);
-            que_.push_back({client, std::move(cmd)});
-            condv_.notify_one();
+            que_.push(std::move(cmd));
+            condv_.notify_all();
         }
-        auto BlockPop() -> std::pair<ClientInfo *, std::unique_ptr<CommandBase>>
+        auto BlockPop() -> std::unique_ptr<CommandBase>
         {
             std::unique_lock<std::mutex> ul(mtx_);
             condv_.wait(ul, [&que = que_]()
                         { return !que.empty(); });
             auto ret = std::move(que_.front());
-            que_.pop_front();
+            que_.pop();
             return ret;
         }
         CommandQue(/* args */) = default;

@@ -35,13 +35,7 @@ namespace rds
         auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> *) override;
 
-        CLASS_DEFAULT_DECLARE(ZSet);
-        // ZSet() = default;
-        // ZSet(const ZSet &) = default;
-        // ~ZSet() = default;
-        // ZSet &operator=(const ZSet &) = default;
-        // ZSet(ZSet &&);
-        // ZSet &operator=(ZSet &&);
+        CLASS_DECLARE_special_copy_move(ZSet);
     };
 
 } // namespace rds

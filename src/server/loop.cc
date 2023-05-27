@@ -11,13 +11,13 @@ namespace rds
 
         if (conf.enable_aof_)
         {
-            databases_ = Aof::Load(&dbfile);
+            // databases_ = Aof::Load(&dbfile);
         }
         else
         {
-            databases_ = Rdb::Load(&dbfile);
-            Rdb rdb([this]()
-                    { return this->RdbSave(); });
+            // databases_ = Rdb::Load(&dbfile);
+            // Rdb rdb([this]()
+            //         { return this->RdbSave(); });
         }
 
         if (databases_.empty())
@@ -33,24 +33,11 @@ namespace rds
         auto clients = server_.Wait(-1);
         for (auto &client : clients)
         {
-            auto reqs = client->ExportMessages();
-            if (reqs.empty())
+            if (!client->GetDB())
             {
-                continue;
+                client->SetDB(databases_.begin()->get());
             }
-            server_.EnableSend(client);
-            for (auto &req : reqs)
-            {
-                auto cmd = RequestToCommandExec(client, req);
-                if (cmd)
-                {
-                    if (!client->database_)
-                    {
-                        client->database_ = databases_.begin()->get();
-                    }
-                    handler_.Push(client, std::move(cmd));
-                }
-            }
+            handler_.Handle(client);
         }
     }
 } // namespace rds

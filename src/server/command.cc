@@ -244,8 +244,9 @@ namespace rds
 
      */
 
-    auto RequestToCommandExec(ClientInfo *client, const json11::Json::array &req) -> std::unique_ptr<CommandBase>
+    auto RequestToCommandExec(std::shared_ptr<ClientInfo> client, json11::Json::array *request) -> std::unique_ptr<CommandBase>
     {
+        json11::Json::array &req = *request;
         auto isCliCommand = [](const std::string &cmd)
         {
             return (cmd == "SELECT" || cmd == "DROP");
@@ -318,6 +319,11 @@ namespace rds
             return nullptr;
         }
         auto cmd = req[0].string_value();
+        for (auto &c : cmd)
+        {
+            c = std::toupper(c);
+        }
+        req[0] = {cmd};
         std::unique_ptr<CommandBase> ret;
         if (isCliCommand(cmd))
         {
@@ -359,25 +365,31 @@ namespace rds
 
      */
 
-    auto StrCommand::Exec() -> json11::Json::array
+    auto StrCommand::Exec() -> std::optional<json11::Json::array>
     {
         if (!valid_)
         {
-            return {" "};
+            return {{" "}};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
+        auto client = cli_.lock();
+        if (!client)
+        {
+            return {};
+        }
+
+        obj_ = client->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "SET")
             {
-                return {" "};
+                return {{" "}};
             }
-            obj_ = cli_->GetDB()->NewStr({obj_name_});
+            obj_ = client->GetDB()->NewStr({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::STR)
         {
-            return {" "};
+            return {{" "}};
         }
 
         auto str = reinterpret_cast<Str *>(obj_.get());
@@ -391,49 +403,49 @@ namespace rds
             auto ret = str->GetRaw();
             if (ret.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
-            return {"\"" + ret + "\""};
+            return {{"\"" + ret + "\""}};
         }
         else if (command_ == "INCRBY")
         {
             auto intval = RedisStrToInt(value_.value());
             if (!intval.has_value())
             {
-                return {" "};
+                return {{" "}};
             }
             auto ret = str->IncrBy(intval.value());
             if (ret.empty())
             {
-                return {" "};
+                return {{" "}};
             }
-            return {ret};
+            return {{ret}};
         }
         else if (command_ == "DECRBY")
         {
             auto intval = RedisStrToInt(value_.value());
             if (!intval.has_value())
             {
-                return {" "};
+                return {{" "}};
             }
             auto ret = str->DecrBy(intval.value());
             if (ret.empty())
             {
-                return {" "};
+                return {{" "}};
             }
-            return {ret};
+            return {{ret}};
         }
         else if (command_ == "APPEND")
         {
             auto size = str->Append(std::move(value_.value()));
-            return {std::to_string(size)};
+            return {{std::to_string(size)}};
         }
         else if (command_ == "LEN")
         {
-            return {std::to_string(str->Len())};
+            return {{std::to_string(str->Len())}};
         }
 
-        return {"OK"};
+        return {{"OK"}};
     }
 
     /*
@@ -443,25 +455,31 @@ namespace rds
 
      */
 
-    auto ListCommand::Exec() -> json11::Json::array
+    auto ListCommand::Exec() -> std::optional<json11::Json::array>
     {
         if (!valid_)
         {
-            return {" "};
+            return {{" "}};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
+        auto client = cli_.lock();
+        if (!client)
+        {
+            return {};
+        }
+
+        obj_ = client->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "LPUSHF" && command_ != "LPUSHB")
             {
-                return {" "};
+                return {{" "}};
             }
-            obj_ = cli_->GetDB()->NewList({obj_name_});
+            obj_ = client->GetDB()->NewList({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::LIST)
         {
-            return {" "};
+            return {{" "}};
         }
 
         auto l = reinterpret_cast<List *>(obj_.get());
@@ -471,7 +489,7 @@ namespace rds
             {
                 l->PushFront(std::move(it));
             }
-            return {std::to_string(l->Len())};
+            return {{std::to_string(l->Len())}};
         }
         else if (command_ == "LPUSHB")
         {
@@ -479,25 +497,25 @@ namespace rds
             {
                 l->PushBack(std::move(it));
             }
-            return {std::to_string(l->Len())};
+            return {{std::to_string(l->Len())}};
         }
         else if (command_ == "LPOPF")
         {
             auto str = l->PopFront();
             if (str.Empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
-            return {'\"' + str.GetRaw() + '\"'};
+            return {{'\"' + str.GetRaw() + '\"'}};
         }
         else if (command_ == "LPOPB")
         {
             auto str = l->PopBack();
             if (str.Empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
-            return {'\"' + str.GetRaw() + '\"'};
+            return {{'\"' + str.GetRaw() + '\"'}};
         }
         else if (command_ == "LINDEX")
         {
@@ -517,23 +535,23 @@ namespace rds
             }
             if (ret.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             return ret;
         }
         else if (command_ == "LLEN")
         {
-            return {std::to_string(l->Len())};
+            return {{std::to_string(l->Len())}};
         }
         else if (command_ == "LREM")
         {
             auto intval = RedisStrToInt(values_[0]);
             if (!intval.has_value())
             {
-                return {" "};
+                return {{" "}};
             }
             std::size_t n = l->Rem(intval.value(), values_[1]);
-            return {std::to_string(n)};
+            return {{std::to_string(n)}};
         }
         else if (command_ == "LTRIM")
         {
@@ -541,12 +559,12 @@ namespace rds
             auto intval2 = RedisStrToInt(values_[1]);
             if (!(intval1.has_value() && intval2.has_value()))
             {
-                return {" "};
+                return {{" "}};
             }
             bool ret = l->Trim(intval1.value(), intval2.value());
             if (!ret)
             {
-                return {" "};
+                return {{" "}};
             }
         }
         else if (command_ == "LSET")
@@ -554,16 +572,16 @@ namespace rds
             auto intval = RedisStrToInt(values_[0]);
             if (!intval.has_value())
             {
-                return {" "};
+                return {{" "}};
             }
             bool ret = l->Set(intval.value(), values_[1]);
             if (!ret)
             {
-                return {" "};
+                return {{" "}};
             }
         }
 
-        return {"OK"};
+        return {{"OK"}};
     }
 
     /*
@@ -578,25 +596,31 @@ namespace rds
 
 
      */
-    auto HashCommand::Exec() -> json11::Json::array
+    auto HashCommand::Exec() -> std::optional<json11::Json::array>
     {
         if (!valid_)
         {
-            return {" "};
+            return {{" "}};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
+        auto client = cli_.lock();
+        if (!client)
+        {
+            return {};
+        }
+
+        obj_ = client->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "HSET")
             {
-                return {" "};
+                return {{" "}};
             }
-            obj_ = cli_->GetDB()->NewHash({obj_name_});
+            obj_ = client->GetDB()->NewHash({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::HASH)
         {
-            return {" "};
+            return {{" "}};
         }
 
         auto tbl = reinterpret_cast<Hash *>(obj_.get());
@@ -621,7 +645,7 @@ namespace rds
             }
             if (ret.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             return ret;
         }
@@ -650,7 +674,7 @@ namespace rds
         }
         else if (command_ == "HLEN")
         {
-            return {std::to_string(tbl->Len())};
+            return {{std::to_string(tbl->Len())}};
         }
         else if (command_ == "HGETALL")
         {
@@ -663,7 +687,7 @@ namespace rds
             }
             if (ret.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             return ret;
         }
@@ -672,31 +696,31 @@ namespace rds
             auto intval = RedisStrToInt(values_[1]);
             if (!intval.has_value())
             {
-                return {" "};
+                return {{" "}};
             }
             auto val = tbl->IncrBy(values_[0], intval.value());
             if (val.empty())
             {
-                return {" "};
+                return {{" "}};
             }
-            return {val};
+            return {{val}};
         }
         else if (command_ == "HDECRBY")
         {
             auto intval = RedisStrToInt(values_[1]);
             if (!intval.has_value())
             {
-                return {" "};
+                return {{" "}};
             }
             auto val = tbl->DecrBy(values_[0], intval.value());
             if (val.empty())
             {
-                return {" "};
+                return {{" "}};
             }
-            return {val};
+            return {{val}};
         }
 
-        return {"OK"};
+        return {{"OK"}};
     }
     /*
 
@@ -705,25 +729,30 @@ namespace rds
 
 
      */
-    auto SetCommand::Exec() -> json11::Json::array
+    auto SetCommand::Exec() -> std::optional<json11::Json::array>
     {
         if (!valid_)
         {
-            return {" "};
+            return {{" "}};
+        }
+        auto client = cli_.lock();
+        if (!client)
+        {
+            return {};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
+        obj_ = client->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "SADD")
             {
-                return {" "};
+                return {{" "}};
             }
-            obj_ = cli_->GetDB()->NewSet({obj_name_});
+            obj_ = client->GetDB()->NewSet({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::SET)
         {
-            return {" "};
+            return {{" "}};
         }
 
         auto st = reinterpret_cast<Set *>(obj_.get());
@@ -738,7 +767,7 @@ namespace rds
                     cnt++;
                 }
             }
-            return {std::to_string(cnt)};
+            return {{std::to_string(cnt)}};
         }
         else if (command_ == "SCARD")
         {
@@ -760,7 +789,7 @@ namespace rds
             }
             if (ret.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             return ret;
         }
@@ -774,7 +803,7 @@ namespace rds
             }
             if (ret.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             return ret;
         }
@@ -784,7 +813,7 @@ namespace rds
             auto v = st->RandMember().GetRaw();
             if (v.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             ret.push_back({'\"' + std::move(v) + '\"'});
             return ret;
@@ -795,7 +824,7 @@ namespace rds
             auto v = st->Pop().GetRaw();
             if (v.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             ret.push_back({'\"' + std::move(v) + '\"'});
             return ret;
@@ -811,18 +840,18 @@ namespace rds
                     cnt++;
                 }
             }
-            return {std::to_string(cnt)};
+            return {{std::to_string(cnt)}};
         }
         else if (command_ == "SINTER")
         {
-            auto another_set = cli_->GetDB()->Get(values_[0]).lock();
+            auto another_set = client->GetDB()->Get(values_[0]).lock();
             if (another_set == nullptr)
             {
-                return {" "};
+                return {{" "}};
             }
             if (another_set->GetObjectType() != ObjectType::SET)
             {
-                return {" "};
+                return {{" "}};
             }
             auto a_st = reinterpret_cast<Set *>(another_set.get());
             auto inter = st->Inter(*a_st);
@@ -833,20 +862,20 @@ namespace rds
             }
             if (ret.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             return ret;
         }
         else if (command_ == "SDIFF")
         {
-            auto another_set = cli_->GetDB()->Get(values_[0]).lock();
+            auto another_set = client->GetDB()->Get(values_[0]).lock();
             if (another_set == nullptr)
             {
-                return {" "};
+                return {{" "}};
             }
             if (another_set->GetObjectType() != ObjectType::SET)
             {
-                return {" "};
+                return {{" "}};
             }
             auto a_st = reinterpret_cast<Set *>(another_set.get());
             auto inter = st->Diff(*a_st);
@@ -857,12 +886,12 @@ namespace rds
             }
             if (ret.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             return ret;
         }
 
-        return {"OK"};
+        return {{"OK"}};
     }
     /*
 
@@ -870,25 +899,30 @@ namespace rds
 
 
      */
-    auto ZSetCommand::Exec() -> json11::Json::array
+    auto ZSetCommand::Exec() -> std::optional<json11::Json::array>
     {
         if (!valid_)
         {
-            return {" "};
+            return {{" "}};
+        }
+        auto client = cli_.lock();
+        if (!client)
+        {
+            return {};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
+        obj_ = client->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "ZADD")
             {
-                return {" "};
+                return {{" "}};
             }
-            obj_ = cli_->GetDB()->NewZSet({obj_name_});
+            obj_ = client->GetDB()->NewZSet({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::ZSET)
         {
-            return {" "};
+            return {{" "}};
         }
 
         auto zst = reinterpret_cast<ZSet *>(obj_.get());
@@ -908,12 +942,12 @@ namespace rds
                     cnt++;
                 }
             }
-            return {std::to_string(cnt)};
+            return {{std::to_string(cnt)}};
         }
         else if (command_ == "ZCARD")
         {
             std::size_t cnt = zst->Card();
-            return {std::to_string(cnt)};
+            return {{std::to_string(cnt)}};
         }
         else if (command_ == "ZREM")
         {
@@ -931,7 +965,7 @@ namespace rds
                     cnt++;
                 }
             }
-            return {std::to_string(cnt)};
+            return {{std::to_string(cnt)}};
         }
         else if (command_ == "ZCOUNT")
         {
@@ -939,43 +973,43 @@ namespace rds
             auto intval2 = RedisStrToInt(values_[1]);
             if (!(intval1.has_value() && intval2.has_value()))
             {
-                return {" "};
+                return {{" "}};
             }
             std::size_t cnt = zst->Count(intval1.value(), intval2.value());
-            return {std::to_string(cnt)};
+            return {{std::to_string(cnt)}};
         }
         else if (command_ == "ZLEXCOUNT")
         {
             std::size_t cnt = zst->LexCount(values_[0], values_[1]);
-            return {std::to_string(cnt)};
+            return {{std::to_string(cnt)}};
         }
         else if (command_ == "ZINCRBY")
         {
             auto intval = RedisStrToInt(values_[0]);
             if (!intval.has_value())
             {
-                return {" "};
+                return {{" "}};
             }
             auto val = zst->IncrBy(intval.value(), values_[1]);
             if (val.empty())
             {
-                return {" "};
+                return {{" "}};
             }
-            return {val};
+            return {{val}};
         }
         else if (command_ == "ZDECRBY")
         {
             auto intval = RedisStrToInt(values_[0]);
             if (!intval.has_value())
             {
-                return {" "};
+                return {{" "}};
             }
             auto val = zst->DecrBy(intval.has_value(), values_[1]);
             if (val.empty())
             {
-                return {" "};
+                return {{" "}};
             }
-            return {val};
+            return {{val}};
         }
         else if (command_ == "ZRANGE")
         {
@@ -983,12 +1017,12 @@ namespace rds
             auto intval2 = RedisStrToInt(values_[1]);
             if (!(intval1.has_value() && intval2.has_value()))
             {
-                return {" "};
+                return {{" "}};
             }
             auto res = zst->Range(intval1.value(), intval2.value());
             if (res.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             json11::Json::array ret;
             for (auto kv : res)
@@ -1004,12 +1038,12 @@ namespace rds
             auto intval2 = RedisStrToInt(values_[1]);
             if (!(intval1.has_value() && intval2.has_value()))
             {
-                return {" "};
+                return {{" "}};
             }
             auto res = zst->RangeByScore(intval1.value(), intval2.value());
             if (res.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             json11::Json::array ret;
             for (auto kv : res)
@@ -1024,7 +1058,7 @@ namespace rds
             auto res = zst->RangeByLex(values_[0], values_[1]);
             if (res.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
             json11::Json::array ret;
             for (auto kv : res)
@@ -1039,30 +1073,30 @@ namespace rds
             auto rank = zst->Rank(values_[0]);
             if (rank.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
-            return {rank};
+            return {{rank}};
         }
         else if (command_ == "ZSCORE")
         {
             auto score = zst->Score(values_[0]);
             if (score.empty())
             {
-                return {"(nil)"};
+                return {{"(nil)"}};
             }
-            return {score};
+            return {{score}};
         }
 
-        return {"OK"};
+        return {{"OK"}};
     }
     /*
 
 
 
      */
-    auto DbCommand::Exec() -> json11::Json::array
+    auto DbCommand::Exec() -> std::optional<json11::Json::array>
     {
-        assert(0);
+        /* assert(0);
         if (!valid_)
         {
             return {""};
@@ -1080,26 +1114,26 @@ namespace rds
         else if (command_ == "EXPIRE")
         {
             cli_->GetDB()->Expire({obj_name_}, std::stoul(value_.value()));
-        }
+        } */
 
-        return {"OK"};
+        return {{"OK"}};
     }
     /*
 
 
 
      */
-    auto CliCommand::Exec() -> json11::Json::array
+    auto CliCommand::Exec() -> std::optional<json11::Json::array>
     {
         assert(0);
         if (!valid_)
         {
-            return {""};
+            return {{" "}};
         }
         if (command_ == "SELECT")
         {
         }
 
-        return {"OK"};
+        return {{"OK"}};
     }
 };

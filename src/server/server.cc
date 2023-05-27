@@ -51,7 +51,7 @@ namespace rds
         close(listen_fd_);
     }
 
-    auto Server::Wait(int timeout) -> std::vector<ClientInfo *>
+    auto Server::Wait(int timeout) -> std::vector<std::shared_ptr<ClientInfo>>
     {
         epoll_revents_.resize(client_map_.size() + 1);
         int n = epoll_wait(epfd_, epoll_revents_.data(),
@@ -60,14 +60,12 @@ namespace rds
         {
             return {};
         }
-        std::vector<ClientInfo *> ret;
+        std::vector<std::shared_ptr<ClientInfo>> ret;
         for (int i = 0; i < n; i++)
         {
             if (epoll_revents_[i].data.fd == listen_fd_)
             {
-#ifndef NDEBUG
-                std::cout << "New client come" << std::endl;
-#endif
+                Log("Server:", "New client");
                 int cfd = ::accept(listen_fd_, 0, 0);
                 int fl = fcntl(cfd, F_GETFL);
                 fcntl(fl, F_SETFL, fl | O_NONBLOCK);
@@ -75,8 +73,7 @@ namespace rds
                 epev.data.fd = cfd;
                 epev.events = EPOLLIN;
                 epoll_ctl(epfd_, EPOLL_CTL_ADD, cfd, &epev);
-                auto c = std::make_unique<ClientInfo>(cfd);
-                // c->db_source_ = &databases_;
+                auto c = std::make_shared<ClientInfo>(this, cfd);
                 client_map_.insert({cfd, std::move(c)});
             }
             else
@@ -84,54 +81,34 @@ namespace rds
                 auto it = client_map_.find(epoll_revents_[i].data.fd);
                 if (it == client_map_.end())
                 {
-#ifndef NDEBUG
-                    Log("Wait: invalid client recv");
-#endif
                     epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
                     close(epoll_revents_[i].data.fd);
                     continue;
                 }
                 if (epoll_revents_[i].events & EPOLLIN)
                 {
-#ifndef NDEBUG
-                    Log("Client message recv");
-#endif
                     int nread = it->second->Read();
                     if (nread == 0 || nread == -1)
                     {
-#ifndef NDEBUG
-                        Log("Closed or invalid read");
-#endif
+                        Log("Server:", "Client invalid");
                         epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
                         client_map_.erase(it);
                     }
                     else
                     {
-#ifndef NDEBUG
-                        Log("Valid read");
-#endif
-                        ret.push_back(it->second.get());
+                        ret.push_back(it->second);
                     }
                 }
                 else
                 {
-#ifndef NDEBUG
-                    Log("Server message send");
-#endif
                     int nsend = it->second->Send();
                     if (nsend == -1)
                     {
-#ifndef NDEBUG
-                        Log("Inalid send");
-#endif
                         epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
                         client_map_.erase(it);
                     }
                     else if (it->second->IsSendOut())
                     {
-#ifndef NDEBUG
-                        Log("Valid send");
-#endif
                         epoll_event epev;
                         epev.data.fd = epoll_revents_[i].data.fd;
                         epev.events = EPOLLIN;
@@ -153,40 +130,32 @@ namespace rds
 
 
      */
-    void Handler::Push(ClientInfo *client, std::unique_ptr<CommandBase> cmd)
-    {
-        if (!cmd->valid_)
-        {
-            return;
-        }
-        cmd->cli_ = client;
-        cmd_que_.Push(client, std::move(cmd));
-    }
 
-    void Handler::Push(std::unique_ptr<Timer> timer)
+    void Handler::ExecCommand(Handler *hdlr)
     {
-        if (!timer->valid_)
+        while (hdlr->running_)
         {
-            return;
-        }
-        tmr_que_.Push(std::move(timer));
-    }
-
-    void Handler::ExecCommand()
-    {
-        while (running_)
-        {
-            auto pair = cmd_que_.BlockPop();
-            auto respond = pair.second->Exec();
-            pair.first->Append(respond);
+            auto cmd = hdlr->cmd_que_.BlockPop();
+            auto respond = cmd->Exec();
+            if (!respond.has_value())
+            {
+                continue;
+            }
+            auto client = cmd->cli_.lock();
+            if (!client)
+            {
+                continue;
+            }
+            client->Append(respond.value());
+            client->EnableSend();
         }
     }
 
-    void Handler::ExecTimer()
+    void Handler::ExecTimer(Handler *hdlr)
     {
-        while (running_)
+        while (hdlr->running_)
         {
-            auto tmr = tmr_que_.BlockPop();
+            auto tmr = hdlr->tmr_que_.BlockPop();
             tmr->Exec();
         }
     }
@@ -194,18 +163,56 @@ namespace rds
     void Handler::Run()
     {
         running_ = true;
-        // std::thread exec_cmd_(, this);
-        // std::thread exec_tmr_(, this);
-        // workers_.push_back(std::move(exec_cmd_));
-        // workers_.push_back(std::move(exec_tmr_));
+        std::thread exec_cmd_(ExecCommand, this);
+        std::thread exec_tmr_(ExecTimer, this);
+        std::thread hdl_cli_(HandleClient, this);
+        workers_.push_back(std::move(exec_cmd_));
+        workers_.push_back(std::move(exec_tmr_));
+        workers_.push_back(std::move(hdl_cli_));
+    }
+
+    void Handler::HandleClient(Handler *hdlr)
+    {
+        while (hdlr->running_)
+        {
+            std::unique_lock<std::mutex> lk(hdlr->cli_mtx_);
+            hdlr->condv_.wait(lk, [&que = hdlr->cli_que_]()
+                              { return !que.empty(); });
+            while (!hdlr->cli_que_.empty())
+            {
+                auto cli = hdlr->cli_que_.front();
+                hdlr->cli_que_.pop();
+                auto client = cli.lock();
+                if (!client)
+                {
+                    continue;
+                }
+                auto reqs = client->ExportMessages();
+                for (auto &req : reqs)
+                {
+                    auto cmd = RequestToCommandExec(client, &req);
+                    if (cmd)
+                    {
+                        hdlr->cmd_que_.Push(std::move(cmd));
+                    }
+                }
+            }
+        }
+    }
+
+    void Handler::Handle(std::weak_ptr<ClientInfo> client)
+    {
+        std::lock_guard<std::mutex> lg(cli_mtx_);
+        cli_que_.push(client);
+        condv_.notify_one();
     }
 
     void Server::EnableSend(ClientInfo *client)
     {
         epoll_event epev;
-        epev.data.fd = client->fd_;
+        epev.data.fd = client->GetFD();
         epev.events = EPOLLOUT;
-        epoll_ctl(epfd_, EPOLL_CTL_MOD, client->fd_, &epev);
+        epoll_ctl(epfd_, EPOLL_CTL_MOD, client->GetFD(), &epev);
     }
 
     /*
@@ -219,6 +226,7 @@ namespace rds
         char buf[65535];
         int total_n = 0;
         int n;
+        WriteGuard wg(latch_);
         do
         {
             n = read(fd_, buf, 65535);
@@ -232,17 +240,13 @@ namespace rds
                 return 0;
             }
             std::copy(std::cbegin(buf), std::cbegin(buf) + n, std::back_inserter(recv_buffer_));
-#ifndef NDEBUG
-            Log("Read");
-            std::copy(recv_buffer_.cbegin(), recv_buffer_.cend(), std::ostreambuf_iterator<char>(std::cout));
-            std::cout << std::endl;
-#endif
         } while (n == 65535);
         return total_n;
     }
 
     auto ClientInfo::Send() -> int
     {
+        WriteGuard wg(latch_);
         if (send_buffer_.empty())
         {
             return 0;
@@ -252,11 +256,6 @@ namespace rds
         std::copy(send_buffer_.cbegin(), send_buffer_.cend(), std::back_inserter(buf));
         int n;
         n = write(fd_, buf.data(), buf.size());
-#ifndef NDEBUG
-        Log("Send");
-        std::copy(buf.cbegin(), buf.cend(), std::ostreambuf_iterator<char>(std::cout));
-        std::cout << std::endl;
-#endif
         if (n == 0 || n == -1)
         {
             return n;
@@ -267,6 +266,7 @@ namespace rds
 
     void ClientInfo::Append(json11::Json::array to_send_message)
     {
+        WriteGuard wg(latch_);
         json11::Json obj(std::move(to_send_message));
         auto str = obj.dump();
         std::copy(str.cbegin(), str.cend(), std::back_inserter(send_buffer_));
@@ -274,11 +274,13 @@ namespace rds
 
     auto ClientInfo::IsSendOut() -> bool
     {
+        ReadGuard rg(latch_);
         return send_buffer_.empty();
     }
 
     auto ClientInfo::ExportMessages() -> std::vector<json11::Json::array>
     {
+        WriteGuard wg(latch_);
         std::vector<json11::Json::array> ret;
         do
         {
@@ -300,17 +302,30 @@ namespace rds
         return ret;
     }
 
-    void ClientInfo::ShiftDB(Db *database)
+    void ClientInfo::SetDB(Db *database)
     {
+        WriteGuard wg(latch_);
         database_ = database;
     }
 
     auto ClientInfo::GetDB() -> Db *
     {
+        ReadGuard rg(latch_);
         return database_;
     }
 
-    ClientInfo::ClientInfo(int fd) : fd_(fd), database_(nullptr)
+    auto ClientInfo::GetFD() -> int
+    {
+        ReadGuard rg(latch_);
+        return fd_;
+    }
+
+    void ClientInfo::EnableSend()
+    {
+        server_->EnableSend(this);
+    }
+
+    ClientInfo::ClientInfo(Server *server, int fd) : fd_(fd), server_(server), database_(nullptr)
     {
     }
 

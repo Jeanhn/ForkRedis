@@ -12,7 +12,7 @@ namespace rds
         }
     }
 
-    ZSet::ZSet(ZSet &&rhs)
+    ZSet::ZSet(ZSet &&rhs)noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         sequence_list_ = std::move(rhs.sequence_list_);
@@ -30,7 +30,7 @@ namespace rds
         return *this;
     }
 
-    ZSet &ZSet::operator=(ZSet &&rhs)
+    ZSet &ZSet::operator=(ZSet &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         sequence_list_ = std::move(rhs.sequence_list_);

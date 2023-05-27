@@ -180,4 +180,16 @@ namespace rds
         conf.frequence_.save_n_times_ = obj_value["time"].int_value();
         return conf;
     }
+
+    auto DefaultConf() -> RedisConf
+    {
+        RedisConf conf;
+        conf.ip_ = "127.0.0.1";
+        conf.port_ = 8080;
+        conf.compress_ = false;
+        conf.enable_aof_ = false;
+        conf.frequence_.every_n_sec_ = 1;
+        conf.frequence_.save_n_times_ = 1;
+        return conf;
+    }
 }

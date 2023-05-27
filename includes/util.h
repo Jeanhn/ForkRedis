@@ -208,6 +208,8 @@ namespace rds
         } frequence_;
     };
 
+    auto DefaultConf() -> RedisConf;
+
     auto LoadConf() -> std::optional<RedisConf>;
 
 } // namespace rds

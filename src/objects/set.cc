@@ -9,7 +9,7 @@ namespace rds
         data_set_ = lhs.data_set_;
     }
 
-    Set::Set(Set &&rhs)
+    Set::Set(Set &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         data_set_ = std::move(rhs.data_set_);
@@ -22,7 +22,7 @@ namespace rds
         return *this;
     }
 
-    Set &Set::operator=(Set &&rhs)
+    Set &Set::operator=(Set &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         data_set_ = std::move(rhs.data_set_);

@@ -31,7 +31,7 @@ namespace rds
         encoding_type_ = lhs.encoding_type_;
     }
 
-    Str::Str(Str &&rhs)
+    Str::Str(Str &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         data_ = std::move(rhs.data_);
@@ -45,7 +45,7 @@ namespace rds
         encoding_type_ = lhs.encoding_type_;
         return *this;
     }
-    Str &Str::operator=(Str &&rhs)
+    Str &Str::operator=(Str &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         data_ = std::move(rhs.data_);
@@ -63,6 +63,22 @@ namespace rds
     {
         WriteGuard wg(latch_);
         data_ = std::move(data);
+        encoding_type_ = EncodingType::INT;
+        for (std::size_t i = 0; i < data_.size(); i++)
+        {
+            if (data_[i] < '0' || data_[i] > '9')
+            {
+                if (i == 0 && data_[i] == '-' && data_.size() > 1)
+                {
+                    continue;
+                }
+                else
+                {
+                    encoding_type_ = EncodingType::STR_RAW;
+                    return;
+                }
+            }
+        }
     }
 
     auto Str::Append(std::string data) -> std::size_t

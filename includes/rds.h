@@ -14,5 +14,6 @@
 #include <server/command.h>
 #include <server/server.h>
 #include <server/timer.h>
+#include <server/loop.h>
 
 #endif

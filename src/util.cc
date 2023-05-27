@@ -1,7 +1,9 @@
 #include <util.h>
+#include <fstream>
 #include <lzfse.h>
 #include <cstdlib>
 #include <objects/str.h>
+#include <json11.hpp>
 
 namespace rds
 {
@@ -146,5 +148,36 @@ namespace rds
             }
             return -std::stoi(abs);
         }
+    }
+
+    auto LoadConf() -> std::optional<RedisConf>
+    {
+        std::string conf_file;
+        std::ifstream ifile_strm;
+        ifile_strm.open("redis-conf.json");
+        while (!ifile_strm.eof())
+        {
+            char c;
+            ifile_strm.read(&c, sizeof(c));
+            if (!ifile_strm.eof())
+            {
+                conf_file.push_back(c);
+            }
+        }
+        std::string err;
+        json11::Json conf_obj = json11::Json::parse(conf_file, err);
+        if (!err.empty())
+        {
+            return {};
+        }
+        RedisConf conf;
+        auto obj_value = conf_obj.object_items();
+        conf.ip_ = obj_value["ip"].string_value();
+        conf.port_ = obj_value["port"].int_value();
+        conf.compress_ = obj_value["compress"].bool_value();
+        conf.enable_aof_ = obj_value["aof"].bool_value();
+        conf.frequence_.every_n_sec_ = obj_value["sec"].int_value();
+        conf.frequence_.save_n_times_ = obj_value["time"].int_value();
+        return conf;
     }
 }

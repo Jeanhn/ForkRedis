@@ -88,6 +88,13 @@ void operator delete[](void *p, size_t size, std::align_val_t val) noexcept;
     name(name &&) noexcept = default;              \
     auto operator=(const name &)->name & = delete; \
     auto operator=(name &&) noexcept -> name & = default;
+#define CLASS_DECLARE_special_copy_move(name) \
+    name() = default;                         \
+    ~name() = default;                        \
+    name(const name &);                       \
+    name(name &&) noexcept;                   \
+    auto operator=(const name &)->name &;     \
+    auto operator=(name &&) noexcept -> name &;
 
 namespace rds
 {
@@ -118,6 +125,18 @@ namespace rds
         {
             latch_.unlock();
         }
+    };
+
+    class SpinMutex
+    {
+    private:
+        std::atomic_bool mu_;
+
+    public:
+        SpinMutex() : mu_(false) {}
+        SpinMutex(const SpinMutex &) : SpinMutex() {}
+        SpinMutex(SpinMutex &&) : SpinMutex() {}
+        ~SpinMutex() = default;
     };
 
     auto UsTime(void) -> std::size_t;
@@ -178,9 +197,18 @@ namespace rds
 
     struct RedisConf
     {
-        const char *ip_;
+        std::string ip_;
         short port_;
+        bool compress_;
+        bool enable_aof_;
+        struct
+        {
+            int every_n_sec_;
+            int save_n_times_;
+        } frequence_;
     };
+
+    auto LoadConf() -> std::optional<RedisConf>;
 
 } // namespace rds
 

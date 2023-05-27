@@ -49,8 +49,8 @@ TEST(KeyValue, kv)
 
     ASSERT_EQ(kv2.GetKey(), kv.GetKey());
 
-    auto _v1 = kv.GetValue();
-    auto _v2 = kv.GetValue();
+    auto _v1 = kv.GetValue().lock().get();
+    auto _v2 = kv.GetValue().lock().get();
 
     ASSERT_EQ(_v1->GetObjectType(), _v2->GetObjectType());
 
@@ -70,7 +70,7 @@ TEST(KeyValue, kv)
     {
         Str s(std::to_string(i));
         auto sp = std::make_unique<Str>(s);
-        kvec.push_back({s, std::move(sp)});
+        kvec.emplace_back(s, std::move(sp));
     }
     // decltype(kvec) kvec2;
 }

@@ -19,15 +19,15 @@ namespace rds
 
     public:
         auto Add(int, Str) -> bool; // number of new (except update)
-        auto Card() -> std::size_t;
+        auto Card() const -> std::size_t;
         auto Rem(int, const Str &) -> bool;
-        auto Count(int, int) -> std::size_t;
-        auto LexCount(const Str &, const Str &) -> std::size_t;
+        auto Count(int, int) const -> std::size_t;
+        auto LexCount(const Str &, const Str &) const -> std::size_t;
         auto IncrBy(int, const Str &) -> std::string;
         auto DecrBy(int, const Str &) -> std::string;
-        auto Range(int, int) -> std::vector<std::pair<Str, int>>;
-        auto RangeByScore(int, int) -> std::vector<std::pair<Str, int>>;
-        auto RangeByLex(const Str &, const Str &) -> std::vector<std::pair<Str, int>>;
+        auto Range(int, int) const -> std::vector<std::pair<Str, int>>;
+        auto RangeByScore(int, int) const -> std::vector<std::pair<Str, int>>;
+        auto RangeByLex(const Str &, const Str &) const -> std::vector<std::pair<Str, int>>;
         auto Rank(const Str &member) const -> std::string;
         auto Score(const Str &member) const -> std::string;
 

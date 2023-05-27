@@ -167,22 +167,33 @@ namespace rds
     class Object
     {
     private:
-        ObjectType obj_type_{ObjectType::OBJ};
-
     protected:
-    public:
-        virtual auto EncodeValue() const -> std::string = 0;
+        mutable std::shared_mutex latch_;
 
-        virtual void DecodeValue(std::deque<char> *) = 0;
+    public:
+        auto ExposeLatch() const -> std::shared_mutex &
+        {
+            return latch_;
+        }
+
+        virtual auto EncodeValue() const -> std::string
+        {
+            return {};
+        };
+
+        virtual void DecodeValue(std::deque<char> *){};
 
         virtual auto GetObjectType() const -> ObjectType
         {
             return ObjectType::OBJ;
         }
 
+        Object() = default;
         virtual ~Object() = default;
-
-        CLASS_DECLARE_without_destructor(Object);
+        Object(const Object &) : Object() {}
+        Object(Object &&) noexcept : Object() {}
+        Object &operator=(const Object &) { return *this; }
+        Object &operator=(Object &&) noexcept { return *this; }
     };
 
 } // namespace rds

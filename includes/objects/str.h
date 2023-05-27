@@ -23,8 +23,6 @@ namespace rds
         std::string data_;
         EncodingType encoding_type_;
 
-        void TypeCheck();
-
     public:
         auto GetRaw() const -> std::string;
         void Set(std::string);
@@ -40,41 +38,66 @@ namespace rds
         auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> *) override;
 
-        CLASS_DEFAULT_DECLARE(Str);
+        CLASS_DECLARE_special_copy_move(Str);
 
-        template <typename T, typename =
-                                  std::enable_if_t<std::is_same_v<std::string, std::decay_t<T>>, void>>
-        Str(T &&data) : data_(std::forward<T>(data)), encoding_type_(EncodingType::INT)
-        {
-            for (auto it = data_.cbegin(); it != data_.cend(); it++)
-            {
-                if (*it < '0' || *it > '9')
-                {
-                    encoding_type_ = EncodingType::STR_RAW;
-                }
-            }
-        }
+        Str(std::string data);
     };
 
     inline auto operator==(const Str &a, const Str &b) -> bool
     {
-        return a.data_ == b.data_;
+        if (&a < &b)
+        {
+            ReadGuard(a.ExposeLatch());
+            ReadGuard(b.ExposeLatch());
+            return a.data_ == b.data_;
+        }
+        else if (&a > &b)
+        {
+            ReadGuard(b.ExposeLatch());
+            ReadGuard(a.ExposeLatch());
+            return a.data_ == b.data_;
+        }
+        return true;
     }
     inline auto operator<(const Str &a, const Str &b) -> bool
     {
-        return a.data_ < b.data_;
+        if (&a < &b)
+        {
+            ReadGuard(a.ExposeLatch());
+            ReadGuard(b.ExposeLatch());
+            return a.data_ < b.data_;
+        }
+        else if (&a > &b)
+        {
+            ReadGuard(b.ExposeLatch());
+            ReadGuard(a.ExposeLatch());
+            return a.data_ < b.data_;
+        }
+        return false;
     }
     inline auto operator<=(const Str &a, const Str &b) -> bool
     {
-        return a.data_ <= b.data_;
+        if (&a < &b)
+        {
+            ReadGuard(a.ExposeLatch());
+            ReadGuard(b.ExposeLatch());
+            return a.data_ <= b.data_;
+        }
+        else if (&a > &b)
+        {
+            ReadGuard(b.ExposeLatch());
+            ReadGuard(a.ExposeLatch());
+            return a.data_ <= b.data_;
+        }
+        return true;
     }
     inline auto operator>(const Str &a, const Str &b) -> bool
     {
-        return a.data_ > b.data_;
+        return !(a <= b);
     }
     inline auto operator>=(const Str &a, const Str &b) -> bool
     {
-        return a.data_ >= b.data_;
+        return !(a < b);
     }
 
     inline auto StrLess(const Str &a, const Str &b) -> bool
@@ -85,6 +108,7 @@ namespace rds
     inline auto StrHash(const Str &s) -> std::size_t
     {
         static std::hash<std::string> hash_;
+        ReadGuard rg(s.ExposeLatch());
         return hash_(s.data_);
     }
 

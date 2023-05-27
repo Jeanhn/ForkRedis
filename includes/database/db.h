@@ -12,11 +12,12 @@ namespace rds
     class KeyValue
     {
     private:
+        mutable std::shared_mutex latch_;
         Str key_;
-        std::unique_ptr<Object> value_;
+        std::shared_ptr<Object> value_;
         std::optional<std::size_t> expire_time_stamp_;
 
-        auto PrefixEncode() const -> std::string;
+        auto InternalPrefixEncode() const -> std::string;
 
     public:
         auto Encode() const -> std::string;
@@ -47,13 +48,19 @@ namespace rds
             return expire_time_stamp_.value() < UsTime();
         }
 
-        auto GetValue() const -> Object *;
+        auto GetValue() const -> std::weak_ptr<Object>;
 
         auto GetKey() const -> Str;
 
-        KeyValue(const Str &, std::unique_ptr<Object>);
+        KeyValue(const Str &, std::shared_ptr<Object>);
 
-        CLASS_DEFAULT_DECLARE(KeyValue);
+        KeyValue() = default;
+        ~KeyValue() = default;
+
+        KeyValue(const KeyValue &);
+        KeyValue(KeyValue &&);
+        KeyValue &operator=(KeyValue &&);
+        KeyValue &operator=(const KeyValue &);
     };
 
     auto ExpireDecode(std::deque<char> &) -> std::optional<std::size_t>;
@@ -65,22 +72,23 @@ namespace rds
 #else
     public:
 #endif
+        mutable std::shared_mutex latch_;
         static int number;
         constexpr static char SELECT_DB_ = 's';
         int number_;
-        std::unordered_map<Str, KeyValue, decltype(&StrHash)> key_value_map_{0xff, StrHash};
+        std::unordered_map<Str, std::shared_ptr<KeyValue>, decltype(&StrHash)> key_value_map_{0xff, StrHash};
 
     public:
-        void NewStr(const Str &);
-        void NewList(const Str &);
-        void NewSet(const Str &);
-        void NewZSet(const Str &);
-        void NewHash(const Str &);
+        auto NewStr(const Str &) -> std::shared_ptr<Object>;
+        auto NewList(const Str &) -> std::shared_ptr<Object>;
+        auto NewSet(const Str &) -> std::shared_ptr<Object>;
+        auto NewZSet(const Str &) -> std::shared_ptr<Object>;
+        auto NewHash(const Str &) -> std::shared_ptr<Object>;
 
         void Del(const Str &);
-        auto Get(const Str &) const -> Object *;
+        auto Get(const Str &) const -> std::weak_ptr<Object>;
 
-        void Expire(const Str &, std::size_t);
+        void Expire(const Str &, std::size_t) const;
 
         auto Save() const -> std::string;
 
@@ -90,8 +98,8 @@ namespace rds
 
         auto Number() const -> int;
 
-        CLASS_DECLARE_without_constructor(Db);
         Db();
+        ~Db() = default;
     };
 
 } // namespace rds

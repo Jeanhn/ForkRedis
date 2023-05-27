@@ -10,11 +10,45 @@ namespace rds
 
     void RdbTimer::Exec()
     {
-        auto newtmr = std::make_unique<RdbTimer>(*this);
-        newtmr->expire_time_us_ = rdb_->Period() + UsTime();
-        hdlr_->Push(std::move(newtmr));
-        auto str = rdb_->Save();
-        fm_->Write(str);
     }
 
+    void TimerQue::Push(std::unique_ptr<Timer> timer)
+    {
+        std::lock_guard<std::mutex> lg(mtx_);
+        que_.push(std::move(timer));
+        condv_.notify_one();
+    }
+
+    auto TimerQue::BlockPop() -> std::unique_ptr<Timer>
+    {
+        std::unique_lock<std::mutex> ul(mtx_);
+        while (true)
+        {
+            if (!que_.empty())
+            {
+                auto now_us = UsTime();
+                if (que_.top()->expire_time_us_ > now_us)
+                {
+                    std::size_t sleep_period = que_.top()->expire_time_us_ - now_us;
+                    condv_.wait_until(ul,
+                                      std::chrono::system_clock::now() +
+                                          std::chrono::microseconds(sleep_period));
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                condv_.wait(ul, [&que = que_]()
+                            { return !que.empty(); });
+            }
+        }
+
+        auto ret = std::move(*(const_cast<std::unique_ptr<Timer> *>(&que_.top())));
+        que_.pop();
+        return ret;
+    }
 } // namespace rds

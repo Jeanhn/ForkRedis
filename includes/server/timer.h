@@ -7,6 +7,8 @@
 #include <database/rdb.h>
 #include <database/aof.h>
 #include <database/disk.h>
+#include <condition_variable>
+#include <queue>
 
 namespace rds
 {
@@ -14,7 +16,7 @@ namespace rds
     {
         bool valid_;
         std::size_t expire_time_us_;
-        virtual void Exec() = 0;
+        virtual void Exec(){};
         CLASS_DEFAULT_DECLARE(Timer);
     };
 
@@ -63,6 +65,24 @@ namespace rds
     {
         return a->expire_time_us_ > b->expire_time_us_;
     }
+
+    class TimerQue
+    {
+    private:
+        /* data */
+        std::mutex mtx_;
+        std::condition_variable condv_;
+        std::priority_queue<std::unique_ptr<Timer>, std::vector<std::unique_ptr<Timer>>,
+                            decltype(&TimerGreater)>
+            que_{TimerGreater};
+
+    public:
+        void Push(std::unique_ptr<Timer> timer);
+        auto BlockPop() -> std::unique_ptr<Timer>;
+        TimerQue(/* args */) = default;
+        ~TimerQue() = default;
+        CLASS_DECLARE_uncopyable(TimerQue);
+    };
 
 } // namespace rds
 

@@ -63,8 +63,6 @@ TEST(Command, Str)
         cout << ret[0].string_value() << endl;
         i++;
     }
-    auto s = database.Get(std::string("str1"));
-    cout << reinterpret_cast<rds::Str *>(s)->GetRaw() << endl;
 }
 
 suit_t list_cli_commands;

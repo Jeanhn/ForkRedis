@@ -5,6 +5,8 @@
 #include <objects/str.h>
 #include <database/db.h>
 #include <json11.hpp>
+#include <condition_variable>
+
 
 namespace rds
 {
@@ -22,7 +24,7 @@ namespace rds
         bool valid_{true};
         std::string command_;
         std::string obj_name_;
-        Object *obj_;
+        std::shared_ptr<Object> obj_;
         ClientInfo *cli_;
         virtual auto Exec() -> json11::Json::array = 0;
         CLASS_DEFAULT_DECLARE(CommandBase);
@@ -77,6 +79,34 @@ namespace rds
         CLASS_DEFAULT_DECLARE(ZSetCommand);
     };
 
+    class CommandQue
+    {
+    private:
+        /* data */
+        std::mutex mtx_;
+        std::condition_variable condv_;
+        std::deque<std::pair<ClientInfo *, std::unique_ptr<CommandBase>>> que_;
+
+    public:
+        void Push(ClientInfo *client, std::unique_ptr<CommandBase> cmd)
+        {
+            std::lock_guard<std::mutex> lg(mtx_);
+            que_.push_back({client, std::move(cmd)});
+            condv_.notify_one();
+        }
+        auto BlockPop() -> std::pair<ClientInfo *, std::unique_ptr<CommandBase>>
+        {
+            std::unique_lock<std::mutex> ul(mtx_);
+            condv_.wait(ul, [&que = que_]()
+                        { return !que.empty(); });
+            auto ret = std::move(que_.front());
+            que_.pop_front();
+            return ret;
+        }
+        CommandQue(/* args */) = default;
+        ~CommandQue() = default;
+        CLASS_DECLARE_uncopyable(CommandQue);
+    };
 } // namespace rds
 
 #endif

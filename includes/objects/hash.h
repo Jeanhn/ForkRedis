@@ -29,7 +29,7 @@ namespace rds
         auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> *) override;
 
-        CLASS_DEFAULT_DECLARE(Hash);
+        CLASS_DECLARE_special_copy_move(Hash);
     };
 
 } // namespace rds

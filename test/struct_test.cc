@@ -265,9 +265,11 @@ TEST(Structs, ZSet)
     std::string ev = s.EncodeValue();
     std::deque<char> cache;
     std::copy(std::cbegin(ev), std::cend(ev), std::back_inserter(cache));
+    Log("zset construct");
 
     ZSet s2;
     s2.DecodeValue(&cache);
+    Log("zset decode");
     /* check en-de-code */
     ASSERT_EQ(s.Card(), s2.Card());
     CheckWhat("zset en-de-code");

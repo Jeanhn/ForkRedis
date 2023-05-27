@@ -23,14 +23,14 @@ namespace rds
         auto RandMember() const -> Str;
         auto Pop() -> Str;
         auto Rem(const Str &) -> bool; // number of removed-members
-        auto Diff(const Set &) -> std::vector<Str>;
-        auto Inter(const Set &) -> std::vector<Str>;
+        auto Diff(const Set &) const -> std::vector<Str>;
+        auto Inter(const Set &) const -> std::vector<Str>;
 
         auto GetObjectType() const -> ObjectType override;
         auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> *) override;
 
-        CLASS_DEFAULT_DECLARE(Set);
+        CLASS_DECLARE_uncopyable(Set);
     };
 
 } // namespace rds

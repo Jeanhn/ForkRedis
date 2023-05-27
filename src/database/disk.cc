@@ -35,9 +35,11 @@ namespace rds
         {
             char c;
             ifile_strm.read(&c, sizeof(c));
-            ret.push_back(c);
+            if (!ifile_strm.eof())
+            {
+                ret.push_back(c);
+            }
         }
-        ret.pop_back();
         return ret;
     }
 

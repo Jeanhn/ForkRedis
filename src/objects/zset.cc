@@ -3,15 +3,45 @@
 namespace rds
 {
 
-    // ZSet::ZSet(ZSet &&rhs) : sequence_list_(rhs.sequence_list_), member_map_(std::move(rhs.member_map_)),
-    //                          rank_map_(std::move(rank_map_)) {}
-    // ZSet &ZSet::operator=(ZSet &&rhs) {
-    //     sequence_list_ = rhs.sequence_list_;
+    ZSet::ZSet(const ZSet &lhs)
+    {
+        ReadGuard rg(lhs.ExposeLatch());
+        for (auto member : lhs.sequence_list_)
+        {
+            Add(member.second, *(member.first));
+        }
+    }
 
-    // }
+    ZSet::ZSet(ZSet &&rhs)
+    {
+        ReadGuard rg(rhs.ExposeLatch());
+        sequence_list_ = std::move(rhs.sequence_list_);
+        member_map_ = std::move(rhs.member_map_);
+        rank_map_ = std::move(rhs.rank_map_);
+    }
+
+    ZSet &ZSet::operator=(const ZSet &lhs)
+    {
+        ReadGuard rg(lhs.ExposeLatch());
+        for (auto member : lhs.sequence_list_)
+        {
+            Add(member.second, *(member.first));
+        }
+        return *this;
+    }
+
+    ZSet &ZSet::operator=(ZSet &&rhs)
+    {
+        ReadGuard rg(rhs.ExposeLatch());
+        sequence_list_ = std::move(rhs.sequence_list_);
+        member_map_ = std::move(rhs.member_map_);
+        rank_map_ = std::move(rhs.rank_map_);
+        return *this;
+    }
 
     auto ZSet::Add(int score, Str member) -> bool
     {
+        WriteGuard wg(latch_);
         auto it = member_map_.insert({std::move(member), sequence_list_.end()});
         if (!it.second)
         {
@@ -25,13 +55,15 @@ namespace rds
         return true;
     }
 
-    auto ZSet::Card() -> std::size_t
+    auto ZSet::Card() const -> std::size_t
     {
+        ReadGuard rg(latch_);
         return sequence_list_.size();
     }
 
     auto ZSet::Rem(int score, const Str &member) -> bool
     {
+        WriteGuard wg(latch_);
         auto pos = member_map_.find(member);
         if (pos == member_map_.end())
         {
@@ -52,23 +84,25 @@ namespace rds
         return true;
     }
 
-    auto ZSet::Count(int score_low, int score_high) -> std::size_t
+    auto ZSet::Count(int score_low, int score_high) const -> std::size_t
     {
         if (score_low > score_high)
         {
             return 0;
         }
+        ReadGuard rg(latch_);
         auto low = rank_map_.lower_bound(score_low);
         auto high = rank_map_.upper_bound(score_high);
         return std::distance(low, high);
     }
 
-    auto ZSet::LexCount(const Str &member_low, const Str &member_high) -> std::size_t
+    auto ZSet::LexCount(const Str &member_low, const Str &member_high) const -> std::size_t
     {
         if (member_low < member_high)
         {
             return 0;
         }
+        ReadGuard rg(latch_);
         auto low = member_map_.lower_bound(member_low);
         auto high = member_map_.upper_bound(member_high);
         return std::distance(low, high);
@@ -76,6 +110,7 @@ namespace rds
 
     auto ZSet::IncrBy(int delta_score, const Str &member) -> std::string
     {
+        WriteGuard wg(latch_);
         auto pos = member_map_.find(member);
         if (pos == member_map_.end())
         {
@@ -97,8 +132,9 @@ namespace rds
         return IncrBy(-delta_score, member);
     }
 
-    auto ZSet::Range(int beg, int end) -> std::vector<std::pair<Str, int>>
+    auto ZSet::Range(int beg, int end) const -> std::vector<std::pair<Str, int>>
     {
+        ReadGuard rg(latch_);
         if (sequence_list_.empty())
         {
             return {};
@@ -129,12 +165,13 @@ namespace rds
         return ret;
     }
 
-    auto ZSet::RangeByScore(int score_low, int score_high) -> std::vector<std::pair<Str, int>>
+    auto ZSet::RangeByScore(int score_low, int score_high) const -> std::vector<std::pair<Str, int>>
     {
         if (score_low > score_high)
         {
             return {};
         }
+        ReadGuard rg(latch_);
         auto low = rank_map_.lower_bound(score_low);
         auto high = rank_map_.upper_bound(score_high);
         std::vector<std::pair<Str, int>> ret;
@@ -143,12 +180,13 @@ namespace rds
         return ret;
     }
 
-    auto ZSet::RangeByLex(const Str &member_low, const Str &member_high) -> std::vector<std::pair<Str, int>>
+    auto ZSet::RangeByLex(const Str &member_low, const Str &member_high) const -> std::vector<std::pair<Str, int>>
     {
         if (member_low > member_high)
         {
             return {};
         }
+        ReadGuard rg(latch_);
         std::vector<std::pair<Str, int>> ret;
         auto low = member_map_.lower_bound(member_low);
         auto high = member_map_.upper_bound(member_high);
@@ -164,6 +202,7 @@ namespace rds
 
     auto ZSet::EncodeValue() const -> std::string
     {
+        ReadGuard rg(latch_);
         std::string ret = BitsToString(sequence_list_.size());
         std::for_each(std::cbegin(sequence_list_), std::cend(sequence_list_), [&ret](const decltype(sequence_list_)::value_type &v) mutable
                       { ret.append(BitsToString(v.second));ret.append(v.first->EncodeValue()); });
@@ -172,6 +211,7 @@ namespace rds
 
     void ZSet::DecodeValue(std::deque<char> *source)
     {
+        WriteGuard wg(latch_);
         member_map_.clear();
         std::size_t len = PeekSize(source);
         for (std::size_t i = 0; i < len; i++)
@@ -180,12 +220,23 @@ namespace rds
             int r;
             r = PeekInt(source);
             s.DecodeValue(source);
-            Add(r, std::move(s));
+
+            auto it = member_map_.insert({std::move(s), sequence_list_.end()});
+            if (!it.second)
+            {
+                continue;
+            }
+            sequence_list_.push_back({&it.first->first, r});
+            auto pos = sequence_list_.end();
+            pos--;
+            it.first->second = pos;
+            rank_map_.insert({r, it.first});
         }
     }
 
     auto ZSet::Rank(const Str &member) const -> std::string
     {
+        ReadGuard rg(latch_);
         auto pos = member_map_.find(member);
         if (pos == member_map_.end())
         {
@@ -196,6 +247,7 @@ namespace rds
     }
     auto ZSet::Score(const Str &member) const -> std::string
     {
+        ReadGuard rg(latch_);
         auto pos = member_map_.find(member);
         if (pos == member_map_.end())
         {

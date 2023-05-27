@@ -2,21 +2,49 @@
 
 namespace rds
 {
+    List::List(const List &lhs)
+    {
+        ReadGuard rg(lhs.ExposeLatch());
+        data_list_ = lhs.data_list_;
+    }
+
+    List::List(List &&rhs)
+    {
+        ReadGuard rg(rhs.ExposeLatch());
+        data_list_ = std::move(rhs.data_list_);
+    }
+
+    List &List::operator=(const List &lhs)
+    {
+        ReadGuard rg(lhs.ExposeLatch());
+        data_list_ = lhs.data_list_;
+        return *this;
+    }
+
+    List &List::operator=(List &&rhs)
+    {
+        ReadGuard rg(rhs.ExposeLatch());
+        data_list_ = std::move(rhs.data_list_);
+        return *this;
+    }
 
     auto List::PushFront(Str str) -> std::size_t
     {
+        WriteGuard wg(latch_);
         data_list_.push_front(std::move(str));
         return data_list_.size();
     }
 
     auto List::PushBack(Str str) -> std::size_t
     {
+        WriteGuard wg(latch_);
         data_list_.push_back(std::move(str));
         return data_list_.size();
     }
 
     auto List::PopFront() -> Str
     {
+        WriteGuard wg(latch_);
         if (data_list_.empty())
         {
             return {};
@@ -29,6 +57,7 @@ namespace rds
 
     auto List::PopBack() -> Str
     {
+        WriteGuard wg(latch_);
         if (data_list_.empty())
         {
             return {};
@@ -41,6 +70,7 @@ namespace rds
 
     auto List::Index(int idx) const -> Str
     {
+        ReadGuard rg(latch_);
         if (data_list_.empty())
         {
             return {};
@@ -63,11 +93,13 @@ namespace rds
 
     auto List::Len() const -> std::size_t
     {
+        ReadGuard rg(latch_);
         return data_list_.size();
     }
 
     auto List::Rem(int count, const Str &value) -> std::size_t
     {
+        WriteGuard wg(latch_);
         if (data_list_.empty())
         {
             return 0;
@@ -139,6 +171,7 @@ namespace rds
 
     auto List::Trim(int begin, int end) -> bool
     {
+        WriteGuard wg(latch_);
         if (data_list_.empty())
         {
             return false;
@@ -169,6 +202,7 @@ namespace rds
 
     auto List::Set(int index, const Str &value) -> bool
     {
+        WriteGuard wg(latch_);
         if (data_list_.empty())
         {
             return false;
@@ -194,6 +228,7 @@ namespace rds
 
     auto List::EncodeValue() const -> std::string
     {
+        ReadGuard rg(latch_);
         std::string ret = BitsToString(data_list_.size());
         std::for_each(std::cbegin(data_list_), std::cend(data_list_), [&ret](const Str &s) mutable
                       { ret.append(s.EncodeValue()); });
@@ -202,6 +237,7 @@ namespace rds
 
     void List::DecodeValue(std::deque<char> *source)
     {
+        WriteGuard wg(latch_);
         std::size_t len = PeekSize(source);
         data_list_.clear();
         for (std::size_t i = 0; i < len; i++)

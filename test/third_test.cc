@@ -5,6 +5,7 @@
 #include <json11.hpp>
 #include <gtest/gtest.h>
 #include <server/command.h>
+#include <util.h>
 using std::cout;
 using std::endl;
 
@@ -27,8 +28,13 @@ TEST(Third, Json11)
     cout << cmd.dump() << endl;
 }
 
-TEST(Third, Snmalloc)
+TEST(Third, stoi)
 {
-    int *p = new int;
-    delete p;
+    for (int i = 1; i < 19999; i++)
+    {
+        std::string s("-");
+        s.append(std::to_string(i));
+        auto val = rds::RedisStrToInt(s);
+        ASSERT_EQ(val, -i);
+    }
 }

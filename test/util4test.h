@@ -152,33 +152,33 @@ private:
         {
             db.NewList(cont.first);
             auto obj = db.Get(cont.first);
-            *(reinterpret_cast<rds::List *>(obj)) = cont.second;
+            *(reinterpret_cast<rds::List *>(obj.lock().get())) = cont.second;
         }
         for (auto cont : set_suit)
         {
             db.NewSet(cont.first);
             auto obj = db.Get(cont.first);
-            *(reinterpret_cast<rds::Set *>(obj)) = cont.second;
+            *(reinterpret_cast<rds::Set *>(obj.lock().get())) = cont.second;
             db.Expire(cont.first, 3);
         }
         for (auto cont : str_suit)
         {
             db.NewStr(cont.first);
             auto obj = db.Get(cont.first);
-            *(reinterpret_cast<rds::Str *>(obj)) = cont.second;
+            *(reinterpret_cast<rds::Str *>(obj.lock().get())) = cont.second;
             db.Expire(cont.first, 2);
         }
         for (auto cont : hash_suit)
         {
             db.NewHash(cont.first);
             auto obj = db.Get(cont.first);
-            *(reinterpret_cast<rds::Hash *>(obj)) = cont.second;
+            *(reinterpret_cast<rds::Hash *>(obj.lock().get())) = cont.second;
         }
         for (auto cont : zset_suit)
         {
             db.NewZSet(cont.first);
             auto obj = db.Get(cont.first);
-            *(reinterpret_cast<rds::ZSet *>(obj)) = cont.second;
+            *(reinterpret_cast<rds::ZSet *>(obj.lock().get())) = cont.second;
             db.Expire(cont.first, 1);
         }
     }

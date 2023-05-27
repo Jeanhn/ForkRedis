@@ -4,44 +4,96 @@
 
 namespace rds
 {
-    void Str::TypeCheck()
+
+    Str::Str(std::string data) : data_(data), encoding_type_(EncodingType::INT)
     {
-        for (auto it = data_.cbegin(); it != data_.cend(); it++)
+        for (std::size_t i = 0; i < data_.size(); i++)
         {
-            if (*it < '0' || *it > '9')
+            if (data_[i] < '0' || data_[i] > '9')
             {
-                encoding_type_ = EncodingType::STR_RAW;
-                return;
+                if (i == 0 && data_[i] == '-' && data_.size() > 1)
+                {
+                    continue;
+                }
+                else
+                {
+                    encoding_type_ = EncodingType::STR_RAW;
+                    break;
+                }
             }
         }
-        encoding_type_ = EncodingType::INT;
+    }
+
+    Str::Str(const Str &lhs)
+    {
+        ReadGuard rg(lhs.ExposeLatch());
+        data_ = lhs.data_;
+        encoding_type_ = lhs.encoding_type_;
+    }
+
+    Str::Str(Str &&rhs)
+    {
+        ReadGuard rg(rhs.ExposeLatch());
+        data_ = std::move(rhs.data_);
+        encoding_type_ = rhs.encoding_type_;
+    }
+
+    Str &Str::operator=(const Str &lhs)
+    {
+        ReadGuard rg(lhs.ExposeLatch());
+        data_ = lhs.data_;
+        encoding_type_ = lhs.encoding_type_;
+        return *this;
+    }
+    Str &Str::operator=(Str &&rhs)
+    {
+        ReadGuard rg(rhs.ExposeLatch());
+        data_ = std::move(rhs.data_);
+        encoding_type_ = rhs.encoding_type_;
+        return *this;
     }
 
     auto Str::GetRaw() const -> std::string
     {
+        ReadGuard rg(latch_);
         return data_;
     }
 
     void Str::Set(std::string data)
     {
+        WriteGuard wg(latch_);
         data_ = std::move(data);
-        TypeCheck();
     }
 
     auto Str::Append(std::string data) -> std::size_t
     {
+        WriteGuard wg(latch_);
         data_.append(std::move(data));
-        TypeCheck();
+        if (encoding_type_ == EncodingType::INT)
+        {
+            auto intval = RedisStrToInt(data_);
+            if (!intval.has_value())
+            {
+                encoding_type_ = EncodingType::STR_RAW;
+            }
+        }
         return data_.size();
     }
 
     auto Str::IncrBy(int delta) -> std::string
     {
+        WriteGuard wg(latch_);
         if (encoding_type_ != EncodingType::INT)
         {
             return {};
         }
-        int raw_int = std::stoi(data_);
+        auto intval = RedisStrToInt(data_);
+        if (!intval.has_value())
+        {
+            encoding_type_ = EncodingType::STR_RAW;
+            return {};
+        }
+        int raw_int = intval.value();
         raw_int += delta;
         data_ = std::to_string(raw_int);
         return data_;
@@ -49,23 +101,18 @@ namespace rds
 
     auto Str::DecrBy(int delta) -> std::string
     {
-        if (encoding_type_ != EncodingType::INT)
-        {
-            return {};
-        }
-        int raw_int = std::stoi(data_);
-        raw_int -= delta;
-        data_ = std::to_string(raw_int);
-        return data_;
+        return IncrBy(-delta);
     }
 
     auto Str::Len() const -> std::size_t
     {
+        ReadGuard rg(latch_);
         return data_.size();
     }
 
     auto Str::Empty() const -> bool
     {
+        ReadGuard rg(latch_);
         return data_.empty();
     }
 
@@ -87,6 +134,7 @@ namespace rds
      */
     auto Str::EncodeValue() const -> std::string
     {
+        ReadGuard rg(latch_);
         std::string ret;
         // encode-type: int or string or compress-string
         char t = EncodingTypeToChar(encoding_type_);
@@ -128,11 +176,13 @@ namespace rds
 
     auto Str::GetEncodingType() const -> EncodingType
     {
+        ReadGuard rg(latch_);
         return encoding_type_;
     }
 
     void Str::DecodeValue(std::deque<char> *source)
     {
+        WriteGuard wg(latch_);
         EncodingType etyp = CharToEncodingType(source->front());
         source->pop_front();
 

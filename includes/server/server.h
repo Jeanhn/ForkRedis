@@ -25,7 +25,6 @@ namespace rds
     public:
 #endif
         int fd_;
-        std::list<std::unique_ptr<Db>> *db_source_;
         Db *database_;
 
         std::deque<char> recv_buffer_;
@@ -38,7 +37,7 @@ namespace rds
         auto Send() -> int;
 
     public:
-        void ShiftDB(int db_number);
+        void ShiftDB(Db *database);
         auto GetDB() -> Db *;
         void Append(json11::Json::array to_send_message);
         auto IsSendOut() -> bool;
@@ -55,14 +54,9 @@ namespace rds
         int listen_fd_;
         int epfd_;
 
-        std::list<std::unique_ptr<Db>> databases_;
-        FileManager file_manager_;
-
     public:
         auto Wait(int timeout) -> std::vector<ClientInfo *>;
         void EnableSend(ClientInfo *client);
-        auto Databases() -> std::list<std::unique_ptr<Db>> *;
-        auto File() -> FileManager *;
         Server(const char *ip = "127.0.0.1", short port = 8080);
         ~Server();
     };
@@ -70,15 +64,22 @@ namespace rds
     class Handler
     {
     private:
-        std::deque<std::pair<ClientInfo *, std::unique_ptr<CommandBase>>> command_que_;
-        std::priority_queue<std::unique_ptr<Timer>, std::vector<std::unique_ptr<Timer>>,
-                            decltype(&TimerGreater)>
-            timer_que_{TimerGreater};
+        std::atomic_bool running_{false};
+
+        CommandQue cmd_que_;
+
+        TimerQue tmr_que_;
+
+        void ExecCommand();
+        void ExecTimer();
+
+        std::list<std::thread> workers_;
 
     public:
         void Push(ClientInfo *client, std::unique_ptr<CommandBase> cmd);
         void Push(std::unique_ptr<Timer> timer);
-        void Handle();
+        void Run();
+        void Stop();
 
         CLASS_DEFAULT_DECLARE(Handler);
     };

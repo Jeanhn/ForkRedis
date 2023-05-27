@@ -4,6 +4,7 @@
 #include <objects/set.h>
 #include <objects/zset.h>
 #include <server/server.h>
+#include <condition_variable>
 
 namespace rds
 {
@@ -103,6 +104,16 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
+        if (ret.command_ == "LREM" ||
+            ret.command_ == "LSET" ||
+            ret.command_ == "LTRIM")
+        {
+            if (source.size() < 4)
+            {
+                ret.valid_ = false;
+                return ret;
+            }
+        }
         for (std::size_t i = 2; i < source.size(); i++)
         {
             ret.values_.push_back({source[i].string_value()});
@@ -152,9 +163,9 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
-        if (source.size() % 2 != 0 && (ret.command_ != "ZSCORE" ||
-                                       ret.command_ != "ZRANK" ||
-                                       ret.command_ != "ZREM"))
+        if (source.size() % 2 != 0 &&
+            ret.command_ != "ZSCORE" &&
+            ret.command_ != "ZRANK")
         {
             ret.valid_ = false;
             return ret;
@@ -182,7 +193,9 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
-        if (ret.command_ == "HSET" || ret.command_ == "HINCRBY" || ret.command_ == "HDECRBY")
+        if (ret.command_ == "HSET" ||
+            ret.command_ == "HINCRBY" ||
+            ret.command_ == "HDECRBY")
         {
             if (source.size() % 2 != 0)
             {
@@ -259,7 +272,8 @@ namespace rds
                     cmd == "LINDEX" ||
                     cmd == "LREM" ||
                     cmd == "LTRIM" ||
-                    cmd == "LLEN");
+                    cmd == "LLEN" ||
+                    cmd == "LSET");
         };
         auto isSetCommand = [](const std::string &cmd)
         {
@@ -284,7 +298,9 @@ namespace rds
                     cmd == "ZREM" ||
                     cmd == "ZRANGE" ||
                     cmd == "ZRANGEBYSCORE" ||
-                    cmd == "ZRANGEBYLEX");
+                    cmd == "ZRANGEBYLEX" ||
+                    cmd == "ZRANK" ||
+                    cmd == "ZSCORE");
         };
         auto isHashCommand = [](const std::string &cmd)
         {
@@ -350,22 +366,21 @@ namespace rds
             return {" "};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "SET")
             {
                 return {" "};
             }
-            cli_->GetDB()->NewStr({obj_name_});
-            obj_ = cli_->GetDB()->Get({obj_name_});
+            obj_ = cli_->GetDB()->NewStr({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::STR)
         {
             return {" "};
         }
 
-        auto str = reinterpret_cast<Str *>(obj_);
+        auto str = reinterpret_cast<Str *>(obj_.get());
 
         if (command_ == "SET")
         {
@@ -382,7 +397,12 @@ namespace rds
         }
         else if (command_ == "INCRBY")
         {
-            auto ret = str->IncrBy(std::stoi(value_.value()));
+            auto intval = RedisStrToInt(value_.value());
+            if (!intval.has_value())
+            {
+                return {" "};
+            }
+            auto ret = str->IncrBy(intval.value());
             if (ret.empty())
             {
                 return {" "};
@@ -391,7 +411,12 @@ namespace rds
         }
         else if (command_ == "DECRBY")
         {
-            auto ret = str->DecrBy(std::stoi(value_.value()));
+            auto intval = RedisStrToInt(value_.value());
+            if (!intval.has_value())
+            {
+                return {" "};
+            }
+            auto ret = str->DecrBy(intval.value());
             if (ret.empty())
             {
                 return {" "};
@@ -425,22 +450,21 @@ namespace rds
             return {" "};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "LPUSHF" && command_ != "LPUSHB")
             {
                 return {" "};
             }
-            cli_->GetDB()->NewList({obj_name_});
-            obj_ = cli_->GetDB()->Get({obj_name_});
+            obj_ = cli_->GetDB()->NewList({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::LIST)
         {
             return {" "};
         }
 
-        auto l = reinterpret_cast<List *>(obj_);
+        auto l = reinterpret_cast<List *>(obj_.get());
         if (command_ == "LPUSHF")
         {
             for (auto &it : values_)
@@ -480,7 +504,12 @@ namespace rds
             json11::Json::array ret;
             for (auto &value : values_)
             {
-                auto str = l->Index(std::stoi(value.GetRaw()));
+                auto intval = RedisStrToInt(value);
+                if (!intval.has_value())
+                {
+                    continue;
+                }
+                auto str = l->Index(intval.value());
                 if (!str.Empty())
                 {
                     ret.push_back('\"' + str.GetRaw() + '\"');
@@ -498,20 +527,23 @@ namespace rds
         }
         else if (command_ == "LREM")
         {
-            if (values_.size() < 2)
+            auto intval = RedisStrToInt(values_[0]);
+            if (!intval.has_value())
             {
                 return {" "};
             }
-            std::size_t n = l->Rem(std::stoi(values_[0].GetRaw()), values_[1]);
+            std::size_t n = l->Rem(intval.value(), values_[1]);
             return {std::to_string(n)};
         }
         else if (command_ == "LTRIM")
         {
-            if (values_.size() < 2)
+            auto intval1 = RedisStrToInt(values_[0]);
+            auto intval2 = RedisStrToInt(values_[1]);
+            if (!(intval1.has_value() && intval2.has_value()))
             {
                 return {" "};
             }
-            bool ret = l->Trim(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
+            bool ret = l->Trim(intval1.value(), intval2.value());
             if (!ret)
             {
                 return {" "};
@@ -519,11 +551,12 @@ namespace rds
         }
         else if (command_ == "LSET")
         {
-            if (values_.size() < 2)
+            auto intval = RedisStrToInt(values_[0]);
+            if (!intval.has_value())
             {
                 return {" "};
             }
-            bool ret = l->Set(std::stoi(values_[0].GetRaw()), values_[1]);
+            bool ret = l->Set(intval.value(), values_[1]);
             if (!ret)
             {
                 return {" "};
@@ -552,22 +585,21 @@ namespace rds
             return {" "};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "HSET")
             {
                 return {" "};
             }
-            cli_->GetDB()->NewHash({obj_name_});
-            obj_ = cli_->GetDB()->Get({obj_name_});
+            obj_ = cli_->GetDB()->NewHash({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::HASH)
         {
             return {" "};
         }
 
-        auto tbl = reinterpret_cast<Hash *>(obj_);
+        auto tbl = reinterpret_cast<Hash *>(obj_.get());
         if (command_ == "HSET")
         {
             for (std::size_t i = 0; i < values_.size(); i += 2)
@@ -637,7 +669,12 @@ namespace rds
         }
         else if (command_ == "HINCRBY")
         {
-            auto val = tbl->IncrBy(values_[0], std::stoul(values_[1].GetRaw()));
+            auto intval = RedisStrToInt(values_[1]);
+            if (!intval.has_value())
+            {
+                return {" "};
+            }
+            auto val = tbl->IncrBy(values_[0], intval.value());
             if (val.empty())
             {
                 return {" "};
@@ -646,7 +683,12 @@ namespace rds
         }
         else if (command_ == "HDECRBY")
         {
-            auto val = tbl->DecrBy(values_[0], std::stoul(values_[1].GetRaw()));
+            auto intval = RedisStrToInt(values_[1]);
+            if (!intval.has_value())
+            {
+                return {" "};
+            }
+            auto val = tbl->DecrBy(values_[0], intval.value());
             if (val.empty())
             {
                 return {" "};
@@ -670,22 +712,21 @@ namespace rds
             return {" "};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "SADD")
             {
                 return {" "};
             }
-            cli_->GetDB()->NewSet({obj_name_});
-            obj_ = cli_->GetDB()->Get({obj_name_});
+            obj_ = cli_->GetDB()->NewSet({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::SET)
         {
             return {" "};
         }
 
-        auto st = reinterpret_cast<Set *>(obj_);
+        auto st = reinterpret_cast<Set *>(obj_.get());
         if (command_ == "SADD")
         {
             int cnt = 0;
@@ -774,12 +815,16 @@ namespace rds
         }
         else if (command_ == "SINTER")
         {
-            Object *another_set = cli_->GetDB()->Get(values_[0]);
+            auto another_set = cli_->GetDB()->Get(values_[0]).lock();
+            if (another_set == nullptr)
+            {
+                return {" "};
+            }
             if (another_set->GetObjectType() != ObjectType::SET)
             {
                 return {" "};
             }
-            auto a_st = reinterpret_cast<Set *>(another_set);
+            auto a_st = reinterpret_cast<Set *>(another_set.get());
             auto inter = st->Inter(*a_st);
             json11::Json::array ret;
             for (auto &element : inter)
@@ -794,12 +839,16 @@ namespace rds
         }
         else if (command_ == "SDIFF")
         {
-            Object *another_set = cli_->GetDB()->Get(values_[0]);
+            auto another_set = cli_->GetDB()->Get(values_[0]).lock();
+            if (another_set == nullptr)
+            {
+                return {" "};
+            }
             if (another_set->GetObjectType() != ObjectType::SET)
             {
                 return {" "};
             }
-            auto a_st = reinterpret_cast<Set *>(another_set);
+            auto a_st = reinterpret_cast<Set *>(another_set.get());
             auto inter = st->Diff(*a_st);
             json11::Json::array ret;
             for (auto &element : inter)
@@ -828,28 +877,32 @@ namespace rds
             return {" "};
         }
 
-        obj_ = cli_->GetDB()->Get({obj_name_});
+        obj_ = cli_->GetDB()->Get({obj_name_}).lock();
         if (obj_ == nullptr)
         {
             if (command_ != "ZADD")
             {
                 return {" "};
             }
-            cli_->GetDB()->NewZSet({obj_name_});
-            obj_ = cli_->GetDB()->Get({obj_name_});
+            obj_ = cli_->GetDB()->NewZSet({obj_name_});
         }
         if (obj_->GetObjectType() != ObjectType::ZSET)
         {
             return {" "};
         }
 
-        auto zst = reinterpret_cast<ZSet *>(obj_);
+        auto zst = reinterpret_cast<ZSet *>(obj_.get());
         if (command_ == "ZADD")
         {
-            int cnt;
+            int cnt = 0;
             for (std::size_t i = 0; i < values_.size(); i += 2)
             {
-                auto ok = zst->Add(std::stoi(values_[i].GetRaw()), std::move(values_[i + 1]));
+                auto intval = RedisStrToInt(values_[i]);
+                if (!intval.has_value())
+                {
+                    continue;
+                }
+                auto ok = zst->Add(intval.value(), std::move(values_[i + 1]));
                 if (ok)
                 {
                     cnt++;
@@ -864,14 +917,31 @@ namespace rds
         }
         else if (command_ == "ZREM")
         {
+            int cnt = 0;
             for (std::size_t i = 0; i < values_.size(); i += 2)
             {
-                zst->Rem(std::stoi(values_[i].GetRaw()), std::move(values_[i + 1]));
+                auto intval = RedisStrToInt(values_[i]);
+                if (!intval.has_value())
+                {
+                    continue;
+                }
+                bool ok = zst->Rem(intval.value(), std::move(values_[i + 1]));
+                if (ok)
+                {
+                    cnt++;
+                }
             }
+            return {std::to_string(cnt)};
         }
         else if (command_ == "ZCOUNT")
         {
-            std::size_t cnt = zst->Count(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
+            auto intval1 = RedisStrToInt(values_[0]);
+            auto intval2 = RedisStrToInt(values_[1]);
+            if (!(intval1.has_value() && intval2.has_value()))
+            {
+                return {" "};
+            }
+            std::size_t cnt = zst->Count(intval1.value(), intval2.value());
             return {std::to_string(cnt)};
         }
         else if (command_ == "ZLEXCOUNT")
@@ -881,7 +951,12 @@ namespace rds
         }
         else if (command_ == "ZINCRBY")
         {
-            auto val = zst->IncrBy(std::stoi(values_[0].GetRaw()), values_[1]);
+            auto intval = RedisStrToInt(values_[0]);
+            if (!intval.has_value())
+            {
+                return {" "};
+            }
+            auto val = zst->IncrBy(intval.value(), values_[1]);
             if (val.empty())
             {
                 return {" "};
@@ -890,7 +965,12 @@ namespace rds
         }
         else if (command_ == "ZDECRBY")
         {
-            auto val = zst->DecrBy(std::stoi(values_[0].GetRaw()), values_[1]);
+            auto intval = RedisStrToInt(values_[0]);
+            if (!intval.has_value())
+            {
+                return {" "};
+            }
+            auto val = zst->DecrBy(intval.has_value(), values_[1]);
             if (val.empty())
             {
                 return {" "};
@@ -899,7 +979,13 @@ namespace rds
         }
         else if (command_ == "ZRANGE")
         {
-            auto res = zst->Range(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
+            auto intval1 = RedisStrToInt(values_[0]);
+            auto intval2 = RedisStrToInt(values_[1]);
+            if (!(intval1.has_value() && intval2.has_value()))
+            {
+                return {" "};
+            }
+            auto res = zst->Range(intval1.value(), intval2.value());
             if (res.empty())
             {
                 return {"(nil)"};
@@ -914,7 +1000,13 @@ namespace rds
         }
         else if (command_ == "ZRANGEBYSCORE")
         {
-            auto res = zst->RangeByScore(std::stoi(values_[0].GetRaw()), std::stoi(values_[1].GetRaw()));
+            auto intval1 = RedisStrToInt(values_[0]);
+            auto intval2 = RedisStrToInt(values_[1]);
+            if (!(intval1.has_value() && intval2.has_value()))
+            {
+                return {" "};
+            }
+            auto res = zst->RangeByScore(intval1.value(), intval2.value());
             if (res.empty())
             {
                 return {"(nil)"};
@@ -1006,7 +1098,6 @@ namespace rds
         }
         if (command_ == "SELECT")
         {
-            cli_->ShiftDB(std::stoi(value_.value()));
         }
 
         return {"OK"};

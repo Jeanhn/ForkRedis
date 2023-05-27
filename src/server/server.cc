@@ -5,6 +5,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <thread>
+#include <condition_variable>
 
 namespace rds
 {
@@ -31,17 +33,17 @@ namespace rds
 
         Log("Server runs successfully on: ", ip, ':', port);
 
-        Log("Loading databases...");
-        auto dbfile = file_manager_.LoadAndExport();
-        file_manager_.Truncate();
+        // Log("Loading databases...");
+        // auto dbfile = file_manager_.LoadAndExport();
+        // file_manager_.Truncate();
 
-        databases_ = rds::Rdb::Load(&dbfile);
+        // databases_ = rds::Rdb::Load(&dbfile);
 
-        if (databases_.empty())
-        {
-            Log("Create a default database");
-            databases_.push_back(std::make_unique<Db>());
-        }
+        // if (databases_.empty())
+        // {
+        //     Log("Create a default database");
+        //     databases_.push_back(std::make_unique<Db>());
+        // }
     }
 
     Server::~Server()
@@ -74,7 +76,7 @@ namespace rds
                 epev.events = EPOLLIN;
                 epoll_ctl(epfd_, EPOLL_CTL_ADD, cfd, &epev);
                 auto c = std::make_unique<ClientInfo>(cfd);
-                c->db_source_ = &databases_;
+                // c->db_source_ = &databases_;
                 client_map_.insert({cfd, std::move(c)});
             }
             else
@@ -141,15 +143,6 @@ namespace rds
         return ret;
     }
 
-    auto Server::Databases() -> std::list<std::unique_ptr<Db>> *
-    {
-        return &databases_;
-    }
-    auto Server::File() -> FileManager *
-    {
-        return &file_manager_;
-    }
-
     /*
 
 
@@ -167,7 +160,7 @@ namespace rds
             return;
         }
         cmd->cli_ = client;
-        command_que_.push_back({client, std::move(cmd)});
+        cmd_que_.Push(client, std::move(cmd));
     }
 
     void Handler::Push(std::unique_ptr<Timer> timer)
@@ -176,25 +169,35 @@ namespace rds
         {
             return;
         }
-        timer_que_.push(std::move(timer));
+        tmr_que_.Push(std::move(timer));
     }
 
-    void Handler::Handle()
+    void Handler::ExecCommand()
     {
-        while (!command_que_.empty())
+        while (running_)
         {
-            auto it = command_que_.begin();
-            auto res = it->second->Exec();
-            it->first->Append(std::move(res));
-            command_que_.pop_front();
+            auto pair = cmd_que_.BlockPop();
+            auto respond = pair.second->Exec();
+            pair.first->Append(respond);
         }
+    }
 
-        std::size_t now_time_us = rds::UsTime();
-        while (!timer_que_.empty() && timer_que_.top()->expire_time_us_ < now_time_us)
+    void Handler::ExecTimer()
+    {
+        while (running_)
         {
-            timer_que_.top()->Exec();
-            timer_que_.pop();
+            auto tmr = tmr_que_.BlockPop();
+            tmr->Exec();
         }
+    }
+
+    void Handler::Run()
+    {
+        running_ = true;
+        // std::thread exec_cmd_(, this);
+        // std::thread exec_tmr_(, this);
+        // workers_.push_back(std::move(exec_cmd_));
+        // workers_.push_back(std::move(exec_tmr_));
     }
 
     void Server::EnableSend(ClientInfo *client)
@@ -297,28 +300,17 @@ namespace rds
         return ret;
     }
 
-    void ClientInfo::ShiftDB(int db_number)
+    void ClientInfo::ShiftDB(Db *database)
     {
-        auto pos = std::find_if(db_source_->cbegin(), db_source_->cend(), [db_number](const std::unique_ptr<Db> &db)
-                                { return db->Number() == db_number; });
-        if (pos == db_source_->cend())
-        {
-            database_ = nullptr;
-            return;
-        }
-        database_ = pos->get();
+        database_ = database;
     }
 
     auto ClientInfo::GetDB() -> Db *
     {
-        if (database_ == nullptr)
-        {
-            database_ = db_source_->begin()->get();
-        }
         return database_;
     }
 
-    ClientInfo::ClientInfo(int fd) : fd_(fd), db_source_(nullptr), database_(nullptr)
+    ClientInfo::ClientInfo(int fd) : fd_(fd), database_(nullptr)
     {
     }
 

@@ -178,6 +178,8 @@ namespace rds
         conf.enable_aof_ = obj_value["aof"].bool_value();
         conf.frequence_.every_n_sec_ = obj_value["sec"].int_value();
         conf.frequence_.save_n_times_ = obj_value["time"].int_value();
+        conf.mem_size_mbytes_ = obj_value["memsiz"].int_value();
+        conf.cpu_num_ = obj_value["cpu"].int_value();
         return conf;
     }
 
@@ -190,6 +192,8 @@ namespace rds
         conf.enable_aof_ = false;
         conf.frequence_.every_n_sec_ = 1;
         conf.frequence_.save_n_times_ = 1;
+        conf.mem_size_mbytes_ = 4096;
+        conf.cpu_num_ = 2;
         return conf;
     }
 }

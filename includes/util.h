@@ -206,6 +206,8 @@ namespace rds
             int every_n_sec_;
             int save_n_times_;
         } frequence_;
+        std::size_t mem_size_mbytes_;
+        int cpu_num_;
     };
 
     auto DefaultConf() -> RedisConf;

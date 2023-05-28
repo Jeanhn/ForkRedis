@@ -30,14 +30,14 @@ namespace rds
 
     void MainLoop::Run()
     {
-        auto clients = server_.Wait(-1);
-        for (auto &client : clients)
+        auto client_events = server_.Wait(-1);
+        for (auto &client_event : client_events)
         {
-            if (!client->GetDB())
+            if (!client_event.first->GetDB())
             {
-                client->SetDB(databases_.begin()->get());
+                client_event.first->SetDB(databases_.begin()->get());
             }
-            handler_.Handle(client);
+            handler_.Handle(std::move(client_event));
         }
     }
 } // namespace rds

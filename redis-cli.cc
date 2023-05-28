@@ -13,7 +13,7 @@ auto RawCommandToRequest(const std::string &raw) -> json11::Json::array
     {
         return (c >= '0' && c <= '9') ||
                (c >= 'a' && c <= 'z') ||
-               (c >= 'A' && c <= 'Z');
+               (c >= 'A' && c <= 'Z') || (c == '-');
     };
     auto nextToken = [&raw, &it, &isTokenMember]() mutable -> std::string
     {

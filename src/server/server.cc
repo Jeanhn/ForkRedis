@@ -10,6 +10,11 @@
 
 namespace rds
 {
+    void SetNonBlock(int fd)
+    {
+        int fl = fcntl(fd, F_GETFL, 0);
+        fcntl(fd, F_SETFL, fl | O_NONBLOCK | O_NDELAY);
+    }
     Server::Server(const char *ip, short port)
     {
         sockaddr_in si;
@@ -21,8 +26,7 @@ namespace rds
         int ret = bind(listen_fd_, reinterpret_cast<sockaddr *>(&si), sizeof(si));
         Assert(ret != -1, "bind");
         listen(listen_fd_, 200);
-        int fl = fcntl(listen_fd_, F_GETFL);
-        fcntl(fl, F_SETFL, fl | O_NONBLOCK);
+        SetNonBlock(listen_fd_);
 
         epfd_ = epoll_create(200);
         Assert(epfd_ != -1, "epollfd");
@@ -51,7 +55,44 @@ namespace rds
         close(listen_fd_);
     }
 
-    auto Server::Wait(int timeout) -> std::vector<std::shared_ptr<ClientInfo>>
+    auto Server::ReadCli(int cli_fd) -> int
+    {
+        ReadGuard rg(latch_);
+        auto it = client_map_.find(cli_fd);
+        if (it == client_map_.end())
+        {
+            epoll_ctl(epfd_, EPOLL_CTL_DEL, cli_fd, 0);
+            close(cli_fd);
+            return -1;
+        }
+        return it->second->Read();
+    }
+    auto Server::SendCli(int cli_fd) -> int
+    {
+        ReadGuard rg(latch_);
+        auto it = client_map_.find(cli_fd);
+        if (it == client_map_.end())
+        {
+            epoll_ctl(epfd_, EPOLL_CTL_DEL, cli_fd, 0);
+            close(cli_fd);
+            return -1;
+        }
+        return it->second->Send();
+    }
+
+    void Server::RemoveCli(int cli_fd)
+    {
+        WriteGuard wg(latch_);
+        epoll_ctl(epfd_, EPOLL_CTL_DEL, cli_fd, 0);
+        auto it = client_map_.find(cli_fd);
+        if (it == client_map_.end())
+        {
+            return;
+        }
+        client_map_.erase(it);
+    }
+
+    auto Server::Wait(int timeout) -> std::vector<std::pair<std::shared_ptr<ClientInfo>, int>>
     {
         epoll_revents_.resize(client_map_.size() + 1);
         int n = epoll_wait(epfd_, epoll_revents_.data(),
@@ -60,24 +101,24 @@ namespace rds
         {
             return {};
         }
-        std::vector<std::shared_ptr<ClientInfo>> ret;
+        std::vector<std::pair<std::shared_ptr<ClientInfo>, int>> ret;
         for (int i = 0; i < n; i++)
         {
             if (epoll_revents_[i].data.fd == listen_fd_)
             {
-                Log("Server:", "New client");
                 int cfd = ::accept(listen_fd_, 0, 0);
-                int fl = fcntl(cfd, F_GETFL);
-                fcntl(fl, F_SETFL, fl | O_NONBLOCK);
+                SetNonBlock(cfd);
                 epoll_event epev;
                 epev.data.fd = cfd;
-                epev.events = EPOLLIN;
+                epev.events = EPOLLIN | EPOLLET;
                 epoll_ctl(epfd_, EPOLL_CTL_ADD, cfd, &epev);
                 auto c = std::make_shared<ClientInfo>(this, cfd);
+                WriteGuard rg(latch_);
                 client_map_.insert({cfd, std::move(c)});
             }
             else
             {
+                ReadGuard rg(latch_);
                 auto it = client_map_.find(epoll_revents_[i].data.fd);
                 if (it == client_map_.end())
                 {
@@ -87,33 +128,11 @@ namespace rds
                 }
                 if (epoll_revents_[i].events & EPOLLIN)
                 {
-                    int nread = it->second->Read();
-                    if (nread == 0 || nread == -1)
-                    {
-                        Log("Server:", "Client invalid");
-                        epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
-                        client_map_.erase(it);
-                    }
-                    else
-                    {
-                        ret.push_back(it->second);
-                    }
+                    ret.push_back({it->second, EPOLLIN});
                 }
                 else
                 {
-                    int nsend = it->second->Send();
-                    if (nsend == -1)
-                    {
-                        epoll_ctl(epfd_, EPOLL_CTL_DEL, epoll_revents_[i].data.fd, 0);
-                        client_map_.erase(it);
-                    }
-                    else if (it->second->IsSendOut())
-                    {
-                        epoll_event epev;
-                        epev.data.fd = epoll_revents_[i].data.fd;
-                        epev.events = EPOLLIN;
-                        epoll_ctl(epfd_, EPOLL_CTL_MOD, epoll_revents_[i].data.fd, &epev);
-                    }
+                    ret.push_back({it->second, EPOLLOUT});
                 }
             }
         }
@@ -146,7 +165,7 @@ namespace rds
             {
                 continue;
             }
-            client->Append(respond.value());
+            client->Append(std::move(respond.value()));
             client->EnableSend();
         }
     }
@@ -180,38 +199,71 @@ namespace rds
                               { return !que.empty(); });
             while (!hdlr->cli_que_.empty())
             {
-                auto cli = hdlr->cli_que_.front();
+                auto cli_evt = hdlr->cli_que_.front();
                 hdlr->cli_que_.pop();
-                auto client = cli.lock();
+                auto client = cli_evt.first.lock();
                 if (!client)
                 {
                     continue;
                 }
-                auto reqs = client->ExportMessages();
-                for (auto &req : reqs)
+                if (cli_evt.second == EPOLLOUT)
                 {
-                    auto cmd = RequestToCommandExec(client, &req);
-                    if (cmd)
+                    int nwrite = client->Send();
+                    if (nwrite == -1)
                     {
-                        hdlr->cmd_que_.Push(std::move(cmd));
+                        client->Logout();
+                    }
+                    if (client->IsSendOut() && errno != EAGAIN)
+                    {
+                        client->EnableRead();
+                    }
+                }
+                else
+                {
+                    int nread = client->Read();
+                    if (nread == 0)
+                    {
+                        client->Logout();
+                        continue;
+                    }
+                    if (nread == -1 && errno == EAGAIN)
+                    {
+                        continue;
+                    }
+                    auto reqs = client->ExportMessages();
+                    for (auto &req : reqs)
+                    {
+                        auto cmd = RequestToCommandExec(client, &req);
+                        if (cmd)
+                        {
+                            hdlr->cmd_que_.Push(std::move(cmd));
+                        }
                     }
                 }
             }
         }
     }
 
-    void Handler::Handle(std::weak_ptr<ClientInfo> client)
+    void Handler::Handle(std::pair<std::weak_ptr<ClientInfo>, int> cli_evt)
     {
         std::lock_guard<std::mutex> lg(cli_mtx_);
-        cli_que_.push(client);
-        condv_.notify_one();
+        cli_que_.push(std::move(cli_evt));
+        condv_.notify_all();
     }
 
     void Server::EnableSend(ClientInfo *client)
     {
         epoll_event epev;
         epev.data.fd = client->GetFD();
-        epev.events = EPOLLOUT;
+        epev.events = EPOLLOUT | EPOLLET;
+        epoll_ctl(epfd_, EPOLL_CTL_MOD, client->GetFD(), &epev);
+    }
+
+    void Server::EnableRead(ClientInfo *client)
+    {
+        epoll_event epev;
+        epev.data.fd = client->GetFD();
+        epev.events = EPOLLIN | EPOLLET;
         epoll_ctl(epfd_, EPOLL_CTL_MOD, client->GetFD(), &epev);
     }
 
@@ -229,7 +281,7 @@ namespace rds
         WriteGuard wg(latch_);
         do
         {
-            n = read(fd_, buf, 65535);
+            n = recv(fd_, buf, 65535, 0);
             total_n += n;
             if (n == -1)
             {
@@ -255,7 +307,7 @@ namespace rds
         buf.reserve(send_buffer_.size() + 10);
         std::copy(send_buffer_.cbegin(), send_buffer_.cend(), std::back_inserter(buf));
         int n;
-        n = write(fd_, buf.data(), buf.size());
+        n = send(fd_, buf.data(), buf.size(), 0);
         if (n == 0 || n == -1)
         {
             return n;
@@ -323,6 +375,16 @@ namespace rds
     void ClientInfo::EnableSend()
     {
         server_->EnableSend(this);
+    }
+
+    void ClientInfo::Logout()
+    {
+        server_->RemoveCli(GetFD());
+    }
+
+    void ClientInfo::EnableRead()
+    {
+        server_->EnableRead(this);
     }
 
     ClientInfo::ClientInfo(Server *server, int fd) : fd_(fd), server_(server), database_(nullptr)

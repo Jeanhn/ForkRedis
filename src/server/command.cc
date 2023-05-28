@@ -269,7 +269,7 @@ namespace rds
         auto isCliCommand = [](const std::string &cmd)
         {
             return (cmd == "SELECT" ||
-                    cmd == "DROP" ||
+                    // cmd == "DROP" ||
                     cmd == "CREATE" ||
                     cmd == "SHOW");
         };

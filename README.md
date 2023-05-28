@@ -3,17 +3,11 @@
 
 
 to add: 
-    client-end: int input
-    timer
-    db select
-    del key
-    expire key
+    rdb expire while loading
     aof
-    rdb
 
 to test:
-    timer thread
-    concurrent reqs
+    concurrent reqs (use golang)
 
 BUG:
     zset. almost all (add some cout to check)

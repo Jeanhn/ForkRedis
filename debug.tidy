@@ -1,0 +1,417 @@
+==================                                                                                                                     WARNING: ThreadSanitizer: data race (pid=15898)                                                                                          Read of size 8 at 0x5622c42eb300 by thread T3 (mutexes: write M774196906575846656):                                                      
+
+#0 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87403)              
+
+
+#0 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x8741d)              
+
+#1 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+
+#1 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+
+
+#1 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#2 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+
+
+#2 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+
+
+
+#2 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#3 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+
+
+
+#3 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+
+
+
+
+#3 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#4 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+
+
+#2 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+
+
+
+#2 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#3 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+
+
+#2 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+
+
+
+#2 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#3 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+
+#1 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+
+
+#1 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#2 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+
+#1 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+
+
+#1 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#2 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+
+
+
+#1 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+#0 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x8743f)              
+
+
+#0 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87459)              
+
+#1 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:61 (redis-server+0x9153b)                                           
+
+
+
+
+
+#0 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87474)                                                                                                                                                   Previous write of size 8 at 0x5622c42eb310 by main thread:                                                                               
+
+#0 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x8748e)              
+
+
+#2 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt15__uniq_ptr_implIN3rds11CommandBaseESt14default_deleteIS1_EE6_M_ptrEv' of size 24 at 0x5622c42ecbc0 (redis-server+0x0000001f3bc0)                                                                                                                                                                                                                                                  Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+#0 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1397 (redis-server+0x7ea35)                                                                                                     
+
+#0 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1397 (redis-server+0x7ea4f)                                                                                                     
+
+#3 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZSt3getILm0EJPN3rds11CommandBaseESt14default_deleteIS1_EEERNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERS9_' of size 24 at 0x5622c42ec5c0 (redis-server+0x0000001f35c0)                                                                                                                                                                                                              Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+#0 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1381 (redis-server+0x813bf)                              
+
+#1 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#0 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1381 (redis-server+0x813d9)                              
+
+#1 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#4 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZSt12__get_helperILm0EPN3rds11CommandBaseEJSt14default_deleteIS1_EEERT0_RSt11_Tuple_implIXT_EJS5_DpT1_EE' of size 24 at 0x5622c42ec090 (redis-server+0x0000001f3090)                                                                                                                                                                                                                    Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >::_M_head(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:268 (redis-server+0x837f7)                                          
+
+#1 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ec)                              
+
+#2 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#0 std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >::_M_head(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:268 (redis-server+0x83811)                                          
+
+#1 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ec)                              
+
+#2 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt11_Tuple_implILm0EJPN3rds11CommandBaseESt14default_deleteIS1_EEE7_M_headERS5_' of size 24 at 0x5622c42ebb40 (redis-server+0x0000001f2b40)                                                                                                                                                                                                                                           Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 std::_Head_base<0ul, rds::CommandBase*, false>::_M_head(std::_Head_base<0ul, rds::CommandBase*, false>&) /usr/include/c++/11/tuple:233 (redis-server+0x8546f)                                                                                                              
+
+#1 std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >::_M_head(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:268 (redis-server+0x83824)                                          
+
+#2 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ec)                              
+
+#3 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#0 std::_Head_base<0ul, rds::CommandBase*, false>::_M_head(std::_Head_base<0ul, rds::CommandBase*, false>&) /usr/include/c++/11/tuple:233 (redis-server+0x85489)                                                                                                              
+
+#1 std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >::_M_head(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:268 (redis-server+0x83824)                                          
+
+#2 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ec)                              
+
+#3 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#6 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt10_Head_baseILm0EPN3rds11CommandBaseELb0EE7_M_headERS3_' of size 16 at 0x5622c42eb750 (redis-server+0x0000001f2750)                                                                                                                                                                                                                                                                 Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 std::_Head_base<0ul, rds::CommandBase*, false>::_M_head(std::_Head_base<0ul, rds::CommandBase*, false>&) /usr/include/c++/11/tuple:233 (redis-server+0x854a8)                                                                                                              
+
+#1 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ec)                              
+
+#2 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#0 std::_Head_base<0ul, rds::CommandBase*, false>::_M_head(std::_Head_base<0ul, rds::CommandBase*, false>&) /usr/include/c++/11/tuple:233 (redis-server+0x854c2)                                                                                                              
+
+#1 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ec)                              
+
+#2 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt10_Head_baseILm0EPN3rds11CommandBaseELb0EE7_M_headERS3_' of size 16 at 0x5622c42eb750 (redis-server+0x0000001f2758)                                                                                                                                                                                                                                                                 Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >::_M_head(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:268 (redis-server+0x83837)                                          
+
+#1 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ec)                              
+
+#2 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#0 std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >::_M_head(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:268 (redis-server+0x83851)                                          
+
+#1 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ec)                              
+
+#2 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt11_Tuple_implILm0EJPN3rds11CommandBaseESt14default_deleteIS1_EEE7_M_headERS5_' of size 24 at 0x5622c42ebb40 (redis-server+0x0000001f2b48)                                                                                                                                                                                                                                           Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >::_M_head(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:268 (redis-server+0x8386c)                                          
+
+#1 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#0 std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >::_M_head(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:268 (redis-server+0x83886)                                          
+
+#1 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#4 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt11_Tuple_implILm0EJPN3rds11CommandBaseESt14default_deleteIS1_EEE7_M_headERS5_' of size 24 at 0x5622c42ebb40 (redis-server+0x0000001f2b50)                                                                                                                                                                                                                                           Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x813ff)                              
+
+#1 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#0 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x81419)                              
+
+#1 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea62)                                                                                                     
+
+
+
+#4 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZSt12__get_helperILm0EPN3rds11CommandBaseEJSt14default_deleteIS1_EEERT0_RSt11_Tuple_implIXT_EJS5_DpT1_EE' of size 24 at 0x5622c42ec090 (redis-server+0x0000001f3098)                                                                                                                                                                                                                    Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x81434)                              
+
+
+
+#0 rds::CommandBase*& std::__get_helper<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::_Tuple_impl<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1382 (redis-server+0x8144e)                              
+
+
+
+#3 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZSt12__get_helperILm0EPN3rds11CommandBaseEJSt14default_deleteIS1_EEERT0_RSt11_Tuple_implIXT_EJS5_DpT1_EE' of size 24 at 0x5622c42ec090 (redis-server+0x0000001f30a0)                                                                                                                                                                                                                    Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea75)                                                                                                     
+
+
+
+#0 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7ea8f)                                                                                                     
+
+
+
+#3 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZSt3getILm0EJPN3rds11CommandBaseESt14default_deleteIS1_EEERNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERS9_' of size 24 at 0x5622c42ec5c0 (redis-server+0x0000001f35c8)                                                                                                                                                                                                              Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+#0 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7eaaa)                                                                                                     
+
+
+#0 std::tuple_element<0ul, std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> > >::type& std::get<0ul, rds::CommandBase*, std::default_delete<rds::CommandBase> >(std::tuple<rds::CommandBase*, std::default_delete<rds::CommandBase> >&) /usr/include/c++/11/tuple:1398 (redis-server+0x7eac4)                                                                                                     
+
+
+#2 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZSt3getILm0EJPN3rds11CommandBaseESt14default_deleteIS1_EEERNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERS9_' of size 24 at 0x5622c42ec5c0 (redis-server+0x0000001f35d0)                                                                                                                                                                                                              Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+
+
+
+
+#2 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt15__uniq_ptr_implIN3rds11CommandBaseESt14default_deleteIS1_EE6_M_ptrEv' of size 24 at 0x5622c42ecbc0 (redis-server+0x0000001f3bc8)                                                                                                                                                                                                                                                  Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+
+
+#1 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt15__uniq_ptr_implIN3rds11CommandBaseESt14default_deleteIS1_EE6_M_ptrEv' of size 24 at 0x5622c42ecbc0 (redis-server+0x0000001f3bd0)                                                                                                                                                                                                                                                  Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+
+
+
+#1 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt10unique_ptrIN3rds11CommandBaseESt14default_deleteIS1_EED2Ev' of size 56 at 0x5622c42ecf00 (redis-server+0x0000001f3f00)                                                                                                                                                                                                                                                            Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+
+
+
+
+
+
+#1 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:240 (redis-server+0x9c0e0)                                                                                                                                                        Location is global '__gcov0._ZNSt10unique_ptrIN3rds11CommandBaseESt14default_deleteIS1_EED2Ev' of size 56 at 0x5622c42ecf00 (redis-server+0x0000001f3f08)                                                                                                                                                                                                                                                            Mutex M773915431599135712 is already destroyed.                                                                                                                                                                                                                               Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+#3 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#4 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:244 (redis-server+0x9c1f2)                                                                                                                                                        Location is global '__gcov0._ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EED2Ev' of size 32 at 0x5622c42ec580 (redis-server+0x0000001f3588)                                                                                                                                                                                                                                                                       Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+#4 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:244 (redis-server+0x9c1f2)                                                                                                                                                        Location is global '__gcov0._ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE15_M_weak_releaseEv' of size 40 at 0x5622c42ec040 (redis-server+0x0000001f3040)                                                                                                                                                                                                                                                    Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+#3 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#4 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:244 (redis-server+0x9c1f2)                                                                                                                                                        Location is global '__gcov0._ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE15_M_weak_releaseEv' of size 40 at 0x5622c42ec040 (redis-server+0x0000001f3060)                                                                                                                                                                                                                                                    Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+#3 std::pair<std::weak_ptr<rds::ClientInfo>, int>::~pair() /usr/include/c++/11/bits/stl_pair.h:211 (redis-server+0x87430)              
+
+#4 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:244 (redis-server+0x9c1f2)                                                                                                                                                        Location is global '__gcov0._ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EED2Ev' of size 32 at 0x5622c42ec580 (redis-server+0x0000001f3590)                                                                                                                                                                                                                                                                       Mutex M774196906575846656 is already destroyed.                                                                                                                                                                                                                               Thread T1 (tid=15900, running) created by main thread at:                                                                                
+
+
+
+
+

@@ -49,6 +49,8 @@ namespace rds
         void Logout();
         ClientInfo(Server *server = nullptr, int fd = -1);
         ~ClientInfo();
+        ClientInfo(const ClientInfo &) = delete;
+        ClientInfo(ClientInfo &&) = delete;
     };
 
     class Server
@@ -93,9 +95,10 @@ namespace rds
     public:
         void Run();
         void Handle(std::pair<std::weak_ptr<ClientInfo>, int> cli_evt);
+        void Handle(std::unique_ptr<Timer> timer);
         void Stop();
-
-        CLASS_DEFAULT_DECLARE(Handler);
+        Handler(int io_thread_num);
+        CLASS_DECLARE_uncopyable(Handler);
     };
 
 } // namespace rds

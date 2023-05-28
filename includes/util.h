@@ -197,14 +197,15 @@ namespace rds
 
     struct RedisConf
     {
+        std::string file_name_;
         std::string ip_;
         short port_;
         bool compress_;
         bool enable_aof_;
         struct
         {
-            int every_n_sec_;
-            int save_n_times_;
+            std::size_t every_n_sec_;
+            std::size_t save_n_times_;
         } frequence_;
         std::size_t mem_size_mbytes_;
         int cpu_num_;

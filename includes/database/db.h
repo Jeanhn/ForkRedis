@@ -65,6 +65,8 @@ namespace rds
 
     auto ExpireDecode(std::deque<char> &) -> std::optional<std::size_t>;
 
+    class Timer;
+
     class Db
     {
 #ifdef NDEBUG
@@ -85,10 +87,10 @@ namespace rds
         auto NewZSet(const Str &) -> std::shared_ptr<Object>;
         auto NewHash(const Str &) -> std::shared_ptr<Object>;
 
-        void Del(const Str &);
+        auto Del(const Str &) -> std::size_t;
         auto Get(const Str &) const -> std::weak_ptr<Object>;
 
-        void Expire(const Str &, std::size_t) const;
+        auto Expire(const Str &, std::size_t) -> std::unique_ptr<Timer>;
 
         auto Save() const -> std::string;
 

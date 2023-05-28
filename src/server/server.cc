@@ -149,6 +149,7 @@ namespace rds
 
 
      */
+    Handler::Handler(int io_thread_num) {}
 
     void Handler::ExecCommand(Handler *hdlr)
     {
@@ -249,6 +250,11 @@ namespace rds
         std::lock_guard<std::mutex> lg(cli_mtx_);
         cli_que_.push(std::move(cli_evt));
         condv_.notify_all();
+    }
+
+    void Handler::Handle(std::unique_ptr<Timer> timer)
+    {
+        tmr_que_.Push(std::move(timer));
     }
 
     void Server::EnableSend(ClientInfo *client)

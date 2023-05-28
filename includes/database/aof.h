@@ -6,13 +6,7 @@
 
 namespace rds
 {
-    class Aof
-    {
-    private:
-    public:
-        static auto Load(std::deque<char> *) -> std::list<std::unique_ptr<Db>>;
-    };
-
+    auto AOFLoad(std::deque<char> *source) -> std::list<std::unique_ptr<Db>>;
 } // namespace rds
 
 #endif

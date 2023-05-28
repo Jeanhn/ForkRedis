@@ -10,6 +10,10 @@ namespace rds
 
     void RdbTimer::Exec()
     {
+        auto src = generator_();
+        RDBSave(std::move(src), fm_);
+        expire_time_us_ = UsTime() + after_;
+        hdlr_->Handle(std::make_unique<RdbTimer>(*this));
     }
 
     void TimerQue::Push(std::unique_ptr<Timer> timer)

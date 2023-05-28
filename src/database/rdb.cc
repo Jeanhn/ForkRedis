@@ -3,20 +3,18 @@
 
 namespace rds
 {
-    auto Rdb::Load(std::deque<char> *source) -> std::list<std::unique_ptr<Db>>
+    auto RDBLoad(std::deque<char> *source) -> std::list<std::unique_ptr<Db>>
     {
+        Log("Loading rdb databases...");
         std::list<std::unique_ptr<Db>> ret;
-        if (source->empty())
+        auto rdb_str = PeekString(source, 3);
+        if (rdb_str != "RDB")
         {
-            auto db = std::make_unique<Db>();
-            ret.push_back(std::move(db));
-            return ret;
+            Log("RDB file loading error, return empty databases");
+            return {};
         }
 
-        PeekString(source, 5);
-        PeekString(source, 4);
-
-        while (source->front() != 'e')
+        while (!source->empty())
         {
             auto db = std::make_unique<Db>();
             db->Load(source);
@@ -25,14 +23,14 @@ namespace rds
         return ret;
     }
 
-    void Rdb::SetSaveFrequency(std::size_t second, std::size_t times)
+    void RDBSave(std::vector<std::string> database_sources, FileManager *dump_file)
     {
-        save_period_us_ = second * 1000'000 / times;
-    }
-
-    auto Rdb::Period() const -> std::size_t
-    {
-        return save_period_us_;
+        dump_file->Truncate();
+        dump_file->Write("RDB");
+        for (auto &db : database_sources)
+        {
+            dump_file->Write(db);
+        }
     }
 
 } // namespace rds

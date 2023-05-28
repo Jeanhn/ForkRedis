@@ -5,28 +5,13 @@
 #include <optional>
 #include <util.h>
 #include <list>
+#include <database/disk.h>
 
 namespace rds
 {
-    class Rdb
-    {
-#ifdef NDEBUG
-    private:
-#else
-    public:
-#endif
-        std::function<std::string()> generator_;
-        std::size_t save_period_us_{1};
+    auto RDBLoad(std::deque<char> *source) -> std::list<std::unique_ptr<Db>>;
 
-    public:
-        static auto Load(std::deque<char> *) -> std::list<std::unique_ptr<Db>>;
-        void SetSaveFrequency(std::size_t second, std::size_t times);
-        auto Period() const -> std::size_t;
-        Rdb(std::function<std::string()> generator);
-        Rdb() = default;
-        ~Rdb() = default;
-    };
-
+    void RDBSave(std::vector<std::string> database_sources, FileManager *dump_file);
 } // namespace rds
 
 #endif

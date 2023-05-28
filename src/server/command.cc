@@ -5,6 +5,7 @@
 #include <objects/zset.h>
 #include <server/server.h>
 #include <condition_variable>
+#include <server/loop.h>
 
 namespace rds
 {
@@ -63,6 +64,7 @@ namespace rds
         }
         ret->command_ = source[0].string_value();
         ret->obj_name_ = source[1].string_value();
+        ret->valid_ = true;
         return true;
     }
 
@@ -233,7 +235,24 @@ namespace rds
     auto JsonToCliCommand(const json11::Json::array &source) -> CliCommand
     {
         CliCommand ret;
-        JsonToBase(&ret, source);
+        if (source.empty())
+        {
+            ret.valid_ = false;
+            return ret;
+        }
+        ret.command_ = source[0].string_value();
+        if (ret.command_ != "CREATE" && ret.command_ != "SHOW")
+        {
+            if (source.size() < 2)
+            {
+                ret.valid_ = false;
+            }
+            else
+            {
+                ret.obj_name_ = source[1].string_value();
+                ret.valid_ = true;
+            }
+        }
         return ret;
     }
     /*
@@ -249,7 +268,10 @@ namespace rds
         json11::Json::array &req = *request;
         auto isCliCommand = [](const std::string &cmd)
         {
-            return (cmd == "SELECT" || cmd == "DROP");
+            return (cmd == "SELECT" ||
+                    cmd == "DROP" ||
+                    cmd == "CREATE" ||
+                    cmd == "SHOW");
         };
         auto isDbCommand = [](const std::string &cmd)
         {
@@ -1096,25 +1118,36 @@ namespace rds
      */
     auto DbCommand::Exec() -> std::optional<json11::Json::array>
     {
-        /* assert(0);
         if (!valid_)
         {
-            return {""};
+            return {{" "}};
         }
 
-        if (cli_->GetDB() == nullptr)
+        auto client = cli_.lock();
+        if (!client)
         {
-            return {""};
+            return {};
         }
 
         if (command_ == "DEL")
         {
-            cli_->GetDB()->Del({obj_name_});
+            std::size_t n = client->GetDB()->Del(obj_name_);
+            return {{std::to_string(n)}};
         }
         else if (command_ == "EXPIRE")
         {
-            cli_->GetDB()->Expire({obj_name_}, std::stoul(value_.value()));
-        } */
+            auto sec = RedisStrToInt(value_.value());
+            if (!sec.has_value())
+            {
+                return {{" "}};
+            }
+            std::size_t usec = sec.value() * 1000'000;
+            auto tmr = client->GetDB()->Expire(obj_name_, usec);
+            if (tmr)
+            {
+                GetGlobalLoop().EncounterTimer(std::move(tmr));
+            }
+        }
 
         return {{"OK"}};
     }
@@ -1125,13 +1158,52 @@ namespace rds
      */
     auto CliCommand::Exec() -> std::optional<json11::Json::array>
     {
-        assert(0);
         if (!valid_)
         {
             return {{" "}};
         }
         if (command_ == "SELECT")
         {
+            auto intval = RedisStrToInt(obj_name_);
+            if (!intval.has_value())
+            {
+                return {{" "}};
+            }
+            auto client = cli_.lock();
+            if (!client)
+            {
+                return {};
+            }
+            client->SetDB(GetGlobalLoop().GetDB(intval.value()));
+        }
+        else if (command_ == "SHOW")
+        {
+            auto client = cli_.lock();
+            if (!client)
+            {
+                return {};
+            }
+            int c_db = client->GetDB()->Number();
+            auto all = GetGlobalLoop().ShowDB();
+            return {{std::to_string(c_db), all}};
+        }
+        else if (command_ == "DROP")
+        {
+            auto intval = RedisStrToInt(obj_name_);
+            if (!intval.has_value())
+            {
+                return {{" "}};
+            }
+            GetGlobalLoop().DropDB(intval.value());
+        }
+        else if (command_ == "CREATE")
+        {
+            int new_db_num = GetGlobalLoop().CreateDB();
+            if (new_db_num == -1)
+            {
+                return {{" "}};
+            }
+            return {{std::to_string(new_db_num)}};
         }
 
         return {{"OK"}};

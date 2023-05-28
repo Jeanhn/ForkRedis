@@ -15,19 +15,31 @@ namespace rds
         const RedisConf &conf_;
 
     private:
+        std::mutex db_mtx_;
         std::list<std::unique_ptr<Db>> databases_;
-        FileManager file_manager_;
+
         Server server_;
         Handler handler_;
+        FileManager file_manager_;
 
         std::unique_ptr<std::thread> save_thread_;
 
     public:
         void Run();
-        auto RdbSave() const -> std::string;
+        auto DatabaseFork() const -> std::vector<std::string>;
+
+        auto GetDB(int db_number) -> Db *;
+        auto CreateDB() -> int;
+        auto DropDB(int db_number) -> bool;
+        auto ShowDB() -> std::string;
+
+        void EncounterTimer(std::unique_ptr<Timer> timer);
+
         MainLoop(const RedisConf &conf);
         ~MainLoop() = default;
     };
+    void SetGlobalLoop(MainLoop *g_loop);
+    auto GetGlobalLoop() -> MainLoop &;
 } // namespace rds
 
 #endif

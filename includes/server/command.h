@@ -30,6 +30,7 @@ namespace rds
         CLASS_DEFAULT_DECLARE(CommandBase);
     };
 
+    class Handler;
     struct CliCommand : CommandBase
     {
         std::optional<std::string> value_;

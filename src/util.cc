@@ -172,6 +172,7 @@ namespace rds
         }
         RedisConf conf;
         auto obj_value = conf_obj.object_items();
+        conf.file_name_ = obj_value["dbfile"].string_value();
         conf.ip_ = obj_value["ip"].string_value();
         conf.port_ = obj_value["port"].int_value();
         conf.compress_ = obj_value["compress"].bool_value();
@@ -186,6 +187,7 @@ namespace rds
     auto DefaultConf() -> RedisConf
     {
         RedisConf conf;
+        conf.file_name_ = "dump.db";
         conf.ip_ = "127.0.0.1";
         conf.port_ = 8080;
         conf.compress_ = false;

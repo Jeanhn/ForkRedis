@@ -75,7 +75,7 @@ std::vector<std::pair<std::string, rds::Hash>> hash_suit;
 
 rds::Db db;
 rds::FileManager fm;
-rds::Rdb rdb;
+// rds::Rdb rdb;
 
 class Util4test
 {

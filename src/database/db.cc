@@ -5,6 +5,7 @@
 #include <objects/hash.h>
 #include <cstring>
 #include <util.h>
+#include <server/timer.h>
 
 namespace rds
 {
@@ -195,10 +196,10 @@ namespace rds
         return hs;
     }
 
-    void Db::Del(const Str &key)
+    auto Db::Del(const Str &key) -> std::size_t
     {
         WriteGuard wg(latch_);
-        key_value_map_.erase(key);
+        return key_value_map_.erase(key);
     }
 
     auto Db::Get(const Str &key) const -> std::weak_ptr<Object>
@@ -213,15 +214,21 @@ namespace rds
         return it->second->GetValue();
     }
 
-    void Db::Expire(const Str &key, std::size_t time_period_s) const
+    auto Db::Expire(const Str &key, std::size_t time_period_us) -> std::unique_ptr<Timer>
     {
         ReadGuard wg(latch_);
         auto it = key_value_map_.find(key);
         if (it == key_value_map_.end())
         {
-            return;
+            return {};
         }
-        it->second->MakeExpire(UsTime() + time_period_s * 1000'000);
+        auto time_point = UsTime() + time_period_us;
+        it->second->MakeExpire(time_period_us);
+        auto ret = std::make_unique<DbExpireTimer>();
+        ret->database_ = this;
+        ret->expire_time_us_ = time_point;
+        ret->obj_name_ = key.GetRaw();
+        return ret;
     }
 
     auto Db::Save() const -> std::string

@@ -14,7 +14,6 @@ namespace rds
 {
     struct Timer
     {
-        bool valid_;
         std::size_t expire_time_us_;
         virtual void Exec(){};
         CLASS_DEFAULT_DECLARE(Timer);
@@ -32,9 +31,10 @@ namespace rds
 
     struct RdbTimer : Timer
     {
-        Handler *hdlr_;
-        Rdb *rdb_;
+        std::function<std::vector<std::string>()> generator_;
         FileManager *fm_;
+        Handler *hdlr_;
+        std::size_t after_;
         void Exec() override;
         CLASS_DEFAULT_DECLARE(RdbTimer);
     };
@@ -42,7 +42,6 @@ namespace rds
     struct AofTimer : Timer
     {
         Handler *hdlr_;
-        Aof *aof_;
         FileManager *dm_;
         void Exec();
     };
@@ -53,8 +52,6 @@ namespace rds
     {
         return nullptr;
     }
-
-    auto NewRdbTimer(Handler *hdlr_, Rdb *rdb_) -> std::unique_ptr<Timer>;
 
     inline auto TimerLess(const std::unique_ptr<Timer> &a, const std::unique_ptr<Timer> &b) -> bool
     {

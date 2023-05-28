@@ -40,7 +40,7 @@ namespace rds
         }
         handler_.Run();
 #ifndef NDEBUG
-        handler_.Run();
+        // handler_.Run();
 #endif
     }
 

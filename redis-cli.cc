@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <iostream>
+#include <cstring>
+#include <atomic>
 auto RawCommandToRequest(const std::string &raw) -> json11::Json::array
 {
     auto it = raw.cbegin();
@@ -52,7 +54,42 @@ auto RawCommandToRequest(const std::string &raw) -> json11::Json::array
     return ret;
 }
 
-int main()
+std::atomic_int good_cnt{0};
+void Pressure()
+{
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in sa;
+    sa.sin_addr.s_addr = inet_addr("127.0.0.1");
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(8080);
+    int ret = connect(fd, reinterpret_cast<sockaddr *>(&sa), sizeof(sa));
+    if (ret == -1)
+    {
+        return;
+    }
+    printf("pressure init..\n");
+    for (int i = 0; i < 10000; i++)
+    {
+        auto obj = std::to_string(i);
+        auto value = obj;
+        auto cmd = "SET " + obj + " " + value;
+        json11::Json req = RawCommandToRequest(cmd);
+        auto tosend = req.dump();
+        write(fd, tosend.data(), tosend.size());
+        char buf[102];
+        int n = read(fd, buf, 100);
+        if (n > 0)
+        {
+            buf[n] = 0;
+            if (strcmp(buf, "[\"OK\"]") == 0)
+            {
+                good_cnt++;
+            }
+        }
+    }
+}
+
+void ClientEnd()
 {
     std::cout << "connecting..." << std::endl;
     int fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -98,4 +135,25 @@ int main()
             break;
         }
     }
+}
+
+void GoPress()
+{
+    std::vector<std::thread> vec;
+    for (int i = 0; i < 4; i++)
+    {
+        std::thread t(Pressure);
+        vec.push_back(std::move(t));
+    }
+    for (auto &t : vec)
+    {
+        t.join();
+    }
+    std::cout << "good: " << good_cnt.load() << std::endl;
+}
+
+int main()
+{
+    ClientEnd();
+    // GoPress();
 }

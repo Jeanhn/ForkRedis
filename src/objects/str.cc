@@ -170,6 +170,7 @@ namespace rds
             {
                 std::string cprs = Compress(data_);
                 std::size_t len = cprs.size();
+                assert(len != 0);
                 ret.append(BitsToString(len));
                 res = std::move(cprs);
             }
@@ -226,9 +227,16 @@ namespace rds
 #else
             PeekSize(source);
 #endif
+            assert(size_compress != 0);
             data_ = Decompress(PeekString(source, size_compress));
             assert(size_origin == data_.size());
         }
+    }
+
+    auto Str::Fork(const std::string &key) -> std::string
+    {
+        ReadGuard rg(latch_);
+        return "SET " + key + " " + data_;
     }
 
 } // namespace rds

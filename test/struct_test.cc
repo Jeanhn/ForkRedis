@@ -6,6 +6,7 @@
 #include <objects/set.h>
 #include <objects/zset.h>
 #include <objects/hash.h>
+#include <algorithm>
 
 void CheckWhat(const std::string &what)
 {
@@ -133,6 +134,16 @@ TEST(Structs, Str)
     {
         Decode(s, cache, EncodingType::INT);
     }
+
+    std::vector<std::string> dt{"a", "b", "c", "d", "e", "f"};
+    std::vector<Str> data;
+    for (auto s : dt)
+    {
+        data.push_back(s);
+    }
+    std::string c("c");
+    auto pos = std::lower_bound(data.cbegin(), data.cend(), c);
+    ASSERT_EQ(pos, data.cbegin() + 2);
 
     CheckWhat("str en-de-code");
     CheckWhat("\n");
@@ -332,6 +343,15 @@ TEST(Structs, ZSet)
     checkSet(member2_lex);
     checkSet(member2_score);
     CheckWhat("zset incr");
+
+    ZSet zs;
+    for (int i = 0; i < 10; i++)
+    {
+        zs.Add(i, std::to_string(i));
+    }
+    auto lexcnt = zs.LexCount(std::string("0"), std::string("5"));
+    ASSERT_EQ(lexcnt, 6);
+
     CheckWhat("\n");
 }
 

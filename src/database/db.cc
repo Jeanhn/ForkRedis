@@ -128,6 +128,11 @@ namespace rds
         return key_;
     }
 
+    auto KeyValue::Fork() -> std::string
+    {
+        ReadGuard rg(latch_);
+        return value_->Fork(key_.GetRaw());
+    }
 }
 
 /*
@@ -255,6 +260,10 @@ namespace rds
     auto Db::Save() const -> std::string
     {
         ReadGuard rg(latch_);
+        if (key_value_map_.empty())
+        {
+            return {};
+        }
         std::string ret;
         ret.push_back(SELECT_DB_);
         ret.append(BitsToString(number_));
@@ -293,5 +302,16 @@ namespace rds
             }
             key_value_map_.insert({kv->GetKey(), std::move(kv)});
         }
+    }
+
+    auto Db::Fork() -> std::vector<std::string>
+    {
+        std::vector<std::string> ret;
+        ReadGuard rg(latch_);
+        for (auto &kv : key_value_map_)
+        {
+            ret.push_back(kv.second->Fork());
+        }
+        return ret;
     }
 }

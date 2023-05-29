@@ -25,42 +25,6 @@
     std::cout << __FILE__ << std::endl; \
     std::abort();
 
-void *operator new(size_t size);
-
-void *operator new[](size_t size);
-
-void *operator new(size_t size, std::nothrow_t &);
-
-void *operator new[](size_t size, std::nothrow_t &);
-
-void operator delete(void *p) noexcept;
-
-void operator delete(void *p, size_t size) noexcept;
-
-void operator delete(void *p, std::nothrow_t &);
-
-void operator delete[](void *p) noexcept;
-
-void operator delete[](void *p, size_t size) noexcept;
-
-void operator delete[](void *p, std::nothrow_t &);
-
-void *operator new(size_t size, std::align_val_t val);
-
-void *operator new[](size_t size, std::align_val_t val);
-
-void *operator new(size_t size, std::align_val_t val, std::nothrow_t &);
-
-void *operator new[](size_t size, std::align_val_t val, std::nothrow_t &);
-
-void operator delete(void *p, std::align_val_t) noexcept;
-
-void operator delete[](void *p, std::align_val_t) noexcept;
-
-void operator delete(void *p, size_t size, std::align_val_t val) noexcept;
-
-void operator delete[](void *p, size_t size, std::align_val_t val) noexcept;
-
 #define CLASS_DEFAULT_DECLARE(name)                 \
     name() = default;                               \
     ~name() = default;                              \

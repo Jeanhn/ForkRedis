@@ -7,6 +7,11 @@
 #include <condition_variable>
 #include <server/loop.h>
 
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 namespace rds
 {
     auto RawCommandToRequest(const std::string &raw) -> json11::Json::array
@@ -61,6 +66,14 @@ namespace rds
         {
             ret->valid_ = false;
             return false;
+        }
+        for (auto &e : source)
+        {
+            if (e.string_value().empty())
+            {
+                ret->valid_ = false;
+                return false;
+            }
         }
         ret->command_ = source[0].string_value();
         ret->obj_name_ = source[1].string_value();
@@ -255,6 +268,27 @@ namespace rds
         }
         return ret;
     }
+
+    auto JsonToServerCommand(const json11::Json::array &source) -> ServerCommand
+    {
+        ServerCommand ret;
+        if (!JsonToBase(&ret, source))
+        {
+            return ret;
+        }
+        std::string &info = ret.obj_name_;
+        auto devide = std::find(info.cbegin(), info.cend(), ':');
+        if (devide == info.cend())
+        {
+            ret.valid_ = false;
+            return ret;
+        }
+        ret.ip_ = info.assign(info.cbegin(), devide);
+        auto port = info.assign(devide + 1, info.cend());
+        ret.port_ = std::stoi(port);
+        return ret;
+    }
+
     /*
 
 
@@ -266,6 +300,10 @@ namespace rds
     auto RequestToCommandExec(std::shared_ptr<ClientInfo> client, json11::Json::array *request) -> std::unique_ptr<CommandBase>
     {
         json11::Json::array &req = *request;
+        auto isServerCommand = [](const std::string &cmd)
+        {
+            return (cmd == "FORK");
+        };
         auto isCliCommand = [](const std::string &cmd)
         {
             return (cmd == "SELECT" ||
@@ -349,6 +387,10 @@ namespace rds
         }
         req[0] = {cmd};
         std::unique_ptr<CommandBase> ret;
+        if (isServerCommand(cmd))
+        {
+            ret = std::make_unique<ServerCommand>(JsonToServerCommand(req));
+        }
         if (isCliCommand(cmd))
         {
             ret = std::make_unique<CliCommand>(JsonToCliCommand(req));
@@ -1213,6 +1255,62 @@ namespace rds
             return {{std::to_string(new_db_num)}};
         }
 
+        return {{"OK"}};
+    }
+
+    auto ServerCommand::Exec() -> std::optional<json11::Json::array>
+    {
+        if (command_ == "FORK")
+        {
+            auto client = cli_.lock();
+            if (!client)
+            {
+                return {};
+            }
+            sockaddr_in sa;
+            sa.sin_addr.s_addr = inet_addr(ip_.data());
+            sa.sin_family = AF_INET;
+            sa.sin_port = htons(port_);
+
+            int virtual_client = socket(AF_INET, SOCK_STREAM, 0);
+            if (virtual_client == -1)
+            {
+                return {{" "}};
+            }
+            int ret = connect(virtual_client, reinterpret_cast<sockaddr *>(&sa), sizeof(sa));
+            if (ret == -1)
+            {
+                return {{" "}};
+            }
+            extern void SetNonBlock(int fd);
+            SetNonBlock(virtual_client);
+
+            auto cmds = client->GetDB()->Fork();
+
+            for (auto &cmd : cmds)
+            {
+                auto req = json11::Json(RawCommandToRequest(cmd)).dump();
+                auto beg = req.data();
+                auto end = beg + req.size();
+                while (beg != end)
+                {
+                    int len = write(virtual_client, beg, std::distance(beg, end));
+                    if (len == -1)
+                    {
+                        if (errno == EAGAIN)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            return {{" "}};
+                        }
+                    }
+                    beg += len;
+                }
+            }
+            close(virtual_client);
+        }
         return {{"OK"}};
     }
 };

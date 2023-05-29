@@ -210,7 +210,7 @@ namespace rds
                 if (cli_evt.second == EPOLLOUT)
                 {
                     int nwrite = client->Send();
-                    if (nwrite == -1)
+                    if (nwrite == -1 && errno == EPIPE)
                     {
                         client->Logout();
                     }

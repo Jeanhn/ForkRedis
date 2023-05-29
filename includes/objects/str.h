@@ -38,6 +38,8 @@ namespace rds
         auto EncodeValue() const -> std::string override;
         void DecodeValue(std::deque<char> *) override;
 
+        auto Fork(const std::string &key) -> std::string;
+
         CLASS_DECLARE_special_copy_move(Str);
 
         Str(std::string data);

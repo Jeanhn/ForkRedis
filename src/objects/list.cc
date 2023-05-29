@@ -248,4 +248,15 @@ namespace rds
         }
     }
 
+    auto List::Fork(const std::string &key) -> std::string
+    {
+        ReadGuard rg(latch_);
+        std::string ret("LPUSHB " + key + " ");
+        for (auto &s : data_list_)
+        {
+            ret.append(s.GetRaw() + " ");
+        }
+        return ret;
+    }
+
 } // namespace rds

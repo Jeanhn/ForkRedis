@@ -12,7 +12,7 @@ namespace rds
         }
     }
 
-    ZSet::ZSet(ZSet &&rhs)noexcept
+    ZSet::ZSet(ZSet &&rhs) noexcept
     {
         ReadGuard rg(rhs.ExposeLatch());
         sequence_list_ = std::move(rhs.sequence_list_);
@@ -98,13 +98,21 @@ namespace rds
 
     auto ZSet::LexCount(const Str &member_low, const Str &member_high) const -> std::size_t
     {
-        if (member_low < member_high)
+        if (member_low > member_high)
         {
             return 0;
         }
         ReadGuard rg(latch_);
         auto low = member_map_.lower_bound(member_low);
+        if (low != member_map_.end())
+        {
+            std::cout << low->first.GetRaw() << std::endl;
+        }
         auto high = member_map_.upper_bound(member_high);
+        if (high != member_map_.end())
+        {
+            std::cout << high->first.GetRaw() << std::endl;
+        }
         return std::distance(low, high);
     }
 
@@ -245,6 +253,7 @@ namespace rds
         auto rank_pos = rank_map_.find(pos->second->second);
         return std::to_string(std::distance(rank_map_.begin(), rank_pos));
     }
+
     auto ZSet::Score(const Str &member) const -> std::string
     {
         ReadGuard rg(latch_);
@@ -255,4 +264,16 @@ namespace rds
         }
         return std::to_string(pos->second->second);
     }
+
+    auto ZSet::Fork(const std::string &key) -> std::string
+    {
+        std::string ret("ZADD " + key + " ");
+        ReadGuard rg(latch_);
+        for (auto &p : sequence_list_)
+        {
+            ret.append(std::to_string(p.second) + " " + p.first->GetRaw() + " ");
+        }
+        return ret;
+    }
+
 } // namespace rds

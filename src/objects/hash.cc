@@ -140,4 +140,15 @@ namespace rds
         data_map_.insert({key, std::move(value)});
     }
 
+    auto Hash::Fork(const std::string &key) -> std::string
+    {
+        std::string ret("HSET " + key + " ");
+        ReadGuard rg(latch_);
+        for (auto &p : data_map_)
+        {
+            ret.append(p.first.GetRaw() + " " + p.second.GetRaw() + " ");
+        }
+        return ret;
+    }
+
 } // namespace rds

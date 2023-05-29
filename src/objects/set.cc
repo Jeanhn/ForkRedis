@@ -185,4 +185,16 @@ namespace rds
                       { ret.push_back(str); });
         return ret;
     }
+
+    auto Set::Fork(const std::string &key) -> std::string
+    {
+        std::string ret("SADD " + key + " ");
+        ReadGuard rg(latch_);
+        for (auto &s : data_set_)
+        {
+            ret.append(s.GetRaw() + " ");
+        }
+        return ret;
+    }
+
 } // namespace fds

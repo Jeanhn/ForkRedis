@@ -40,6 +40,7 @@ namespace rds
             Log("Create a default database");
             databases_.push_back(std::make_unique<Db>());
         }
+        Log("Inition works are done.");
         handler_.Run();
 #ifndef NDEBUG
         // handler_.Run();

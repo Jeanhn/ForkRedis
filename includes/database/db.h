@@ -52,6 +52,8 @@ namespace rds
 
         auto GetKey() const -> Str;
 
+        auto Fork() -> std::string;
+
         KeyValue(const Str &, std::shared_ptr<Object>);
 
         KeyValue() = default;
@@ -101,6 +103,8 @@ namespace rds
         auto Size() const -> std::size_t;
 
         auto Number() const -> int;
+
+        auto Fork() -> std::vector<std::string>;
 
         Db();
         ~Db() = default;

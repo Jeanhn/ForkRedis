@@ -159,14 +159,12 @@ private:
             db.NewSet(cont.first);
             auto obj = db.Get(cont.first);
             *(reinterpret_cast<rds::Set *>(obj.lock().get())) = cont.second;
-            db.Expire(cont.first, 3);
         }
         for (auto cont : str_suit)
         {
             db.NewStr(cont.first);
             auto obj = db.Get(cont.first);
             *(reinterpret_cast<rds::Str *>(obj.lock().get())) = cont.second;
-            db.Expire(cont.first, 2);
         }
         for (auto cont : hash_suit)
         {
@@ -179,7 +177,6 @@ private:
             db.NewZSet(cont.first);
             auto obj = db.Get(cont.first);
             *(reinterpret_cast<rds::ZSet *>(obj.lock().get())) = cont.second;
-            db.Expire(cont.first, 1);
         }
     }
 

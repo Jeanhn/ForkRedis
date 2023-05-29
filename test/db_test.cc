@@ -78,24 +78,34 @@ TEST(Database, Db)
 {
     using namespace rds;
 
-    print("dbsize: ", db.key_value_map_.size());
-
+    Log("checking db en-de-code");
     auto dbfile = db.Save();
-    print("dbfilesize: ", dbfile.size());
     std::deque<char> cache;
     std::copy(dbfile.cbegin(), dbfile.cend(), std::back_inserter(cache));
 
     Db db2;
     db2.Load(&cache);
 
-    print("db2size: ", db2.key_value_map_.size());
+    DbEqual(&db, &db2);
 
-    for (auto &kv : db2.key_value_map_)
+    Log("checking db fork");
+    Db cli_db;
+    auto cli = std::make_shared<ClientInfo>();
+    cli->database_ = &cli_db;
+    auto raw_cmds = db2.Fork();
+    for (auto &cmd : raw_cmds)
     {
-        auto pos = db.key_value_map_.find(kv.first);
-        ASSERT_NE(pos, db.key_value_map_.end());
+        auto req = json11::Json(RawCommandToRequest(cmd)).dump();
+        std::copy(req.cbegin(), req.cend(), std::back_inserter(cli->recv_buffer_));
+        auto requests = cli->ExportMessages();
+        for (auto &request : requests)
+        {
+            auto cmd = RequestToCommandExec(cli, &request);
+            ASSERT_TRUE(cmd);
+            cmd->Exec();
+        }
     }
-    ASSERT_EQ(db.key_value_map_.size(), db2.key_value_map_.size());
+    DbEqual(&cli_db, &db2);
 }
 
 #endif

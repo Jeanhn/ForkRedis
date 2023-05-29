@@ -33,7 +33,6 @@ namespace rds
     class Handler;
     struct CliCommand : CommandBase
     {
-        std::optional<std::string> value_;
         auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(CliCommand);
     };
@@ -78,6 +77,14 @@ namespace rds
         std::vector<Str> values_;
         auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(ZSetCommand);
+    };
+
+    struct ServerCommand : CommandBase
+    {
+        std::string ip_;
+        short port_;
+        auto Exec() -> std::optional<json11::Json::array> override;
+        CLASS_DEFAULT_DECLARE(ServerCommand);
     };
 
     class CommandQue

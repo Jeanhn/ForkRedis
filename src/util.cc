@@ -59,41 +59,46 @@ namespace rds
 
     auto Compress(const std::string &data) -> std::string
     {
+        if (data.empty())
+        {
+            return {};
+        }
         uint8_t *src = reinterpret_cast<uint8_t *>(const_cast<char *>(data.data()));
-        uint8_t *dst = reinterpret_cast<uint8_t *>(malloc(data.size()));
-        std::size_t len = lzfse_encode_buffer(dst, data.size(), src, data.size(), 0);
+        std::vector<uint8_t> destination;
+
+        int times = 1;
+        std::size_t len = 0;
+        while (len == 0)
+        {
+            destination.resize(data.size() * times);
+            uint8_t *dst = destination.data();
+            len = lzfse_encode_buffer(dst, destination.size(), src, data.size(), 0);
+            times++;
+        }
+
         std::string ret;
         ret.reserve(len);
-        for (std::size_t i = 0; i < len; i++)
-        {
-            ret.push_back(static_cast<char>(dst[i]));
-        }
-        free(dst);
+        std::copy(destination.cbegin(), destination.cbegin() + len, std::back_inserter(ret));
         return ret;
     }
 
     auto Decompress(const std::string &data) -> std::string
     {
         uint8_t *src = reinterpret_cast<uint8_t *>(const_cast<char *>(data.data()));
-        const size_t dst_size = data.size() * 2;
-        uint8_t *dst = reinterpret_cast<uint8_t *>(malloc(dst_size));
+        std::vector<uint8_t> destination;
 
         std::size_t len = 0;
-        std::string ret;
-        ret.reserve(dst_size);
-
+        int times = 5;
         do
         {
-            len = lzfse_decode_buffer(dst, dst_size, src, data.size(), 0);
-            for (std::size_t i = 0; i < len; i++)
-            {
-                ret.push_back(static_cast<char>(dst[i]));
-            }
-        } while (len == dst_size);
+            destination.resize(data.size() * times);
+            uint8_t *dst = destination.data();
+            len = lzfse_decode_buffer(dst, destination.size(), src, data.size(), 0);
+            times++;
+        } while (len == destination.size());
 
-        free(dst);
-
-        ret.shrink_to_fit();
+        std::string ret;
+        std::copy(destination.cbegin(), destination.cbegin() + len, std::back_inserter(ret));
         return ret;
     }
 
@@ -107,6 +112,7 @@ namespace rds
     void EnCompress()
     {
         __compress.store(true);
+        Log("Enable string compress save");
     }
 
     void DisCompress()
@@ -190,7 +196,7 @@ namespace rds
         conf.file_name_ = "dump.db";
         conf.ip_ = "127.0.0.1";
         conf.port_ = 8080;
-        conf.compress_ = false;
+        conf.compress_ = true;
         conf.enable_aof_ = false;
         conf.frequence_.every_n_sec_ = 1;
         conf.frequence_.save_n_times_ = 1;

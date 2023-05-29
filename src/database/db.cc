@@ -6,6 +6,7 @@
 #include <cstring>
 #include <util.h>
 #include <server/timer.h>
+#include <server/loop.h>
 
 namespace rds
 {
@@ -41,12 +42,12 @@ namespace rds
     auto KeyValue::InternalPrefixEncode() const -> std::string
     {
         std::string ret;
-        if (expire_time_stamp_.has_value()) // the entry has expire
+        if (expire_time_us_.has_value()) // the entry has expire
         {
             char c = ObjectTypeToChar(ObjectType::EXPIRE_ENTRY);
             ret.push_back(c);
-            std::string expr_ms = BitsToString(expire_time_stamp_.value());
-            ret.append(expr_ms);
+            std::string expr_us = BitsToString(expire_time_us_.value());
+            ret.append(expr_us);
         }
         char otyp = ObjectTypeToChar(value_->GetObjectType());
         ret.push_back(otyp);
@@ -72,11 +73,11 @@ namespace rds
         if (otyp == ObjectType::EXPIRE_ENTRY)
         {
             auto s = PeekSize(source);
-            expire_time_stamp_ = s;
+            expire_time_us_ = s;
         }
         else
         {
-            expire_time_stamp_.reset();
+            expire_time_us_.reset();
         }
 
         if (otyp == ObjectType::EXPIRE_ENTRY)
@@ -148,7 +149,12 @@ namespace rds
 
     auto Db::Number() const -> int
     {
-        return number_;
+        int no;
+        {
+            ReadGuard rg(latch_);
+            no = number_;
+        }
+        return no;
     }
 
     auto Db::NewStr(const Str &key) -> std::shared_ptr<Object>
@@ -208,7 +214,6 @@ namespace rds
         auto it = key_value_map_.find(key);
         if (it == key_value_map_.end())
         {
-            std::weak_ptr<int> wp;
             return {};
         }
         return it->second->GetValue();
@@ -223,12 +228,28 @@ namespace rds
             return {};
         }
         auto time_point = UsTime() + time_period_us;
-        it->second->MakeExpire(time_period_us);
+        it->second->MakeExpireAt(time_point);
         auto ret = std::make_unique<DbExpireTimer>();
         ret->database_ = this;
         ret->expire_time_us_ = time_point;
         ret->obj_name_ = key.GetRaw();
         return ret;
+    }
+
+    auto Db::WhenExpire(const Str &key) -> std::string
+    {
+        ReadGuard wg(latch_);
+        auto it = key_value_map_.find(key);
+        if (it == key_value_map_.end())
+        {
+            return "(nil)";
+        }
+        auto time_point = it->second->GetExpire();
+        if (time_point.has_value())
+        {
+            return std::to_string((time_point.value() - UsTime()) / 990'000);
+        }
+        return "never";
     }
 
     auto Db::Save() const -> std::string
@@ -261,6 +282,15 @@ namespace rds
         {
             auto kv = std::make_shared<KeyValue>();
             kv->Decode(source);
+            auto expire_time_us = kv->GetExpire();
+            if (expire_time_us.has_value())
+            {
+                auto exp_tmr = std::make_unique<DbExpireTimer>();
+                exp_tmr->database_ = this;
+                exp_tmr->obj_name_ = kv->GetKey().GetRaw();
+                exp_tmr->expire_time_us_ = expire_time_us.value();
+                GetGlobalLoop().EncounterTimer(std::move(exp_tmr));
+            }
             key_value_map_.insert({kv->GetKey(), std::move(kv)});
         }
     }

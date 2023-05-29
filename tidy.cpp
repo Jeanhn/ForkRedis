@@ -21,7 +21,7 @@ int main()
         }
     }
     ofstream ofs;
-    ofs.open("debug.tidy");
+    ofs.open("debug1.tidy");
     ofs << str;
     ofs.flush();
 }

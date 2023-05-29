@@ -380,7 +380,12 @@ namespace rds
 
     void ClientInfo::EnableSend()
     {
-        server_->EnableSend(this);
+        decltype(this) ths;
+        {
+            ReadGuard rg(latch_);
+            ths = this;
+        }
+        server_->EnableSend(ths);
     }
 
     void ClientInfo::Logout()
@@ -390,7 +395,12 @@ namespace rds
 
     void ClientInfo::EnableRead()
     {
-        server_->EnableRead(this);
+        decltype(this) ths;
+        {
+            ReadGuard rg(latch_);
+            ths = this;
+        }
+        server_->EnableRead(ths);
     }
 
     ClientInfo::ClientInfo(Server *server, int fd) : fd_(fd), server_(server), database_(nullptr)

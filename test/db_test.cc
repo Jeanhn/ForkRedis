@@ -36,7 +36,7 @@ TEST(KeyValue, kv)
 
     auto v = std::make_unique<Set>(std::move(value));
     KeyValue kv(key, std::move(v));
-    kv.MakeExpire(100);
+    kv.MakeExpireAt(100);
 
     std::deque<char> src;
     std::string code = kv.Encode();

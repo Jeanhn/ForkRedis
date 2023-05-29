@@ -15,7 +15,7 @@ namespace rds
         mutable std::shared_mutex latch_;
         Str key_;
         std::shared_ptr<Object> value_;
-        std::optional<std::size_t> expire_time_stamp_;
+        std::optional<std::size_t> expire_time_us_;
 
         auto InternalPrefixEncode() const -> std::string;
 
@@ -24,28 +24,28 @@ namespace rds
 
         void Decode(std::deque<char> *);
 
-        auto MakeExpire(std::size_t time_stamp)
+        auto MakeExpireAt(std::size_t time_stamp)
         {
-            expire_time_stamp_ = time_stamp;
+            expire_time_us_ = time_stamp;
         }
 
         void UndoExpire()
         {
-            expire_time_stamp_.reset();
+            expire_time_us_.reset();
         }
 
         auto GetExpire() const -> std::optional<std::size_t>
         {
-            return expire_time_stamp_;
+            return expire_time_us_;
         }
 
         auto IsExpire() const -> bool
         {
-            if (!expire_time_stamp_.has_value())
+            if (!expire_time_us_.has_value())
             {
                 return false;
             }
-            return expire_time_stamp_.value() < UsTime();
+            return expire_time_us_.value() < UsTime();
         }
 
         auto GetValue() const -> std::weak_ptr<Object>;
@@ -91,6 +91,8 @@ namespace rds
         auto Get(const Str &) const -> std::weak_ptr<Object>;
 
         auto Expire(const Str &, std::size_t) -> std::unique_ptr<Timer>;
+
+        auto WhenExpire(const Str &) -> std::string;
 
         auto Save() const -> std::string;
 

@@ -219,7 +219,7 @@ namespace rds
         {
             return ret;
         }
-        if (ret.command_ == "DEL")
+        if (ret.command_ == "DEL" || ret.command_ == "WHEN")
         {
             return ret;
         }
@@ -275,7 +275,9 @@ namespace rds
         };
         auto isDbCommand = [](const std::string &cmd)
         {
-            return (cmd == "DEL" || cmd == "EXPIRE");
+            return (cmd == "DEL" ||
+                    cmd == "EXPIRE" ||
+                    cmd == "WHEN");
         };
         auto isStrCommand = [](const std::string &cmd)
         {
@@ -1147,6 +1149,11 @@ namespace rds
             {
                 GetGlobalLoop().EncounterTimer(std::move(tmr));
             }
+        }
+        else if (command_ == "WHEN")
+        {
+            auto when = client->GetDB()->WhenExpire(obj_name_);
+            return {{when}};
         }
 
         return {{"OK"}};

@@ -1,0 +1,3141 @@
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/tuple:233 in std::_Head_base<0ul, void (*)(rds::Handler*), false>::_M_head(std::_Head_base<0ul, void (*)(rds::Handler*), false>&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef4220 by thread T2:    
+
+
+  Previous write of size 8 at 0x55bfc0ef4220 by thread T1:
+    
+
+  Location is global '__gcov0._ZSt12__get_helperILm0EPFvPN3rds7HandlerEEJS2_EERT0_RSt11_Tuple_implIXT_EJS5_DpT1_EE' of size 24 at 0x55bfc0ef4210 (redis-server+0x0000002fe220)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/tuple:1382 in void (*&std::__get_helper<0ul, void (*)(rds::Handler*), rds::Handler*>(std::_Tuple_impl<0ul, void (*)(rds::Handler*), rds::Handler*>&))(rds::Handler*)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef42a8 by thread T2:
+    
+
+  Previous write of size 8 at 0x55bfc0ef42a8 by thread T1:
+    
+
+  Location is global '__gcov0._ZSt3getILm0EJPFvPN3rds7HandlerEES2_EEONSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeEOS9_' of size 32 at 0x55bfc0ef42a0 (redis-server+0x0000002fe2a8)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/tuple:1412 in std::tuple_element<0ul, std::tuple<void (*)(rds::Handler*), rds::Handler*> >::type&& std::get<0ul, void (*)(rds::Handler*), rds::Handler*>(std::tuple<void (*)(rds::Handler*), rds::Handler*>&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef4200 by thread T2:
+    
+
+
+  Previous write of size 8 at 0x55bfc0ef4200 by thread T1:
+    
+
+
+  Location is global '__gcov0._ZSt7forwardIPFvPN3rds7HandlerEEEOT_RNSt16remove_referenceIS5_E4typeE' of size 16 at 0x55bfc0ef4200 (redis-server+0x0000002fe200)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/move.h:77 in void (*&&std::forward<void (*)(rds::Handler*)>(std::remove_reference<void (*)(rds::Handler*)>::type&))(rds::Handler*)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef4208 by thread T2:
+    
+
+  Previous write of size 8 at 0x55bfc0ef4208 by thread T1:
+    
+
+  Location is global '__gcov0._ZSt7forwardIPFvPN3rds7HandlerEEEOT_RNSt16remove_referenceIS5_E4typeE' of size 16 at 0x55bfc0ef4200 (redis-server+0x0000002fe208)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/move.h:78 in void (*&&std::forward<void (*)(rds::Handler*)>(std::remove_reference<void (*)(rds::Handler*)>::type&))(rds::Handler*)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef42b0 by thread T2:
+    
+
+  Previous write of size 8 at 0x55bfc0ef42b0 by thread T1:
+    
+
+  Location is global '__gcov0._ZSt3getILm0EJPFvPN3rds7HandlerEES2_EEONSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeEOS9_' of size 32 at 0x55bfc0ef42a0 (redis-server+0x0000002fe2b0)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/tuple:1412 in std::tuple_element<0ul, std::tuple<void (*)(rds::Handler*), rds::Handler*> >::type&& std::get<0ul, void (*)(rds::Handler*), rds::Handler*>(std::tuple<void (*)(rds::Handler*), rds::Handler*>&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef42b8 by thread T2:
+    
+
+    
+
+    
+
+    
+
+#3 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef42b8 by thread T1:
+    
+
+    
+
+    
+
+    
+
+#3 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZSt3getILm0EJPFvPN3rds7HandlerEES2_EEONSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeEOS9_' of size 32 at 0x55bfc0ef42a0 (redis-server+0x0000002fe2b8)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/tuple:1412 in std::tuple_element<0ul, std::tuple<void (*)(rds::Handler*), rds::Handler*> >::type&& std::get<0ul, void (*)(rds::Handler*), rds::Handler*>(std::tuple<void (*)(rds::Handler*), rds::Handler*>&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef4218 by thread T3:
+    
+
+
+  Previous write of size 8 at 0x55bfc0ef4218 by thread T1:
+    
+
+
+  Location is global '__gcov0._ZSt12__get_helperILm0EPFvPN3rds7HandlerEEJS2_EERT0_RSt11_Tuple_implIXT_EJS5_DpT1_EE' of size 24 at 0x55bfc0ef4210 (redis-server+0x0000002fe218)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/tuple:1382 in void (*&std::__get_helper<0ul, void (*)(rds::Handler*), rds::Handler*>(std::_Tuple_impl<0ul, void (*)(rds::Handler*), rds::Handler*>&))(rds::Handler*)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef4240 by thread T3:
+    
+
+  Previous write of size 8 at 0x55bfc0ef4240 by thread T1:
+    
+
+  Location is global '__gcov0._ZSt8__invokeIPFvPN3rds7HandlerEEJS2_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS6_DpOS7_' of size 56 at 0x55bfc0ef4240 (redis-server+0x0000002fe240)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/invoke.h:90 in std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef4248 by thread T3:
+    
+
+  Previous write of size 8 at 0x55bfc0ef4248 by thread T1:
+    
+
+  Location is global '__gcov0._ZSt8__invokeIPFvPN3rds7HandlerEEJS2_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS6_DpOS7_' of size 56 at 0x55bfc0ef4240 (redis-server+0x0000002fe248)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/invoke.h:96 in std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef4250 by thread T3:
+    
+
+  Previous write of size 8 at 0x55bfc0ef4250 by thread T1:
+    
+
+  Location is global '__gcov0._ZSt8__invokeIPFvPN3rds7HandlerEEJS2_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS6_DpOS7_' of size 56 at 0x55bfc0ef4240 (redis-server+0x0000002fe250)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/invoke.h:96 in std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef41a0 by thread T3:
+    
+
+
+  Previous write of size 8 at 0x55bfc0ef41a0 by thread T1:
+    
+
+
+  Location is global '__gcov0._ZSt13__invoke_implIvPFvPN3rds7HandlerEEJS2_EET_St14__invoke_otherOT0_DpOT1_' of size 56 at 0x55bfc0ef41a0 (redis-server+0x0000002fe1a0)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/invoke.h:60 in void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef41a8 by thread T3:
+    
+
+
+  Previous write of size 8 at 0x55bfc0ef41a8 by thread T1:
+    
+
+
+  Location is global '__gcov0._ZSt13__invoke_implIvPFvPN3rds7HandlerEEJS2_EET_St14__invoke_otherOT0_DpOT1_' of size 56 at 0x55bfc0ef41a0 (redis-server+0x0000002fe1a8)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/invoke.h:61 in void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef4300 by thread T2:
+    
+
+    
+
+    
+
+    
+
+#3 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef4300 by thread T1:
+    
+
+    
+
+    
+
+    
+
+#3 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt6thread8_InvokerISt5tupleIJPFvPN3rds7HandlerEES4_EEE9_M_invokeIJLm0ELm1EEEEvSt12_Index_tupleIJXspT_EEE' of size 72 at 0x55bfc0ef42e0 (redis-server+0x0000002fe300)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/std_thread.h:253 in void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef41b0 by thread T3:
+    
+
+
+  Previous write of size 8 at 0x55bfc0ef41b0 by thread T1:
+    
+
+
+  Location is global '__gcov0._ZSt13__invoke_implIvPFvPN3rds7HandlerEEJS2_EET_St14__invoke_otherOT0_DpOT1_' of size 56 at 0x55bfc0ef41a0 (redis-server+0x0000002fe1b0)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/invoke.h:61 in void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0f00960 by thread T2:
+    
+
+    
+
+#1 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:176 (redis-server+0xb8808)
+    
+
+    
+
+    
+
+#4 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#5 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#6 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#7 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0f00960 by thread T1:
+    
+
+    
+
+#1 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:156 (redis-server+0xb8399)
+    
+
+    
+
+    
+
+#4 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#5 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#6 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#7 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNKSt6atomicIbEcvbEv' of size 24 at 0x55bfc0f00960 (redis-server+0x00000030a960)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/atomic:86 in std::atomic<bool>::operator bool() const
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0f00968 by thread T3:
+    
+
+    
+
+    
+
+#2 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:196 (redis-server+0xba0bd)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0f00968 by thread T1:
+    
+
+    
+
+    
+
+#2 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:156 (redis-server+0xb8399)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNKSt6atomicIbEcvbEv' of size 24 at 0x55bfc0f00960 (redis-server+0x00000030a968)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/atomic_base.h:477 in std::__atomic_base<bool>::load(std::memory_order) const
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0f00970 by thread T2:
+    
+
+    
+
+    
+
+    
+
+#3 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+    
+
+#5 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#6 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0f00970 by thread T1:
+    
+
+    
+
+    
+
+    
+
+#3 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+    
+
+#5 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#6 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNKSt6atomicIbEcvbEv' of size 24 at 0x55bfc0f00960 (redis-server+0x00000030a970)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/atomic:87 in std::atomic<bool>::operator bool() const
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efe780 by thread T3:
+    
+
+    
+
+#1 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+    
+
+    
+
+#4 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#5 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#6 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#7 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efe780 by thread T1:
+    
+
+    
+
+#1 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#2 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt11unique_lockISt5mutexEC2ERS0_' of size 48 at 0x55bfc0efe780 (redis-server+0x000000308780)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/unique_lock.h:66 in std::unique_lock<std::mutex>::unique_lock(std::mutex&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efcf98 by thread T3:
+    
+
+    
+
+#1 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+    
+
+    
+
+#4 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#5 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#6 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#7 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efcf98 by thread T1:
+    
+
+    
+
+#1 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#2 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZSt11__addressofISt5mutexEPT_RS1_' of size 16 at 0x55bfc0efcf90 (redis-server+0x000000306f98)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/move.h:50 in std::mutex* std::__addressof<std::mutex>(std::mutex&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efe788 by thread T3:
+    
+
+    
+
+#1 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+    
+
+    
+
+#4 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#5 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#6 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#7 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efe788 by thread T1:
+    
+
+    
+
+#1 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#2 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt11unique_lockISt5mutexEC2ERS0_' of size 48 at 0x55bfc0efe780 (redis-server+0x000000308788)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/unique_lock.h:67 in std::unique_lock<std::mutex>::unique_lock(std::mutex&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efcf90 by thread T2:
+    
+
+    
+
+    
+
+#2 rds::TimerQue::BlockPop() /home/jean/mypieces/rds/src/server/timer.cc:28 (redis-server+0x108998)
+    
+
+#3 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:178 (redis-server+0xb8702)
+    
+
+#4 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#5 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#6 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#7 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#9 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efcf90 by thread T1:
+    
+
+    
+
+    
+
+#2 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#3 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#4 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#5 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#6 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#7 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#9 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZSt11__addressofISt5mutexEPT_RS1_' of size 16 at 0x55bfc0efcf90 (redis-server+0x000000306f90)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/move.h:49 in std::mutex* std::__addressof<std::mutex>(std::mutex&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef3f40 by thread T2:
+    
+
+    
+
+    
+
+    
+
+#3 rds::TimerQue::BlockPop() /home/jean/mypieces/rds/src/server/timer.cc:28 (redis-server+0x108998)
+    
+
+#4 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:178 (redis-server+0xb8702)
+    
+
+#5 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#6 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#7 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#8 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#9 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#10 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef3f40 by thread T1:
+    
+
+    
+
+    
+
+    
+
+#3 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#4 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#5 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#6 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#7 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#8 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#9 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#10 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt5mutex4lockEv' of size 48 at 0x55bfc0ef3f40 (redis-server+0x0000002fdf40)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/std_mutex.h:98 in std::mutex::lock()
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efcf40 by thread T3:
+    
+
+    
+
+    
+
+#2 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efcf40 by thread T1:
+    
+
+    
+
+    
+
+#2 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#3 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#4 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#5 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#6 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#7 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#9 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt11unique_lockISt5mutexE4lockEv' of size 72 at 0x55bfc0efcf40 (redis-server+0x000000306f40)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/unique_lock.h:131 in std::unique_lock<std::mutex>::lock()
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef40a0 by thread T2:
+    
+
+#4 rds::TimerQue::BlockPop() /home/jean/mypieces/rds/src/server/timer.cc:28 (redis-server+0x108998)
+    
+
+#5 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:178 (redis-server+0xb8702)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef40a0 by thread T1:
+    
+
+#4 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#5 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZL20__gthread_mutex_lockP15pthread_mutex_t' of size 40 at 0x55bfc0ef40a0 (redis-server+0x0000002fe0a0)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:747 in __gthread_mutex_lock
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef40d8 by thread T2:
+    
+
+#4 rds::TimerQue::BlockPop() /home/jean/mypieces/rds/src/server/timer.cc:28 (redis-server+0x108998)
+    
+
+#5 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:178 (redis-server+0xb8702)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef40d8 by thread T1:
+    
+
+#4 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#5 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZL18__gthread_active_pv' of size 16 at 0x55bfc0ef40d0 (redis-server+0x0000002fe0d8)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:302 in __gthread_active_p
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef40a8 by thread T2:
+    
+
+#4 rds::TimerQue::BlockPop() /home/jean/mypieces/rds/src/server/timer.cc:28 (redis-server+0x108998)
+    
+
+#5 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:178 (redis-server+0xb8702)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef40a8 by thread T1:
+    
+
+#4 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#5 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZL20__gthread_mutex_lockP15pthread_mutex_t' of size 40 at 0x55bfc0ef40a0 (redis-server+0x0000002fe0a8)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:748 in __gthread_mutex_lock
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef40d0 by thread T3:
+    
+
+#0 __gthread_active_p /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:301 (redis-server+0x9d9b9)
+    
+
+    
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef40d0 by thread T1:
+    
+
+#0 __gthread_active_p /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:301 (redis-server+0x9d9d3)
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZL18__gthread_active_pv' of size 16 at 0x55bfc0ef40d0 (redis-server+0x0000002fe0d0)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:301 in __gthread_active_p
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef40c0 by thread T3 (mutexes: write M29):
+    
+
+#0 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:751 (redis-server+0xa35f2)
+    
+
+    
+
+    
+
+#3 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#4 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#5 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#6 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#7 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#9 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef40c0 by thread T1 (mutexes: write M27):
+    
+
+#0 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:751 (redis-server+0xa360c)
+    
+
+    
+
+    
+
+#3 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#4 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#5 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#6 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#7 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#8 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#9 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#10 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZL20__gthread_mutex_lockP15pthread_mutex_t' of size 40 at 0x55bfc0ef40a0 (redis-server+0x0000002fe0c0)
+
+  Mutex M29 (0x7ffd57c04e40) created at:
+    
+    
+
+    
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Mutex M27 (0x7ffd57c04d20) created at:
+    
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:751 in __gthread_mutex_lock
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef3f48 by thread T3 (mutexes: write M29):
+    
+
+    
+
+    
+
+    
+
+#3 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#4 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#5 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#6 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#7 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#9 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef3f48 by thread T1 (mutexes: write M27):
+    
+
+    
+
+    
+
+    
+
+#3 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#4 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#5 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#6 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#7 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#8 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#9 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#10 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt5mutex4lockEv' of size 48 at 0x55bfc0ef3f40 (redis-server+0x0000002fdf48)
+
+  Mutex M29 (0x7ffd57c04e40) created at:
+    
+    
+
+    
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Mutex M27 (0x7ffd57c04d20) created at:
+    
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/std_mutex.h:100 in std::mutex::lock()
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef40b0 by thread T2 (mutexes: write M25):
+    
+
+#4 rds::TimerQue::BlockPop() /home/jean/mypieces/rds/src/server/timer.cc:28 (redis-server+0x108998)
+    
+
+#5 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:178 (redis-server+0xb8702)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef40b0 by thread T1 (mutexes: write M27):
+    
+
+#4 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#5 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZL20__gthread_mutex_lockP15pthread_mutex_t' of size 40 at 0x55bfc0ef40a0 (redis-server+0x0000002fe0b0)
+
+  Mutex M25 (0x7ffd57c04dc8) created at:
+    
+    
+
+  
+#4 rds::TimerQue::Push(std::unique_ptr<rds::Timer, std::default_delete<rds::Timer> >) /home/jean/mypieces/rds/src/server/timer.cc:21 (redis-server+0x1085c0)
+    
+
+#5 rds::Handler::Handle(std::unique_ptr<rds::Timer, std::default_delete<rds::Timer> >) /home/jean/mypieces/rds/src/server/server.cc:257 (redis-server+0xba8e3)
+    
+
+#6 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:33 (redis-server+0x9e3a1)
+    
+
+#7 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Mutex M27 (0x7ffd57c04d20) created at:
+    
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h:749 in __gthread_mutex_lock
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0ef3f60 by thread T3 (mutexes: write M29):
+    
+
+    
+
+    
+
+#2 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0ef3f60 by thread T1 (mutexes: write M27):
+    
+
+    
+
+    
+
+#2 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#3 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#4 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#5 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#6 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#7 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#9 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt5mutex4lockEv' of size 48 at 0x55bfc0ef3f40 (redis-server+0x0000002fdf60)
+
+  Mutex M29 (0x7ffd57c04e40) created at:
+    
+    
+
+    
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Mutex M27 (0x7ffd57c04d20) created at:
+    
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/std_mutex.h:104 in std::mutex::lock()
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efcf70 by thread T2 (mutexes: write M25):
+    
+
+    
+
+    
+
+#2 rds::TimerQue::BlockPop() /home/jean/mypieces/rds/src/server/timer.cc:28 (redis-server+0x108998)
+    
+
+#3 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:178 (redis-server+0xb8702)
+    
+
+#4 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#5 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#6 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#7 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#9 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efcf70 by thread T1 (mutexes: write M27):
+    
+
+    
+
+    
+
+#2 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#3 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#4 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#5 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#6 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#7 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#8 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#9 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt11unique_lockISt5mutexE4lockEv' of size 72 at 0x55bfc0efcf40 (redis-server+0x000000306f70)
+
+  Mutex M25 (0x7ffd57c04dc8) created at:
+    
+    
+
+  
+#4 rds::TimerQue::Push(std::unique_ptr<rds::Timer, std::default_delete<rds::Timer> >) /home/jean/mypieces/rds/src/server/timer.cc:21 (redis-server+0x1085c0)
+    
+
+#5 rds::Handler::Handle(std::unique_ptr<rds::Timer, std::default_delete<rds::Timer> >) /home/jean/mypieces/rds/src/server/server.cc:257 (redis-server+0xba8e3)
+    
+
+#6 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:33 (redis-server+0x9e3a1)
+    
+
+#7 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Mutex M27 (0x7ffd57c04d20) created at:
+    
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/unique_lock.h:139 in std::unique_lock<std::mutex>::lock()
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efcf78 by thread T3 (mutexes: write M29):
+    
+
+    
+
+#1 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+    
+
+    
+
+#4 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#5 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#6 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#7 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efcf78 by thread T1 (mutexes: write M27):
+    
+
+    
+
+#1 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#2 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt11unique_lockISt5mutexE4lockEv' of size 72 at 0x55bfc0efcf40 (redis-server+0x000000306f78)
+
+  Mutex M29 (0x7ffd57c04e40) created at:
+    
+    
+
+    
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Mutex M27 (0x7ffd57c04d20) created at:
+    
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/unique_lock.h:140 in std::unique_lock<std::mutex>::lock()
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efe798 by thread T2 (mutexes: write M25):
+    
+
+    
+
+#1 rds::TimerQue::BlockPop() /home/jean/mypieces/rds/src/server/timer.cc:28 (redis-server+0x108998)
+    
+
+#2 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:178 (redis-server+0xb8702)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efe798 by thread T1 (mutexes: write M27):
+    
+
+    
+
+#1 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#2 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#3 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+    
+
+#5 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#6 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#7 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#8 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt11unique_lockISt5mutexEC2ERS0_' of size 48 at 0x55bfc0efe780 (redis-server+0x000000308798)
+
+  Mutex M25 (0x7ffd57c04dc8) created at:
+    
+    
+
+  
+#4 rds::TimerQue::Push(std::unique_ptr<rds::Timer, std::default_delete<rds::Timer> >) /home/jean/mypieces/rds/src/server/timer.cc:21 (redis-server+0x1085c0)
+    
+
+#5 rds::Handler::Handle(std::unique_ptr<rds::Timer, std::default_delete<rds::Timer> >) /home/jean/mypieces/rds/src/server/server.cc:257 (redis-server+0xba8e3)
+    
+
+#6 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:33 (redis-server+0x9e3a1)
+    
+
+#7 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Mutex M27 (0x7ffd57c04d20) created at:
+    
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/unique_lock.h:69 in std::unique_lock<std::mutex>::unique_lock(std::mutex&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0efe7a0 by thread T3 (mutexes: write M29):
+    
+
+    
+
+    
+
+    
+
+#3 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+    
+
+#5 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#6 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0efe7a0 by thread T1 (mutexes: write M27):
+    
+
+    
+
+#1 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+    
+
+    
+
+#4 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#5 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#6 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#7 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Location is global '__gcov0._ZNSt11unique_lockISt5mutexEC2ERS0_' of size 48 at 0x55bfc0efe780 (redis-server+0x0000003087a0)
+
+  Mutex M29 (0x7ffd57c04e40) created at:
+    
+    
+
+    
+
+#5 rds::Handler::HandleClient(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:198 (redis-server+0xb91f8)
+    
+
+#6 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#7 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#8 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#9 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#10 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#11 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Mutex M27 (0x7ffd57c04d20) created at:
+    
+    
+
+    
+
+#5 rds::CommandQue::BlockPop() <null> (redis-server+0xc07cc)
+    
+
+#6 rds::Handler::ExecCommand(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:158 (redis-server+0xb7d9d)
+    
+
+#7 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#8 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#9 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#10 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#11 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#12 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Thread T3 (tid=4204, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:188 (redis-server+0xb8b1c)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+  Thread T1 (tid=4202, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:186 (redis-server+0xb8a60)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/unique_lock.h:70 in std::unique_lock<std::mutex>::unique_lock(std::mutex&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0eebd00 by thread T2:
+    
+
+#4 void std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) <null> (redis-server+0xae215)
+    
+
+#5 std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >& std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::emplace_back<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) <null> (redis-server+0xab627)
+    
+
+#6 std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::push_back(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) /usr/include/c++/11/bits/stl_vector.h:1204 (redis-server+0xa7e76)
+    
+
+#7 rds::MainLoop::DatabaseFork[abi:cxx11]() const /home/jean/mypieces/rds/src/server/loop.cc:71 (redis-server+0x9f794)
+    
+
+#8 operator() /home/jean/mypieces/rds/src/server/loop.cc:27 (redis-server+0x9daa3)
+    
+
+#9 __invoke_impl<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:61 (redis-server+0xa2bad)
+    
+
+#10 __invoke_r<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:116 (redis-server+0xa2371)
+    
+
+#11 _M_invoke /usr/include/c++/11/bits/std_function.h:291 (redis-server+0xa1c05)
+    
+
+#12 std::function<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ()>::operator()() const /usr/include/c++/11/bits/std_function.h:590 (redis-server+0x10a236)
+    
+
+#13 rds::RdbTimer::Exec() /home/jean/mypieces/rds/src/server/timer.cc:13 (redis-server+0x107f4e)
+    
+
+#14 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:179 (redis-server+0xb8790)
+    
+
+#15 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#16 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#17 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#18 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#19 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#20 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0eebd00 by main thread:
+    
+    
+
+#5 rds::Server::Wait(int) /home/jean/mypieces/rds/src/server/server.cc:97 (redis-server+0xb6599)
+    
+
+#6 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:49 (redis-server+0x9ed8e)
+    
+
+#7 main /home/jean/mypieces/rds/redis-server.cc:12 (redis-server+0x79e3e)
+
+  Location is global '__gcov0._ZSt3minImERKT_S2_S2_' of size 24 at 0x55bfc0eebd00 (redis-server+0x0000002f5d00)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/stl_algobase.h:230 in unsigned long const& std::min<unsigned long>(unsigned long const&, unsigned long const&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0eebd10 by thread T2:
+    
+
+#0 unsigned long const& std::min<unsigned long>(unsigned long const&, unsigned long const&) /usr/include/c++/11/bits/stl_algobase.h:237 (redis-server+0x926e6)
+    
+
+    
+
+    
+
+#3 void std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) <null> (redis-server+0xae215)
+    
+    
+
+#5 std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::push_back(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) /usr/include/c++/11/bits/stl_vector.h:1204 (redis-server+0xa7e76)
+    
+
+#6 rds::MainLoop::DatabaseFork[abi:cxx11]() const /home/jean/mypieces/rds/src/server/loop.cc:71 (redis-server+0x9f794)
+    
+
+#7 operator() /home/jean/mypieces/rds/src/server/loop.cc:27 (redis-server+0x9daa3)
+    
+
+#8 __invoke_impl<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:61 (redis-server+0xa2bad)
+    
+
+#9 __invoke_r<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:116 (redis-server+0xa2371)
+    
+
+#10 _M_invoke /usr/include/c++/11/bits/std_function.h:291 (redis-server+0xa1c05)
+    
+
+#11 std::function<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ()>::operator()() const /usr/include/c++/11/bits/std_function.h:590 (redis-server+0x10a236)
+    
+
+#12 rds::RdbTimer::Exec() /home/jean/mypieces/rds/src/server/timer.cc:13 (redis-server+0x107f4e)
+    
+
+#13 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:179 (redis-server+0xb8790)
+    
+
+#14 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#15 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#16 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#17 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#18 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#19 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0eebd10 by main thread:
+    
+
+#4 rds::Server::Wait(int) /home/jean/mypieces/rds/src/server/server.cc:97 (redis-server+0xb6599)
+    
+
+#5 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:49 (redis-server+0x9ed8e)
+    
+
+#6 main /home/jean/mypieces/rds/redis-server.cc:12 (redis-server+0x79e3e)
+
+  Location is global '__gcov0._ZSt3minImERKT_S2_S2_' of size 24 at 0x55bfc0eebd00 (redis-server+0x0000002f5d10)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/stl_algobase.h:237 in unsigned long const& std::min<unsigned long>(unsigned long const&, unsigned long const&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0eec4a0 by thread T2:
+    
+
+#0 unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&) /usr/include/c++/11/bits/stl_algobase.h:254 (redis-server+0x8f04d)
+
+#5 rds::MainLoop::DatabaseFork[abi:cxx11]() const /home/jean/mypieces/rds/src/server/loop.cc:71 (redis-server+0x9f794)
+    
+
+#6 operator() /home/jean/mypieces/rds/src/server/loop.cc:27 (redis-server+0x9daa3)
+    
+
+#7 __invoke_impl<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:61 (redis-server+0xa2bad)
+    
+
+#8 __invoke_r<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:116 (redis-server+0xa2371)
+    
+
+#9 _M_invoke /usr/include/c++/11/bits/std_function.h:291 (redis-server+0xa1c05)
+    
+
+#10 std::function<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ()>::operator()() const /usr/include/c++/11/bits/std_function.h:590 (redis-server+0x10a236)
+    
+
+#11 rds::RdbTimer::Exec() /home/jean/mypieces/rds/src/server/timer.cc:13 (redis-server+0x107f4e)
+    
+
+#12 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:179 (redis-server+0xb8790)
+    
+
+#13 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#14 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#15 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#16 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#17 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#18 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0eec4a0 by main thread:
+    
+
+#4 rds::Server::Wait(int) /home/jean/mypieces/rds/src/server/server.cc:97 (redis-server+0xb6599)
+    
+
+#5 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:49 (redis-server+0x9ed8e)
+    
+
+#6 main /home/jean/mypieces/rds/redis-server.cc:12 (redis-server+0x79e3e)
+
+  Location is global '__gcov0._ZSt3maxImERKT_S2_S2_' of size 24 at 0x55bfc0eec4a0 (redis-server+0x0000002f64a0)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/stl_algobase.h:254 in unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0eec4a8 by thread T2:
+    
+
+#0 unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&) /usr/include/c++/11/bits/stl_algobase.h:259 (redis-server+0x8f0a8)
+
+#5 rds::MainLoop::DatabaseFork[abi:cxx11]() const /home/jean/mypieces/rds/src/server/loop.cc:71 (redis-server+0x9f794)
+    
+
+#6 operator() /home/jean/mypieces/rds/src/server/loop.cc:27 (redis-server+0x9daa3)
+    
+
+#7 __invoke_impl<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:61 (redis-server+0xa2bad)
+    
+
+#8 __invoke_r<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:116 (redis-server+0xa2371)
+    
+
+#9 _M_invoke /usr/include/c++/11/bits/std_function.h:291 (redis-server+0xa1c05)
+    
+
+#10 std::function<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ()>::operator()() const /usr/include/c++/11/bits/std_function.h:590 (redis-server+0x10a236)
+    
+
+#11 rds::RdbTimer::Exec() /home/jean/mypieces/rds/src/server/timer.cc:13 (redis-server+0x107f4e)
+    
+
+#12 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:179 (redis-server+0xb8790)
+    
+
+#13 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#14 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#15 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#16 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#17 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#18 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0eec4a8 by main thread:
+    
+
+#4 rds::Server::Wait(int) /home/jean/mypieces/rds/src/server/server.cc:97 (redis-server+0xb6599)
+    
+
+#5 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:49 (redis-server+0x9ed8e)
+    
+
+#6 main /home/jean/mypieces/rds/redis-server.cc:12 (redis-server+0x79e3e)
+
+  Location is global '__gcov0._ZSt3maxImERKT_S2_S2_' of size 24 at 0x55bfc0eec4a0 (redis-server+0x0000002f64a8)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/stl_algobase.h:259 in unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0eec4b0 by thread T2:
+    
+
+#4 rds::MainLoop::DatabaseFork[abi:cxx11]() const /home/jean/mypieces/rds/src/server/loop.cc:71 (redis-server+0x9f794)
+    
+
+#5 operator() /home/jean/mypieces/rds/src/server/loop.cc:27 (redis-server+0x9daa3)
+    
+
+#6 __invoke_impl<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:61 (redis-server+0xa2bad)
+    
+
+#7 __invoke_r<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:116 (redis-server+0xa2371)
+    
+
+#8 _M_invoke /usr/include/c++/11/bits/std_function.h:291 (redis-server+0xa1c05)
+    
+
+#9 std::function<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ()>::operator()() const /usr/include/c++/11/bits/std_function.h:590 (redis-server+0x10a236)
+    
+
+#10 rds::RdbTimer::Exec() /home/jean/mypieces/rds/src/server/timer.cc:13 (redis-server+0x107f4e)
+    
+
+#11 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:179 (redis-server+0xb8790)
+    
+
+#12 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#13 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#14 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#15 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#16 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#17 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0eec4b0 by main thread:
+    
+
+#0 unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&) /usr/include/c++/11/bits/stl_algobase.h:261 (redis-server+0x8f101)
+    
+
+    
+
+    
+
+#3 rds::Server::Wait(int) /home/jean/mypieces/rds/src/server/server.cc:97 (redis-server+0xb6599)
+    
+
+#4 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:49 (redis-server+0x9ed8e)
+    
+
+#5 main /home/jean/mypieces/rds/redis-server.cc:12 (redis-server+0x79e3e)
+
+  Location is global '__gcov0._ZSt3maxImERKT_S2_S2_' of size 24 at 0x55bfc0eec4a0 (redis-server+0x0000002f64b0)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/bits/stl_algobase.h:261 in unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0eed3f0 by thread T2:
+    
+
+#0 operator new(unsigned long, void*) /usr/include/c++/11/new:175 (redis-server+0x8b2a9)
+    
+
+    
+
+    
+
+#3 void std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) <null> (redis-server+0xae3bf)
+    
+    
+
+#5 std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::push_back(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) /usr/include/c++/11/bits/stl_vector.h:1204 (redis-server+0xa7e76)
+    
+
+#6 rds::MainLoop::DatabaseFork[abi:cxx11]() const /home/jean/mypieces/rds/src/server/loop.cc:71 (redis-server+0x9f794)
+    
+
+#7 operator() /home/jean/mypieces/rds/src/server/loop.cc:27 (redis-server+0x9daa3)
+    
+
+#8 __invoke_impl<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:61 (redis-server+0xa2bad)
+    
+
+#9 __invoke_r<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:116 (redis-server+0xa2371)
+    
+
+#10 _M_invoke /usr/include/c++/11/bits/std_function.h:291 (redis-server+0xa1c05)
+    
+
+#11 std::function<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ()>::operator()() const /usr/include/c++/11/bits/std_function.h:590 (redis-server+0x10a236)
+    
+
+#12 rds::RdbTimer::Exec() /home/jean/mypieces/rds/src/server/timer.cc:13 (redis-server+0x107f4e)
+    
+
+#13 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:179 (redis-server+0xb8790)
+    
+
+#14 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#15 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#16 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#17 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#18 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#19 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0eed3f0 by main thread:
+    
+
+#0 operator new(unsigned long, void*) /usr/include/c++/11/new:175 (redis-server+0x8b2c3)
+    
+
+    
+
+#2 epoll_event* std::__uninitialized_default_n_1<true>::__uninit_default_n<epoll_event*, unsigned long>(epoll_event*, unsigned long) /usr/include/c++/11/bits/stl_uninitialized.h:601 (redis-server+0xef02f)
+    
+
+#3 epoll_event* std::__uninitialized_default_n<epoll_event*, unsigned long>(epoll_event*, unsigned long) <null> (redis-server+0xe6067)
+    
+
+#4 epoll_event* std::__uninitialized_default_n_a<epoll_event*, unsigned long, epoll_event>(epoll_event*, unsigned long, std::allocator<epoll_event>&) /usr/include/c++/11/bits/stl_uninitialized.h:704 (redis-server+0xda892)
+    
+
+#5 std::vector<epoll_event, std::allocator<epoll_event> >::_M_default_append(unsigned long) /usr/include/c++/11/bits/vector.tcc:640 (redis-server+0xcff68)
+    
+
+#6 std::vector<epoll_event, std::allocator<epoll_event> >::resize(unsigned long) /usr/include/c++/11/bits/stl_vector.h:940 (redis-server+0xc6272)
+    
+
+#7 rds::Server::Wait(int) /home/jean/mypieces/rds/src/server/server.cc:97 (redis-server+0xb6599)
+    
+
+#8 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:49 (redis-server+0x9ed8e)
+    
+
+#9 main /home/jean/mypieces/rds/redis-server.cc:12 (redis-server+0x79e3e)
+
+  Location is global '__gcov0._ZnwmPv' of size 16 at 0x55bfc0eed3f0 (redis-server+0x0000002f73f0)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/new:175 in operator new(unsigned long, void*)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=4200)
+  Read of size 8 at 0x55bfc0eed3f8 by thread T2:
+    
+
+#0 operator new(unsigned long, void*) /usr/include/c++/11/new:175 (redis-server+0x8b2e2)
+
+#5 rds::MainLoop::DatabaseFork[abi:cxx11]() const /home/jean/mypieces/rds/src/server/loop.cc:71 (redis-server+0x9f794)
+    
+
+#6 operator() /home/jean/mypieces/rds/src/server/loop.cc:27 (redis-server+0x9daa3)
+    
+
+#7 __invoke_impl<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:61 (redis-server+0xa2bad)
+    
+
+#8 __invoke_r<std::vector<std::__cxx11::basic_string<char> >, rds::MainLoop::MainLoop(const rds::RedisConf&)::<lambda()>&> /usr/include/c++/11/bits/invoke.h:116 (redis-server+0xa2371)
+    
+
+#9 _M_invoke /usr/include/c++/11/bits/std_function.h:291 (redis-server+0xa1c05)
+    
+
+#10 std::function<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ()>::operator()() const /usr/include/c++/11/bits/std_function.h:590 (redis-server+0x10a236)
+    
+
+#11 rds::RdbTimer::Exec() /home/jean/mypieces/rds/src/server/timer.cc:13 (redis-server+0x107f4e)
+    
+
+#12 rds::Handler::ExecTimer(rds::Handler*) /home/jean/mypieces/rds/src/server/server.cc:179 (redis-server+0xb8790)
+    
+
+#13 void std::__invoke_impl<void, void (*)(rds::Handler*), rds::Handler*>(std::__invoke_other, void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:61 (redis-server+0x1076de)
+    
+
+#14 std::__invoke_result<void (*)(rds::Handler*), rds::Handler*>::type std::__invoke<void (*)(rds::Handler*), rds::Handler*>(void (*&&)(rds::Handler*), rds::Handler*&&) /usr/include/c++/11/bits/invoke.h:96 (redis-server+0x1072b9)
+    
+
+#15 void std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::_M_invoke<0ul, 1ul>(std::_Index_tuple<0ul, 1ul>) /usr/include/c++/11/bits/std_thread.h:253 (redis-server+0x106e2f)
+    
+
+#16 std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> >::operator()() /usr/include/c++/11/bits/std_thread.h:260 (redis-server+0x106a86)
+    
+
+#17 std::thread::_State_impl<std::thread::_Invoker<std::tuple<void (*)(rds::Handler*), rds::Handler*> > >::_M_run() /usr/include/c++/11/bits/std_thread.h:211 (redis-server+0x106792)
+    
+
+#18 <null> <null> (libstdc++.so.6+0xdc2b2)
+
+  Previous write of size 8 at 0x55bfc0eed3f8 by main thread:
+    
+
+#0 operator new(unsigned long, void*) /usr/include/c++/11/new:175 (redis-server+0x8b2fc)
+    
+
+#1 epoll_event* std::__uninitialized_default_n_1<true>::__uninit_default_n<epoll_event*, unsigned long>(epoll_event*, unsigned long) /usr/include/c++/11/bits/stl_uninitialized.h:601 (redis-server+0xef02f)
+    
+
+#2 epoll_event* std::__uninitialized_default_n<epoll_event*, unsigned long>(epoll_event*, unsigned long) <null> (redis-server+0xe6067)
+    
+
+#3 epoll_event* std::__uninitialized_default_n_a<epoll_event*, unsigned long, epoll_event>(epoll_event*, unsigned long, std::allocator<epoll_event>&) /usr/include/c++/11/bits/stl_uninitialized.h:704 (redis-server+0xda892)
+    
+    
+
+#5 std::vector<epoll_event, std::allocator<epoll_event> >::resize(unsigned long) /usr/include/c++/11/bits/stl_vector.h:940 (redis-server+0xc6272)
+    
+
+#6 rds::Server::Wait(int) /home/jean/mypieces/rds/src/server/server.cc:97 (redis-server+0xb6599)
+    
+
+#7 rds::MainLoop::Run() /home/jean/mypieces/rds/src/server/loop.cc:49 (redis-server+0x9ed8e)
+    
+
+#8 main /home/jean/mypieces/rds/redis-server.cc:12 (redis-server+0x79e3e)
+
+  Location is global '__gcov0._ZnwmPv' of size 16 at 0x55bfc0eed3f0 (redis-server+0x0000002f73f8)
+
+  Thread T2 (tid=4203, running) created by main thread at:
+
+#2 rds::Handler::Run() /home/jean/mypieces/rds/src/server/server.cc:187 (redis-server+0xb8abe)
+    
+
+#3 rds::MainLoop::MainLoop(rds::RedisConf const&) /home/jean/mypieces/rds/src/server/loop.cc:41 (redis-server+0x9e6a3)
+    
+
+#4 main /home/jean/mypieces/rds/redis-server.cc:6 (redis-server+0x79d43)
+
+SUMMARY: ThreadSanitizer: data race /usr/include/c++/11/new:175 in operator new(unsigned long, void*)

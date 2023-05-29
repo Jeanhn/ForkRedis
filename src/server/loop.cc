@@ -11,6 +11,8 @@ namespace rds
         auto dbfile = file_manager_.LoadAndExport();
         file_manager_.Truncate();
 
+        SetGlobalLoop(this);
+
         if (conf.enable_aof_)
         {
             // databases_ = Aof::Load(&dbfile);
@@ -21,7 +23,6 @@ namespace rds
             {
                 EnCompress();
             }
-            databases_ = RDBLoad(&dbfile);
             RdbTimer timer;
             timer.generator_ = [this]()
             { return this->DatabaseFork(); };
@@ -31,6 +32,7 @@ namespace rds
             timer.after_ = conf.frequence_.every_n_sec_ * 1000'000 / conf.frequence_.save_n_times_;
 
             handler_.Handle(std::make_unique<RdbTimer>(timer));
+            databases_ = RDBLoad(&dbfile);
         }
 
         if (databases_.empty())

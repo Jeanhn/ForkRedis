@@ -264,6 +264,10 @@ namespace rds
             {
                 ret.obj_name_ = source[1].string_value();
                 ret.valid_ = true;
+                if (source.size() == 3)
+                {
+                    ret.pswd_ = source[2].string_value();
+                }
             }
         }
         return ret;
@@ -283,8 +287,9 @@ namespace rds
             ret.valid_ = false;
             return ret;
         }
-        ret.ip_ = info.assign(info.cbegin(), devide);
-        auto port = info.assign(devide + 1, info.cend());
+        std::copy(info.cbegin(), devide, std::back_inserter(ret.ip_));
+        std::string port;
+        std::copy(devide + 1, info.cend(), std::back_inserter(port));
         ret.port_ = std::stoi(port);
         return ret;
     }
@@ -1223,7 +1228,15 @@ namespace rds
             {
                 return {};
             }
-            client->SetDB(GetGlobalLoop().GetDB(intval.value()));
+            if (pswd_.has_value() && pswd_.value() == GetPassword())
+            {
+                client->SetDB(GetGlobalLoop().SuGetDB(intval.value()));
+            }
+            else
+            {
+                client->SetDB(GetGlobalLoop().GetDB(intval.value()));
+            }
+            return {{"Select: " + std::to_string(client->GetDB()->Number())}};
         }
         else if (command_ == "SHOW")
         {
@@ -1247,11 +1260,17 @@ namespace rds
         }
         else if (command_ == "CREATE")
         {
+            auto client = cli_.lock();
+            if (!client)
+            {
+                return {};
+            }
             int new_db_num = GetGlobalLoop().CreateDB();
             if (new_db_num == -1)
             {
                 return {{" "}};
             }
+            // client->SetDB(GetGlobalLoop().GetDB(new_db_num));
             return {{std::to_string(new_db_num)}};
         }
 
@@ -1260,32 +1279,34 @@ namespace rds
 
     auto ServerCommand::Exec() -> std::optional<json11::Json::array>
     {
+        auto client = cli_.lock();
+        if (!client)
+        {
+            return {};
+        }
         if (command_ == "FORK")
         {
-            auto client = cli_.lock();
-            if (!client)
-            {
-                return {};
-            }
             sockaddr_in sa;
             sa.sin_addr.s_addr = inet_addr(ip_.data());
             sa.sin_family = AF_INET;
             sa.sin_port = htons(port_);
 
-            int virtual_client = socket(AF_INET, SOCK_STREAM, 0);
-            if (virtual_client == -1)
+            int another_server = socket(AF_INET, SOCK_STREAM, 0);
+            if (another_server == -1)
             {
                 return {{" "}};
             }
-            int ret = connect(virtual_client, reinterpret_cast<sockaddr *>(&sa), sizeof(sa));
+            int ret = connect(another_server, reinterpret_cast<sockaddr *>(&sa), sizeof(sa));
             if (ret == -1)
             {
-                return {{" "}};
+                return {{"Connect faied: " + ip_ + ':' + std::to_string(port_)}};
             }
             extern void SetNonBlock(int fd);
-            SetNonBlock(virtual_client);
+            SetNonBlock(another_server);
 
-            auto cmds = client->GetDB()->Fork();
+            std::deque<std::string> cmds = client->GetDB()->Fork();
+            cmds.push_front("STARTFORKING" + ' ' + GetPassword());
+            cmds.push_back("ENDFORKING");
 
             for (auto &cmd : cmds)
             {
@@ -1294,7 +1315,7 @@ namespace rds
                 auto end = beg + req.size();
                 while (beg != end)
                 {
-                    int len = write(virtual_client, beg, std::distance(beg, end));
+                    int len = write(another_server, beg, std::distance(beg, end));
                     if (len == -1)
                     {
                         if (errno == EAGAIN)
@@ -1303,13 +1324,20 @@ namespace rds
                         }
                         else
                         {
-                            return {{" "}};
+                            return {{"Write Error"}};
                         }
                     }
                     beg += len;
                 }
             }
-            close(virtual_client);
+            close(another_server);
+        }
+        else if (command_ == "STARTFORKING")
+        {
+        }
+        else if (command_ == "ENDFORKING")
+        {
+            client->Logout();
         }
         return {{"OK"}};
     }

@@ -2,16 +2,15 @@
 
 ## Surport:
 ### consistence:
-- RDB Persistence
-- Expire key-value-objects
+- RDB/AOF Persistence
 - RDB file compress
-- Auto delete expired kv-obj when loading
+- Auto delete expired kv-obj when loading database file
 ### time event:
 - Any time event can be triggered with no delay
 ### concurrency:
 - Parallel read and concurrent write
 ### distribution:
-- Data migrate to another server
+<!-- - Data migrate to another server -->
 
 ---
 
@@ -79,6 +78,8 @@
     cmake .. -DCMAKE_BUILD_TYPE=RELEASE
     ## a server and a client will be built
 
+building:
+    data migration
 
 to add: 
     aof

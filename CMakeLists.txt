@@ -22,10 +22,12 @@ target_link_libraries(redis-server PRIVATE redis)
 
 add_executable(redis-cli redis-cli.cc)
 
-target_link_libraries(redis-cli PRIVATE json11.a)
+target_link_libraries(redis-cli PRIVATE redis)
 
-target_link_directories(redis-cli PRIVATE /home/jean/mypieces/rds/third/install/usr/lib/x86_64-linux-gnu)
+# target_link_libraries(redis-cli PRIVATE json11.a)
 
-target_include_directories(redis-cli PRIVATE /home/jean/mypieces/rds/third/install/usr/include/x86_64-linux-gnu)
+# target_link_directories(redis-cli PRIVATE /home/jean/mypieces/rds/third/install/usr/lib/x86_64-linux-gnu)
+
+# target_include_directories(redis-cli PRIVATE /home/jean/mypieces/rds/third/install/usr/include/x86_64-linux-gnu)
 
 

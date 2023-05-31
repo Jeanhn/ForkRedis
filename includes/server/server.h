@@ -18,12 +18,13 @@ namespace rds
 
     class ClientInfo
     {
+        friend void AOFLoad(const std::string &ip, short port, std::deque<char> *source);
 #ifdef NDEBUG
     private:
 #else
     public:
 #endif
-        const int fd_;
+        int fd_;
         Server *server_;
         Db *database_;
 
@@ -76,6 +77,8 @@ namespace rds
     class Handler
     {
     private:
+        const RedisConf conf_;
+
         std::atomic_bool running_{false};
 
         CommandQue cmd_que_;
@@ -98,6 +101,7 @@ namespace rds
         void Handle(std::unique_ptr<Timer> timer);
         void Stop();
         Handler(int io_thread_num);
+        Handler(const RedisConf &conf);
         CLASS_DECLARE_uncopyable(Handler);
     };
 

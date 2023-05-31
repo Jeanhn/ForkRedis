@@ -6,6 +6,7 @@
 #include <objects/str.h>
 #include <map>
 #include <unordered_map>
+#include <json11.hpp>
 
 namespace rds
 {
@@ -77,10 +78,12 @@ namespace rds
     public:
 #endif
         mutable std::shared_mutex latch_;
-        static int number;
         constexpr static char SELECT_DB_ = 's';
         int number_;
         std::unordered_map<Str, std::shared_ptr<KeyValue>, decltype(&StrHash)> key_value_map_{0xff, StrHash};
+
+        std::mutex aof_mtx_;
+        std::deque<char> aof_cache_;
 
     public:
         auto NewStr(const Str &) -> std::shared_ptr<Object>;
@@ -104,10 +107,17 @@ namespace rds
 
         auto Number() const -> int;
 
-        auto Fork() -> std::vector<std::string>;
+        auto Fork() -> std::deque<std::string>;
+
+        void AppendAOF(const json11::Json::array &request);
+
+        auto ExportAOF() -> std::string;
+
+        void LoadAOF(std::deque<char> *source);
 
         Db();
-        ~Db() = default;
+        Db(int db_number);
+        ~Db();
     };
 
 } // namespace rds

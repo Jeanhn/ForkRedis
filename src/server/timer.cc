@@ -16,6 +16,17 @@ namespace rds
         hdlr_->Handle(std::make_unique<RdbTimer>(*this));
     }
 
+    void AofTimer::Exec()
+    {
+        auto src = generator_();
+        AOFSave(std::move(src), fm_);
+        expire_time_us_ = UsTime() + after_;
+        if (every_sec_)
+        {
+            hdlr_->Handle(std::make_unique<AofTimer>(*this));
+        }
+    }
+
     void TimerQue::Push(std::unique_ptr<Timer> timer)
     {
         std::lock_guard<std::mutex> lg(mtx_);

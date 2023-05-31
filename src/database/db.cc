@@ -7,6 +7,7 @@
 #include <util.h>
 #include <server/timer.h>
 #include <server/loop.h>
+#include <stack>
 
 namespace rds
 {
@@ -149,8 +150,36 @@ namespace rds
  */
 namespace rds
 {
-    int Db::number = 0;
-    Db::Db() : number_(number++) {}
+    static std::mutex smtx;
+    static std::unordered_map<int, int> num_hash;
+    static int number_source = 0;
+    Db::Db()
+    {
+        std::lock_guard lg(smtx);
+        while (num_hash[number_source])
+        {
+            number_source++;
+        }
+        num_hash[number_source] = 1;
+        number_ = number_source;
+    }
+
+    Db::Db(int db_number)
+    {
+        std::lock_guard lg(smtx);
+        while (num_hash[db_number])
+        {
+            db_number++;
+        }
+        num_hash[db_number] = 1;
+        number_ = db_number;
+    }
+
+    Db::~Db()
+    {
+        std::lock_guard lg(smtx);
+        num_hash[number_source] = 0;
+    }
 
     auto Db::Number() const -> int
     {
@@ -304,14 +333,42 @@ namespace rds
         }
     }
 
-    auto Db::Fork() -> std::vector<std::string>
+    auto Db::Fork() -> std::deque<std::string>
     {
-        std::vector<std::string> ret;
+        std::deque<std::string> ret;
+        ret.push_back("SELECT " + std::to_string(number_) + " " + GetPassword());
         ReadGuard rg(latch_);
         for (auto &kv : key_value_map_)
         {
             ret.push_back(kv.second->Fork());
         }
         return ret;
+    }
+
+    void Db::AppendAOF(const json11::Json::array &request)
+    {
+        auto req_dump = json11::Json(request).dump();
+        std::lock_guard lg(aof_mtx_);
+        std::copy(req_dump.cbegin(), req_dump.cend(), std::back_inserter(aof_cache_));
+    }
+
+    auto Db::ExportAOF() -> std::string
+    {
+        std::string select_cmd("SELECT " + std::to_string(number_) + " " + GetPassword());
+        auto sel_req = RawCommandToRequest(select_cmd);
+        std::string ret = json11::Json(sel_req).dump();
+        std::lock_guard lg(aof_mtx_);
+        if (aof_cache_.empty())
+        {
+            return {};
+        }
+        ret.reserve(aof_cache_.size());
+        std::copy(aof_cache_.cbegin(), aof_cache_.cend(), std::back_inserter(ret));
+        aof_cache_.clear();
+        return ret;
+    }
+
+    void LoadAOF(std::deque<char> *source)
+    {
     }
 }

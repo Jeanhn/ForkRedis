@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstring>
 #include <atomic>
+#include <util.h>
 auto RawCommandToRequest(const std::string &raw) -> json11::Json::array
 {
     auto it = raw.cbegin();
@@ -15,7 +16,7 @@ auto RawCommandToRequest(const std::string &raw) -> json11::Json::array
     {
         return (c >= '0' && c <= '9') ||
                (c >= 'a' && c <= 'z') ||
-               (c >= 'A' && c <= 'Z') || (c == '-');
+               (c >= 'A' && c <= 'Z') || (c == '-') || (c == '.') || (c == ':');
     };
     auto nextToken = [&raw, &it, &isTokenMember]() mutable -> std::string
     {
@@ -91,6 +92,19 @@ void Pressure()
 
 void ClientEnd()
 {
+    rds::RedisConf conf;
+    rds::Log("Loading config file...");
+    auto c = rds::LoadConf();
+    if (!c.has_value())
+    {
+        rds::Log("Set defualt config");
+        conf = rds::DefaultConf();
+    }
+    else
+    {
+        conf = c.value();
+    }
+    conf.Print();
     std::cout << "connecting..." << std::endl;
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd == -1)
@@ -98,9 +112,9 @@ void ClientEnd()
         throw std::runtime_error("socket");
     }
     sockaddr_in sa;
-    sa.sin_addr.s_addr = inet_addr("127.0.0.1");
+    sa.sin_addr.s_addr = inet_addr(conf.ip_.data());
     sa.sin_family = AF_INET;
-    sa.sin_port = htons(8080);
+    sa.sin_port = htons(conf.port_);
     int ret = connect(fd, reinterpret_cast<sockaddr *>(&sa), sizeof(sa));
     if (ret == -1)
     {

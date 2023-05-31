@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <thread>
 #include <condition_variable>
+#include <server/loop.h>
 
 namespace rds
 {
@@ -36,18 +37,6 @@ namespace rds
         epoll_ctl(epfd_, EPOLL_CTL_ADD, listen_fd_, &levt);
 
         Log("Server runs successfully on: ", ip, ':', port);
-
-        // Log("Loading databases...");
-        // auto dbfile = file_manager_.LoadAndExport();
-        // file_manager_.Truncate();
-
-        // databases_ = rds::Rdb::Load(&dbfile);
-
-        // if (databases_.empty())
-        // {
-        //     Log("Create a default database");
-        //     databases_.push_back(std::make_unique<Db>());
-        // }
     }
 
     Server::~Server()
@@ -149,7 +138,7 @@ namespace rds
 
 
      */
-    Handler::Handler(int io_thread_num) {}
+    Handler::Handler(const RedisConf &conf) : conf_(conf) {}
 
     void Handler::ExecCommand(Handler *hdlr)
     {
@@ -234,6 +223,15 @@ namespace rds
                     auto reqs = client->ExportMessages();
                     for (auto &req : reqs)
                     {
+                        if (hdlr->conf_.enable_aof_)
+                        {
+                            client->GetDB()->AppendAOF(req);
+                            if (hdlr->conf_.aof_mode_ == "no")
+                            {
+                                auto atmr = std::make_unique<AofTimer>(GetGlobalLoop().GetAOFTimer());
+                                hdlr->tmr_que_.Push(std::move(atmr));
+                            }
+                        }
                         auto cmd = RequestToCommandExec(client, &req);
                         if (cmd)
                         {

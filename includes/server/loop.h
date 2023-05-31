@@ -12,7 +12,7 @@ namespace rds
     class MainLoop
     {
     public:
-        const RedisConf &conf_;
+        const RedisConf conf_;
 
     private:
         std::mutex db_mtx_;
@@ -24,16 +24,33 @@ namespace rds
 
         std::unique_ptr<std::thread> save_thread_;
 
+        RdbTimer rdb_timer_;
+        AofTimer aof_timer_;
+
+        std::optional<std::thread> aof_load_;
+        bool aof_load_flag_{false};
+        std::mutex aof_mtx_;
+        std::condition_variable aof_condv_;
+
     public:
         void Run();
-        auto DatabaseFork() const -> std::vector<std::string>;
+        auto DatabaseSave() const -> std::vector<std::string>;
+        auto DatabaseAppend() const -> std::vector<std::string>;
 
         auto GetDB(int db_number) -> Db *;
         auto CreateDB() -> int;
         auto DropDB(int db_number) -> bool;
         auto ShowDB() -> std::string;
 
+        auto SuGetDB(int db_number) -> Db *;
+
         void EncounterTimer(std::unique_ptr<Timer> timer);
+
+        auto CheckAOFLoad() -> bool;
+        void AOFSyncWait();
+        void AOFSyncNotice();
+        auto GetAOFTimer() -> AofTimer;
+        auto GetRDBTimer() -> RdbTimer;
 
         MainLoop(const RedisConf &conf);
         ~MainLoop() = default;

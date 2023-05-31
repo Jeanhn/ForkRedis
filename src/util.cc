@@ -185,8 +185,10 @@ namespace rds
         conf.enable_aof_ = obj_value["aof"].bool_value();
         conf.frequence_.every_n_sec_ = obj_value["sec"].int_value();
         conf.frequence_.save_n_times_ = obj_value["time"].int_value();
-        conf.mem_size_mbytes_ = obj_value["memsiz"].int_value();
+        conf.mem_size_mbytes_ = obj_value["memsiz_mb"].int_value();
         conf.cpu_num_ = obj_value["cpu"].int_value();
+        conf.password_ = obj_value["password"].string_value();
+        conf.aof_mode_ = obj_value["aof_mode"].string_value();
         return conf;
     }
 
@@ -202,6 +204,22 @@ namespace rds
         conf.frequence_.save_n_times_ = 1;
         conf.mem_size_mbytes_ = 4096;
         conf.cpu_num_ = 2;
+        conf.password_ = "yeah";
         return conf;
+    }
+
+    static std::string password_;
+    static std::mutex pswd_mtx_;
+    auto SetPassword(std::string pswd) -> bool
+    {
+        std::lock_guard lg(pswd_mtx_);
+        password_ = std::move(pswd);
+        return true;
+    }
+
+    auto GetPassword() -> std::string
+    {
+        std::lock_guard lg(pswd_mtx_);
+        return password_;
     }
 }

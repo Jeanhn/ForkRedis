@@ -6,7 +6,10 @@
 
 namespace rds
 {
-    auto AOFLoad(std::deque<char> *source) -> std::list<std::unique_ptr<Db>>;
+    void AOFLoad(const std::string ip, short port, std::deque<char> source);
+
+    void AOFSave(std::vector<std::string> database_sources, FileManager *dump_file);
+
 } // namespace rds
 
 #endif

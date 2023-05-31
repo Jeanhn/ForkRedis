@@ -41,10 +41,19 @@ namespace rds
 
     struct AofTimer : Timer
     {
+        std::function<std::vector<std::string>()> generator_;
+        std::string ip_;
+        short port_;
+        FileManager *fm_;
+
+        std::size_t after_;
         Handler *hdlr_;
-        FileManager *dm_;
+        bool every_sec_{true};
         void Exec();
     };
+
+    auto NewAOFTimer() -> AofTimer;
+    auto NewRDBTimer() -> RdbTimer;
 
     class ClientInfo;
 

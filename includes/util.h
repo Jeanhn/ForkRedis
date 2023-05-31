@@ -159,6 +159,21 @@ namespace rds
         }
     }
 
+    template <typename T, typename... Ts>
+    inline void Logln(T arg, Ts... args)
+    {
+        std::cout << arg;
+        if constexpr (sizeof...(args) != 0)
+        {
+            std::cout << std::endl;
+            Log(args...);
+        }
+        else
+        {
+            std::cout << std::endl;
+        }
+    }
+
     struct RedisConf
     {
         std::string file_name_;
@@ -173,11 +188,31 @@ namespace rds
         } frequence_;
         std::size_t mem_size_mbytes_;
         int cpu_num_;
+        std::string password_;
+        std::string aof_mode_;
+        void Print()
+        {
+            std::cout << "filename: " << file_name_ << '\n'
+                      << "ip: " << ip_ << '\n'
+                      << "port: " << port_ << '\n'
+                      << "compress_: " << compress_ << '\n'
+                      << "aof: " << enable_aof_ << '\n'
+                      << "sec: " << frequence_.every_n_sec_ << '\n'
+                      << "time: " << frequence_.save_n_times_ << '\n'
+                      << "mem size: " << mem_size_mbytes_ << '\n'
+                      << "cpu: " << cpu_num_ << '\n'
+                      << "pass word: " << password_ << '\n'
+                      << "aof mode: " << aof_mode_ << '\n'
+                      << std::endl;
+        }
     };
 
     auto DefaultConf() -> RedisConf;
 
     auto LoadConf() -> std::optional<RedisConf>;
+
+    auto SetPassword(std::string) -> bool;
+    auto GetPassword() -> std::string;
 
 } // namespace rds
 

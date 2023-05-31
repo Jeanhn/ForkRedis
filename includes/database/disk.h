@@ -1,6 +1,7 @@
 #ifndef __DISK_H__
 #define __DISK_H__
 
+#include <mutex>
 #include <deque>
 #include <fstream>
 #include <string>
@@ -11,6 +12,7 @@ namespace rds
     class FileManager
     {
     private:
+        mutable std::mutex mtx_;
         std::string filename_;
 
     public:

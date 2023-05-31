@@ -108,4 +108,8 @@ TEST(Database, Db)
     DbEqual(&cli_db, &db2);
 }
 
+TEST(DB, AOF)
+{
+}
+
 #endif

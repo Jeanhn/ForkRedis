@@ -33,6 +33,7 @@ namespace rds
     class Handler;
     struct CliCommand : CommandBase
     {
+        std::optional<std::string> pswd_;
         auto Exec() -> std::optional<json11::Json::array> override;
         CLASS_DEFAULT_DECLARE(CliCommand);
     };

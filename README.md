@@ -3,17 +3,57 @@
 ## Surport:
 ### consistence:
 - RDB/AOF Persistence
+【RDB或AOF持久化】
 - RDB file compress
+【RDB文件压缩】
 <!-- - AOF file rewrite -->
 - Auto delete expired kv-obj when loading RDB/<!--AOF--> file
+【加载RDB文件时自动删除过期键】
 ### time event:
 - Any time event can be triggered with no delay
+【时间事件无延迟触发】
 ### concurrency:
 - Parallel read and concurrent write
+【并行读操作以及并发写操作】
 ### distribution:
-- Data migrate to another server
+- Data migrate to an another remote server
+【数据可远程迁移至另一服务器】
 
 ---
+## Configfile:redis-conf.json
+***- notice: all field should be written. there is not any of them can be ignored, otherwise the default conf will be loaded instead.配置文件的每个field都不能被省略，否则会加载默认配置***
+### e.g.:
+{
+    "aof": true,
+    "aof_mode": "no"
+    "compress": true,
+    "cpu": 2,
+    "dbfile": "dump.db",
+    "ip": "127.0.0.1",
+    "memsiz_mb": 4096,
+    "password": "yeah",
+    "port": 8080,
+    "sec": 1,
+    "time": 1,
+}
+- aof: if enable aof.
+【是否开启aof】
+- aof_mode: always,no,every_sec
+【aof模式的三种选择】
+- compress: if enable compress in rdb
+【是否开启rdb文件压缩】
+- cpu: io_thread num
+【io线程数】
+- dbfile: database file name
+【db文件名】
+- memsiz_mb: memory limit size. MBytes.
+【内存容积】
+- password: for some high priority ops.
+【更高权限密码】
+- ip & port
+【服务器地址】
+- sec & time: for rdb's save frequency. every [sec] seconds save [time] times.
+【rdb存储频率】
 
 ## Commands:
 ### string commands:
@@ -67,11 +107,12 @@
 - expire [key] [time_period](sec) // remove a kv after n secs
 - when [key] // when will the expiring kv be removed
 ### client manage command
-- select [int-value] // select db whose number is [int-value] 
+- select [int-value] [password] // select db whose number is [int-value] ;
+***if password is right and the db doesn't exist, then create the db***
 - create // create a db
 - drop [int-value] // delete a db (this command has been banned)
 - show // show the db in use, and all dbs exists
-
+- fork [ip:port] // copy data of this db to the address ip:port 
 
 ## build:
     mkdir build
@@ -80,9 +121,10 @@
     ## a server and a client will be built
 
 building:
+    lru-memory-limit
 
 to add: 
-    lru-memory-limit
+    destribute
 
 to test:
 

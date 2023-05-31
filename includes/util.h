@@ -21,6 +21,7 @@
 #include <cassert>
 #include <deque>
 #include <iostream>
+#include <signal.h>
 #define Panic()                         \
     std::cout << __FILE__ << std::endl; \
     std::abort();
@@ -209,7 +210,7 @@ namespace rds
 
     auto DefaultConf() -> RedisConf;
 
-    auto LoadConf() -> std::optional<RedisConf>;
+    auto LoadConf() -> RedisConf;
 
     auto SetPassword(std::string) -> bool;
     auto GetPassword() -> std::string;

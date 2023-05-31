@@ -172,12 +172,15 @@ namespace rds
     void Handler::Run()
     {
         running_ = true;
-        std::thread exec_cmd_(ExecCommand, this);
+        for (int i = 0; i < std::min(conf_.cpu_num_, 3); i++)
+        {
+            std::thread exec_cmd_(ExecCommand, this);
+            std::thread hdl_cli_(HandleClient, this);
+            workers_.push_back(std::move(exec_cmd_));
+            workers_.push_back(std::move(hdl_cli_));
+        }
         std::thread exec_tmr_(ExecTimer, this);
-        std::thread hdl_cli_(HandleClient, this);
-        workers_.push_back(std::move(exec_cmd_));
         workers_.push_back(std::move(exec_tmr_));
-        workers_.push_back(std::move(hdl_cli_));
     }
 
     void Handler::HandleClient(Handler *hdlr)

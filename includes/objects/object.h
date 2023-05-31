@@ -190,6 +190,8 @@ namespace rds
 
         virtual auto Fork(const std::string &key) -> std::string { return {}; };
 
+        // virtual auto Size() -> std::size_t { return 0; }
+
         Object() = default;
         virtual ~Object() = default;
         Object(const Object &) : Object() {}

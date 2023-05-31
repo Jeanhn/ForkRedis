@@ -156,11 +156,16 @@ namespace rds
         }
     }
 
-    auto LoadConf() -> std::optional<RedisConf>
+    auto LoadConf() -> RedisConf
     {
         std::string conf_file;
         std::ifstream ifile_strm;
         ifile_strm.open("redis-conf.json");
+        if (!ifile_strm.is_open())
+        {
+            Log("Error:", "open redis-conf.json");
+            return {};
+        }
         while (!ifile_strm.eof())
         {
             char c;
@@ -174,10 +179,33 @@ namespace rds
         json11::Json conf_obj = json11::Json::parse(conf_file, err);
         if (!err.empty())
         {
-            return {};
+            Log("Error:", "parse redis-conf.json");
+            return DefaultConf();
         }
         RedisConf conf;
+        std::vector<std::string> fields{
+            "dbfile",
+            "ip",
+            "port",
+            "compress",
+            "aof",
+            "aof_mode",
+            "sec",
+            "time",
+            "memsiz_mb",
+            "cpu",
+            "password"};
         auto obj_value = conf_obj.object_items();
+        bool good = true;
+        std::for_each(fields.cbegin(), fields.cend(), [&good, &o = obj_value](const std::string &f) mutable
+                      { if (o.find(f)==o.cend()){
+                Log("redis-conf.json file: ", "no", f);
+                good = false;
+            } });
+        if (!good)
+        {
+            return DefaultConf();
+        }
         conf.file_name_ = obj_value["dbfile"].string_value();
         conf.ip_ = obj_value["ip"].string_value();
         conf.port_ = obj_value["port"].int_value();

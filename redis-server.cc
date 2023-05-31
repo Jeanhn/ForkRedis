@@ -1,19 +1,18 @@
 #include <rds.h>
+#include <signal.h>
+
+void SIGPIPE_Handler(int) {}
+
+inline void SystemInit()
+{
+    signal(SIGPIPE, SIGPIPE_Handler);
+}
 
 int main()
 {
-    rds::RedisConf conf;
+    SystemInit();
     rds::Log("Loading config file...");
-    auto c = rds::LoadConf();
-    if (!c.has_value())
-    {
-        rds::Log("Set defualt config");
-        conf = rds::DefaultConf();
-    }
-    else
-    {
-        conf = c.value();
-    }
+    rds::RedisConf conf = rds::LoadConf();
     conf.Print();
 
     rds::MainLoop loop(conf);

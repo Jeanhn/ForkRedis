@@ -40,6 +40,8 @@ namespace rds
 
         auto Fork(const std::string &key) -> std::string;
 
+        // auto Size() -> std::size_t;
+
         CLASS_DECLARE_special_copy_move(Str);
 
         Str(std::string data);

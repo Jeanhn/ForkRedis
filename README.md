@@ -4,13 +4,14 @@
 ### consistence:
 - RDB/AOF Persistence
 - RDB file compress
-- Auto delete expired kv-obj when loading database file
+<!-- - AOF file rewrite -->
+- Auto delete expired kv-obj when loading RDB/<!--AOF--> file
 ### time event:
 - Any time event can be triggered with no delay
 ### concurrency:
 - Parallel read and concurrent write
 ### distribution:
-<!-- - Data migrate to another server -->
+- Data migrate to another server
 
 ---
 
@@ -79,10 +80,8 @@
     ## a server and a client will be built
 
 building:
-    data migration
 
 to add: 
-    aof
     lru-memory-limit
 
 to test:

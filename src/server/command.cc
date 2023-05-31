@@ -276,6 +276,15 @@ namespace rds
     auto JsonToServerCommand(const json11::Json::array &source) -> ServerCommand
     {
         ServerCommand ret;
+        if (!source.empty())
+        {
+            if (source[0].string_value() == "ENDFORKING")
+            {
+                ret.command_ = "ENDFORKING";
+                ret.valid_ = true;
+                return ret;
+            }
+        }
         if (!JsonToBase(&ret, source))
         {
             return ret;
@@ -307,7 +316,8 @@ namespace rds
         json11::Json::array &req = *request;
         auto isServerCommand = [](const std::string &cmd)
         {
-            return (cmd == "FORK");
+            return (cmd == "FORK" ||
+                    cmd == "ENDFORKING");
         };
         auto isCliCommand = [](const std::string &cmd)
         {
@@ -1270,7 +1280,6 @@ namespace rds
             {
                 return {{" "}};
             }
-            // client->SetDB(GetGlobalLoop().GetDB(new_db_num));
             return {{std::to_string(new_db_num)}};
         }
 
@@ -1290,7 +1299,6 @@ namespace rds
             sa.sin_addr.s_addr = inet_addr(ip_.data());
             sa.sin_family = AF_INET;
             sa.sin_port = htons(port_);
-
             int another_server = socket(AF_INET, SOCK_STREAM, 0);
             if (another_server == -1)
             {
@@ -1305,8 +1313,11 @@ namespace rds
             SetNonBlock(another_server);
 
             std::deque<std::string> cmds = client->GetDB()->Fork();
-            cmds.push_front("STARTFORKING" + ' ' + GetPassword());
             cmds.push_back("ENDFORKING");
+
+            Log("Try forking to:");
+            std::cout << ip_ << ':' << port_ << '\n'
+                      << std::endl;
 
             for (auto &cmd : cmds)
             {
@@ -1318,26 +1329,32 @@ namespace rds
                     int len = write(another_server, beg, std::distance(beg, end));
                     if (len == -1)
                     {
-                        if (errno == EAGAIN)
-                        {
-                            continue;
-                        }
-                        else
+                        if (errno != EAGAIN)
                         {
                             return {{"Write Error"}};
                         }
+                        else
+                        {
+                            continue;
+                        }
                     }
                     beg += len;
+                    Log("Len:", len);
                 }
             }
+            SetNonBlock(another_server);
+            char buf[65535];
+            int len = 65535;
+            while (len != 0 && len != -1)
+            {
+                len = read(another_server, buf, 65535);
+            }
             close(another_server);
-        }
-        else if (command_ == "STARTFORKING")
-        {
         }
         else if (command_ == "ENDFORKING")
         {
             client->Logout();
+            return {{" "}};
         }
         return {{"OK"}};
     }

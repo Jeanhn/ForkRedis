@@ -94,16 +94,7 @@ void ClientEnd()
 {
     rds::RedisConf conf;
     rds::Log("Loading config file...");
-    auto c = rds::LoadConf();
-    if (!c.has_value())
-    {
-        rds::Log("Set defualt config");
-        conf = rds::DefaultConf();
-    }
-    else
-    {
-        conf = c.value();
-    }
+    conf = rds::LoadConf();
     conf.Print();
     std::cout << "connecting..." << std::endl;
     int fd = socket(AF_INET, SOCK_STREAM, 0);

@@ -136,6 +136,7 @@ namespace rds
 
     class Str;
     auto RedisStrToInt(const Str &value) -> std::optional<int>;
+    auto RedisStrToSize(const Str &value) -> std::optional<std::size_t>;
 
     inline void Assert(bool expr, const std::string &info)
     {

@@ -89,6 +89,7 @@ namespace rds
         }
         AOFSyncNotice();
         aof_load_.value().join();
+        WriteGuard wg(db_mtx_);
         if (databases_.empty())
         {
             Log("Create a default database");
@@ -124,6 +125,7 @@ namespace rds
     auto MainLoop::DatabaseSave() const -> std::vector<std::string>
     {
         std::vector<std::string> ret;
+        ReadGuard rg(db_mtx_);
         for (auto &db : databases_)
         {
             auto source = db->Save();
@@ -135,6 +137,7 @@ namespace rds
     auto MainLoop::DatabaseAppend() const -> std::vector<std::string>
     {
         std::vector<std::string> ret;
+        ReadGuard rg(db_mtx_);
         for (auto &db : databases_)
         {
             auto source = db->ExportAOF();
@@ -143,9 +146,25 @@ namespace rds
         return ret;
     }
 
-    auto MainLoop::GetDB(int db_number) -> Db *
+    auto MainLoop::DatabaseForkAll() const -> std::string
     {
-        std::lock_guard lg(db_mtx_);
+        std::string ret;
+        ReadGuard rg(db_mtx_);
+        for (auto &db : databases_)
+        {
+            auto source = db->Fork();
+            while (!source.empty())
+            {
+                ret.append(std::move(source.front()));
+                source.pop_front();
+            }
+        }
+        return ret;
+    }
+
+    auto MainLoop::GetDB(int db_number) const -> Db *
+    {
+        ReadGuard rg(db_mtx_);
         for (auto &db : databases_)
         {
             if (db->Number() == db_number)
@@ -158,7 +177,7 @@ namespace rds
 
     auto MainLoop::CreateDB() -> int
     {
-        std::lock_guard lg(db_mtx_);
+        WriteGuard wg(db_mtx_);
         if (databases_.size() >= 16)
         {
             return -1;
@@ -171,7 +190,7 @@ namespace rds
 
     auto MainLoop::DropDB(int db_number) -> bool
     {
-        std::lock_guard lg(db_mtx_);
+        WriteGuard wg(db_mtx_);
         if (databases_.size() == 1)
         {
             return false;
@@ -187,10 +206,10 @@ namespace rds
         return false;
     }
 
-    auto MainLoop::ShowDB() -> std::string
+    auto MainLoop::ShowDB() const -> std::string
     {
         std::string ret;
-        std::lock_guard lg(db_mtx_);
+        ReadGuard rg(db_mtx_);
         for (auto &db : databases_)
         {
             ret.append(std::to_string(db->Number()));
@@ -201,7 +220,7 @@ namespace rds
 
     auto MainLoop::SuGetDB(int db_number) -> Db *
     {
-        std::lock_guard lg(db_mtx_);
+        WriteGuard wg(db_mtx_);
         for (auto &db : databases_)
         {
             if (db->Number() == db_number)

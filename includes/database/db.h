@@ -95,7 +95,7 @@ namespace rds
         auto Del(const Str &) -> std::size_t;
         auto Get(const Str &) const -> std::weak_ptr<Object>;
 
-        auto Expire(const Str &, std::size_t) -> std::unique_ptr<Timer>;
+        auto ExpireAt(const Str &key, std::size_t time_point_us) -> std::unique_ptr<Timer>;
 
         auto WhenExpire(const Str &) -> std::string;
 
@@ -112,8 +112,6 @@ namespace rds
         void AppendAOF(const json11::Json::array &request);
 
         auto ExportAOF() -> std::string;
-
-        void LoadAOF(std::deque<char> *source);
 
         Db();
         Db(int db_number);

@@ -29,6 +29,13 @@ namespace rds
 
     class Handler;
 
+    struct DbRewriteTimer : Timer
+    {
+        FileManager *fm_;
+        std::string cache_;
+        void Exec() override;
+    };
+
     struct RdbTimer : Timer
     {
         std::function<std::vector<std::string>()> generator_;

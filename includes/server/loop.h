@@ -3,6 +3,7 @@
 #include <server/server.h>
 #include <server/timer.h>
 #include <server/command.h>
+#include <server/handler.h>
 #include <database/db.h>
 #include <database/disk.h>
 #include <database/rdb.h>
@@ -15,7 +16,7 @@ namespace rds
         const RedisConf conf_;
 
     private:
-        std::mutex db_mtx_;
+        mutable std::shared_mutex db_mtx_;
         std::list<std::unique_ptr<Db>> databases_;
 
         Server server_;
@@ -36,11 +37,12 @@ namespace rds
         void Run();
         auto DatabaseSave() const -> std::vector<std::string>;
         auto DatabaseAppend() const -> std::vector<std::string>;
+        auto DatabaseForkAll() const -> std::string;
 
-        auto GetDB(int db_number) -> Db *;
+        auto GetDB(int db_number) const -> Db *;
         auto CreateDB() -> int;
         auto DropDB(int db_number) -> bool;
-        auto ShowDB() -> std::string;
+        auto ShowDB() const -> std::string;
 
         auto SuGetDB(int db_number) -> Db *;
 

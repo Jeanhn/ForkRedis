@@ -120,6 +120,23 @@ namespace rds
         __compress.store(false);
     }
 
+    auto RedisStrToSize(const Str &value) -> std::optional<std::size_t>
+    {
+        auto raw = value.GetRaw();
+        if (raw.empty())
+        {
+            return {};
+        }
+        for (auto c : raw)
+        {
+            if (c < '0' || c > '9')
+            {
+                return {};
+            }
+        }
+        return std::stoull(raw);
+    }
+
     auto RedisStrToInt(const Str &value) -> std::optional<int>
     {
         auto raw = value.GetRaw();

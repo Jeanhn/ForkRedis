@@ -129,7 +129,16 @@ void ClientEnd()
     while (1)
     {
         std::getline(std::cin, input);
-        json11::Json js(RawCommandToRequest(input));
+        auto cmd_arr = RawCommandToRequest(input);
+        if (cmd_arr[0].string_value() == "expire")
+        {
+            if (cmd_arr.size() > 2)
+            {
+                std::size_t expire_point = rds::UsTime() + std::stoul(cmd_arr[2].string_value()) * 1000'000;
+                cmd_arr[2] = std::to_string(expire_point);
+            }
+        }
+        json11::Json js(cmd_arr);
         auto cmd = js.dump();
 #ifndef NDEBUG
         std::cout << "send: " << cmd << std::endl;

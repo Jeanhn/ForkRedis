@@ -18,6 +18,7 @@ namespace rds
 
     void FileManager::Truncate()
     {
+        std::lock_guard lg(mtx_);
         std::filesystem::resize_file(filename_, 0);
     }
 

@@ -6,9 +6,10 @@
 【RDB或AOF持久化】
 - RDB file compress
 【RDB文件压缩】
-<!-- - AOF file rewrite -->
-- Auto delete expired kv-obj when loading RDB/<!--AOF--> file
-【加载RDB文件时自动删除过期键】
+- AOF file rewrite
+【AOF文件重写】
+- Auto delete expired kv-obj when loading RDB/AOF file
+【加载RDB或AOF存储文件时自动删除过期键】
 ### time event:
 - Any time event can be triggered with no delay
 【时间事件无延迟触发】
@@ -125,6 +126,7 @@ building:
 
 to add: 
     destribute
+    aof-rewrite
 
 to test:
 

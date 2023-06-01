@@ -1,4 +1,5 @@
 #include <server/timer.h>
+#include <server/handler.h>
 #include <server/server.h>
 
 namespace rds
@@ -25,6 +26,12 @@ namespace rds
         {
             hdlr_->Handle(std::make_unique<AofTimer>(*this));
         }
+    }
+
+    void DbRewriteTimer::Exec()
+    {
+        fm_->Truncate();
+        fm_->Write(std::move(cache_));
     }
 
     void TimerQue::Push(std::unique_ptr<Timer> timer)

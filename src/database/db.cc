@@ -253,7 +253,7 @@ namespace rds
         return it->second->GetValue();
     }
 
-    auto Db::Expire(const Str &key, std::size_t time_period_us) -> std::unique_ptr<Timer>
+    auto Db::ExpireAt(const Str &key, std::size_t time_point_us) -> std::unique_ptr<Timer>
     {
         ReadGuard wg(latch_);
         auto it = key_value_map_.find(key);
@@ -261,11 +261,10 @@ namespace rds
         {
             return {};
         }
-        auto time_point = UsTime() + time_period_us;
-        it->second->MakeExpireAt(time_point);
+        it->second->MakeExpireAt(time_point_us);
         auto ret = std::make_unique<DbExpireTimer>();
         ret->database_ = this;
-        ret->expire_time_us_ = time_point;
+        ret->expire_time_us_ = time_point_us;
         ret->obj_name_ = key.GetRaw();
         return ret;
     }
@@ -336,11 +335,15 @@ namespace rds
     auto Db::Fork() -> std::deque<std::string>
     {
         std::deque<std::string> ret;
-        ret.push_back("SELECT " + std::to_string(number_) + " " + GetPassword());
+        std::string sel_cmd = "SELECT " + std::to_string(number_) + " " + GetPassword();
+        json11::Json temp = RawCommandToRequest(sel_cmd);
+        ret.push_back(temp.dump());
         ReadGuard rg(latch_);
         for (auto &kv : key_value_map_)
         {
-            ret.push_back(kv.second->Fork());
+            auto raw_cmd = kv.second->Fork();
+            json11::Json cmd_temp = RawCommandToRequest(raw_cmd);
+            ret.push_back(cmd_temp.dump());
         }
         return ret;
     }

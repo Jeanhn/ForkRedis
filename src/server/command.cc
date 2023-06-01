@@ -228,6 +228,15 @@ namespace rds
     auto JsonToDbCommand(const json11::Json::array &source) -> DbCommand
     {
         DbCommand ret;
+        if (!source.empty())
+        {
+            if (source[0].string_value() == "REWRITE")
+            {
+                ret.valid_ = true;
+                ret.command_ = "REWRITE";
+                return ret;
+            }
+        }
         if (!JsonToBase(&ret, source))
         {
             return ret;
@@ -330,7 +339,8 @@ namespace rds
         {
             return (cmd == "DEL" ||
                     cmd == "EXPIRE" ||
-                    cmd == "WHEN");
+                    cmd == "WHEN" ||
+                    cmd == "REWRITE");
         };
         auto isStrCommand = [](const std::string &cmd)
         {
@@ -1195,13 +1205,12 @@ namespace rds
         }
         else if (command_ == "EXPIRE")
         {
-            auto sec = RedisStrToInt(value_.value());
-            if (!sec.has_value())
+            auto time_point_us = RedisStrToSize(value_.value());
+            if (!time_point_us.has_value())
             {
                 return {{" "}};
             }
-            std::size_t usec = sec.value() * 1000'000;
-            auto tmr = client->GetDB()->Expire(obj_name_, usec);
+            auto tmr = client->GetDB()->ExpireAt(obj_name_, time_point_us.value());
             if (tmr)
             {
                 GetGlobalLoop().EncounterTimer(std::move(tmr));
@@ -1211,6 +1220,15 @@ namespace rds
         {
             auto when = client->GetDB()->WhenExpire(obj_name_);
             return {{when}};
+        }
+        else if (command_ == "REWRITE" && GetGlobalLoop().conf_.enable_aof_)
+        {
+            auto rewrite_tmr = std::make_unique<DbRewriteTimer>();
+            rewrite_tmr->expire_time_us_ = 0;
+            rewrite_tmr->fm_ = GetGlobalLoop().GetAOFTimer().fm_;
+            rewrite_tmr->cache_ = "AOF";
+            rewrite_tmr->cache_.append(GetGlobalLoop().DatabaseForkAll());
+            GetGlobalLoop().EncounterTimer(std::move(rewrite_tmr));
         }
 
         return {{"OK"}};
@@ -1312,16 +1330,15 @@ namespace rds
             extern void SetNonBlock(int fd);
             SetNonBlock(another_server);
 
-            std::deque<std::string> cmds = client->GetDB()->Fork();
-            cmds.push_back("ENDFORKING");
+            std::deque<std::string> reqs = client->GetDB()->Fork();
+            reqs.push_back("ENDFORKING");
 
             Log("Try forking to:");
             std::cout << ip_ << ':' << port_ << '\n'
                       << std::endl;
 
-            for (auto &cmd : cmds)
+            for (auto &req : reqs)
             {
-                auto req = json11::Json(RawCommandToRequest(cmd)).dump();
                 auto beg = req.data();
                 auto end = beg + req.size();
                 while (beg != end)
@@ -1339,7 +1356,6 @@ namespace rds
                         }
                     }
                     beg += len;
-                    Log("Len:", len);
                 }
             }
             SetNonBlock(another_server);
